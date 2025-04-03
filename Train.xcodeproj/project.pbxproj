@@ -11,6 +11,7 @@
 		8B7BCF912D9DFD3F0089F6D3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCF902D9DFD3F0089F6D3 /* ContentView.swift */; };
 		8B7BCF932D9DFD430089F6D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B7BCF922D9DFD430089F6D3 /* Assets.xcassets */; };
 		8B7BCF962D9DFD430089F6D3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B7BCF952D9DFD430089F6D3 /* Preview Assets.xcassets */; };
+		8B7BCF9D2D9E05AF0089F6D3 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCF9C2D9E05AF0089F6D3 /* HealthKitManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		8B7BCF902D9DFD3F0089F6D3 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8B7BCF922D9DFD430089F6D3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8B7BCF952D9DFD430089F6D3 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		8B7BCF9C2D9E05AF0089F6D3 /* HealthKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +55,7 @@
 			children = (
 				8B7BCF8E2D9DFD3F0089F6D3 /* TrainApp.swift */,
 				8B7BCF902D9DFD3F0089F6D3 /* ContentView.swift */,
+				8B7BCF9C2D9E05AF0089F6D3 /* HealthKitManager.swift */,
 				8B7BCF922D9DFD430089F6D3 /* Assets.xcassets */,
 				8B7BCF942D9DFD430089F6D3 /* Preview Content */,
 			);
@@ -139,6 +142,7 @@
 			files = (
 				8B7BCF912D9DFD3F0089F6D3 /* ContentView.swift in Sources */,
 				8B7BCF8F2D9DFD3F0089F6D3 /* TrainApp.swift in Sources */,
+				8B7BCF9D2D9E05AF0089F6D3 /* HealthKitManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,6 +279,7 @@
 				DEVELOPMENT_TEAM = 7229M3R3PU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.\n";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -304,6 +309,7 @@
 				DEVELOPMENT_TEAM = 7229M3R3PU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.\n";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
