@@ -12,6 +12,7 @@
 		8B7BCF932D9DFD430089F6D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B7BCF922D9DFD430089F6D3 /* Assets.xcassets */; };
 		8B7BCF962D9DFD430089F6D3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B7BCF952D9DFD430089F6D3 /* Preview Assets.xcassets */; };
 		8B7BCF9D2D9E05AF0089F6D3 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCF9C2D9E05AF0089F6D3 /* HealthKitManager.swift */; };
+		8B7BCFA02D9F6AE20089F6D3 /* TrainingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCF9F2D9F6AE20089F6D3 /* TrainingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,8 @@
 		8B7BCF922D9DFD430089F6D3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8B7BCF952D9DFD430089F6D3 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		8B7BCF9C2D9E05AF0089F6D3 /* HealthKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
+		8B7BCF9E2D9E0AF90089F6D3 /* Train.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Train.entitlements; sourceTree = "<group>"; };
+		8B7BCF9F2D9F6AE20089F6D3 /* TrainingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrainingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,8 +56,10 @@
 		8B7BCF8D2D9DFD3F0089F6D3 /* Train */ = {
 			isa = PBXGroup;
 			children = (
+				8B7BCF9E2D9E0AF90089F6D3 /* Train.entitlements */,
 				8B7BCF8E2D9DFD3F0089F6D3 /* TrainApp.swift */,
 				8B7BCF902D9DFD3F0089F6D3 /* ContentView.swift */,
+				8B7BCF9F2D9F6AE20089F6D3 /* TrainingView.swift */,
 				8B7BCF9C2D9E05AF0089F6D3 /* HealthKitManager.swift */,
 				8B7BCF922D9DFD430089F6D3 /* Assets.xcassets */,
 				8B7BCF942D9DFD430089F6D3 /* Preview Content */,
@@ -140,6 +145,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B7BCFA02D9F6AE20089F6D3 /* TrainingView.swift in Sources */,
 				8B7BCF912D9DFD3F0089F6D3 /* ContentView.swift in Sources */,
 				8B7BCF8F2D9DFD3F0089F6D3 /* TrainApp.swift in Sources */,
 				8B7BCF9D2D9E05AF0089F6D3 /* HealthKitManager.swift in Sources */,
@@ -273,6 +279,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Train/Train.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Train/Preview Content\"";
@@ -303,6 +310,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Train/Train.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Train/Preview Content\"";

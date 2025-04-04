@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    // Mock data
-    @State private var hrv: Int = 67
+    @StateObject private var healthKit = HealthKitManager.shared
     @State private var selectedTab = 0
     
     var body: some View {
@@ -19,48 +18,59 @@ struct ContentView: View {
                 Color(white: 0.12)
                     .ignoresSafeArea()
                 
-                VStack(spacing: 25) {
-                    // Header greeting
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Good morning")
-                                .foregroundColor(.gray)
-                            Text("Sean")
-                                .font(.title)
-                                .fontWeight(.bold)
-                        }
-                        Spacer()
-                        
-                        Circle()
-                            .fill(Color(white: 0.2))
-                            .frame(width: 40, height: 40)
-                            .overlay(
-                                Image(systemName: "bell")
-                                    .foregroundColor(.gray)
-                            )
-                    }
-                    .padding(.horizontal)
-                    
-                    ScrollView {
+                // Main content based on selected tab
+                Group {
+                    switch selectedTab {
+                    case 0:
+                        // Workout tab (existing dashboard)
                         VStack(spacing: 25) {
-                            // Today's Training Plan
-                            TrainingPlanCard()
+                            // Header greeting
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Good morning")
+                                        .foregroundColor(.gray)
+                                    Text("Sean")
+                                        .font(.title)
+                                        .fontWeight(.bold)
+                                }
+                                Spacer()
+                                
+                                Circle()
+                                    .fill(Color(white: 0.2))
+                                    .frame(width: 40, height: 40)
+                                    .overlay(
+                                        Image(systemName: "bell")
+                                            .foregroundColor(.gray)
+                                    )
+                            }
+                            .padding(.horizontal)
                             
-                            // Vitals Section
-                            VitalsCard()
-                            
-                            // Recovery Status
-                            RecoveryStatusCard()
+                            ScrollView {
+                                VStack(spacing: 25) {
+                                    TrainingPlanCard()
+                                    VitalsCard()
+                                    RecoveryStatusCard()
+                                }
+                                .padding(.horizontal)
+                            }
                         }
-                        .padding(.horizontal)
+                        .padding(.top)
+                    case 1:
+                        Text("History")
+                            .foregroundColor(.white)
+                    case 2:
+                        TrainingView()
+                    case 3:
+                        Text("Profile")
+                            .foregroundColor(.white)
+                    default:
+                        EmptyView()
                     }
                 }
-                .padding(.top)
-            }
-            
-            // Tab Bar
-            .toolbar {
-                ToolbarItem(placement: .bottomBar) {
+                
+                // Tab Bar
+                VStack {
+                    Spacer()
                     CustomTabBar(selectedTab: $selectedTab)
                 }
             }
