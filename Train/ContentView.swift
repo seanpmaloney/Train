@@ -172,13 +172,14 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                // Background color
                 Color(white: 0.12)
                     .ignoresSafeArea()
                 
                 Group {
                     switch selectedTab {
                     case 0:
-                        ScrollView {
+                        ScrollView(showsIndicators: false) {
                             VStack(spacing: 24) {
                                 // Header
                                 HStack {
@@ -200,20 +201,30 @@ struct ContentView: View {
                                         )
                                 }
                                 .padding(.horizontal)
-                                .padding(.top)
+                                .padding(.top, 8)
                                 
-                                // Vitals Row
-                                VitalsRow()
-                                
-                                // Enhanced Training Plan
-                                EnhancedTrainingPlanCard(selectedTab: $selectedTab)
-                                    .padding(.horizontal)
-                                
-                                // Recovery Status
-                                RecoveryStatusCard()
-                                    .padding(.horizontal)
+                                // Dashboard Content
+                                VStack(spacing: 24) {
+                                    // Vitals Row
+                                    VitalsRow()
+                                    
+                                    // Today's Training
+                                    EnhancedTrainingPlanCard(selectedTab: $selectedTab)
+                                        .padding(.horizontal)
+                                    
+                                    // Tomorrow's Training
+                                    TomorrowTrainingCard()
+                                        .padding(.horizontal)
+                                    
+                                    // Recovery Status
+                                    RecoveryStatusCard()
+                                        .padding(.horizontal)
+                                }
                             }
+                            // Add bottom padding to clear the tab bar
+                            .padding(.bottom, 100)
                         }
+                        
                     case 1:
                         Text("History")
                             .foregroundColor(.white)
@@ -227,6 +238,7 @@ struct ContentView: View {
                     }
                 }
                 
+                // Tab Bar
                 VStack {
                     Spacer()
                     CustomTabBar(selectedTab: $selectedTab)
@@ -560,6 +572,68 @@ struct CustomTabBar: View {
         case 3: return "Profile"
         default: return ""
         }
+    }
+}
+
+struct TomorrowTrainingCard: View {
+    // Sample workouts for tomorrow
+    let workouts = [
+        (
+            title: "Long Run",
+            type: "Endurance",
+            duration: "60 min"
+        ),
+        (
+            title: "Lower Body",
+            type: "Strength",
+            duration: "5 sets"
+        )
+    ]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            // Header
+            Text("Tomorrow's Training")
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            // Workouts List
+            VStack(spacing: 16) {
+                ForEach(workouts, id: \.title) { workout in
+                    HStack {
+                        // Workout Info
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(workout.title)
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            
+                            Text(workout.type)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        
+                        Spacer()
+                        
+                        // Duration/Sets
+                        Text(workout.duration)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(white: 0.2))
+                    )
+                }
+            }
+        }
+        .padding(24)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(white: 0.17))
+                .shadow(color: .black.opacity(0.2), radius: 10)
+        )
     }
 }
 
