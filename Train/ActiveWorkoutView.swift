@@ -4,6 +4,7 @@ struct ActiveWorkoutView: View {
     let workout: Workout
     @AppStorage("activeWorkoutId") private var activeWorkoutId: String?
     @State private var exercises: [Exercise]
+    @State private var isTimerExpanded = false
     
     // Initialize with workout and create exercise state
     init(workout: Workout) {
@@ -39,39 +40,66 @@ struct ActiveWorkoutView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                // Workout Header
-                VStack(spacing: 16) {
-                    Text(workout.title)
-                        .font(.title)
-                        .fontWeight(.bold)
-                }
-                .padding(.bottom)
-                
-                // Exercises List
-                LazyVStack(spacing: 16) {
-                    ForEach($exercises) { $exercise in
-                        ExerciseCard(exercise: $exercise)
+        ZStack(alignment: .top) {
+            // Main scrolling content
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    // Header with clock button
+                    HStack {
+                        Text(workout.title)
+                            .font(.title)
+                            .fontWeight(.bold)
+                        
+                        Spacer()
+                        
+                        // Clock button
+                        TimerButton(isExpanded: $isTimerExpanded)
                     }
-                }
-                Button(action: {
-                    activeWorkoutId = nil
-                }) {
-                    Text("End Workout")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.red)
-                        )
+                    .padding(.bottom)
+                    
+                    // Rest of workout content
+                    LazyVStack(spacing: 16) {
+                        ForEach($exercises) { $exercise in
+                            ExerciseCard(exercise: $exercise)
+                        }
+                    }
+                    
+                    Button(action: {
+                        activeWorkoutId = nil
+                    }) {
+                        Text("End Workout")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.red)
+                            )
+                    }
+                    .padding(.horizontal)
                 }
                 .padding(.horizontal)
+                .padding(.bottom, 100)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 100)
+            
+            // Floating timer overlay
+            if isTimerExpanded {
+                GeometryReader { geometry in
+                    VStack {
+                        // Add spacing to position below button
+                        HStack {
+                            Spacer()
+                            RestTimer(isExpanded: $isTimerExpanded)
+                                .padding(.top, 60) // Adjust based on your header height
+                                .padding(.trailing)
+                        }
+                        Spacer()
+                    }
+                }
+                .background(Color.clear) // Make sure background is clear
+                .transition(.opacity.combined(with: .scale))
+            }
         }
     }
 }
@@ -149,6 +177,29 @@ struct SetRow: View {
             }
         }
         .opacity(set.isComplete ? 0.6 : 1)
+    }
+}
+
+// Simplified timer button
+struct TimerButton: View {
+    @Binding var isExpanded: Bool
+    
+    var body: some View {
+        Button(action: {
+                isExpanded.toggle()
+            }
+        ) {
+            Image(systemName: "clock.circle.fill")
+                .font(.system(size: 24))
+                .foregroundColor(.white)
+                .frame(width: 52, height: 52)
+                .background(
+                    Circle()
+                        .fill(Color(white: 0.17))
+                        .shadow(color: .black.opacity(0.2), radius: 10)
+                )
+                .contentShape(Circle())
+        }
     }
 }
 
