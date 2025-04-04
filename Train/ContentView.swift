@@ -249,11 +249,67 @@ struct ContentView: View {
     }
 }
 
+struct CollapsibleCard<Content: View>: View {
+    let title: String
+    let content: Content
+    let storageKey: String
+    let defaultCollapsed: Bool
+    
+    @AppStorage private var isCollapsed: Bool
+    
+    init(
+        title: String,
+        storageKey: String,
+        defaultCollapsed: Bool = false,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.title = title
+        self.content = content()
+        self.storageKey = storageKey
+        self.defaultCollapsed = defaultCollapsed
+        self._isCollapsed = AppStorage(wrappedValue: defaultCollapsed, storageKey)
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            // Header with toggle
+            HStack {
+                Text(title)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Spacer()
+                
+                Button(action: {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        isCollapsed.toggle()
+                    }
+                }) {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.gray)
+                        .rotationEffect(.degrees(isCollapsed ? 0 : 90))
+                }
+            }
+            
+            // Collapsible content
+            if !isCollapsed {
+                content
+            }
+        }
+        .padding(24)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(white: 0.17))
+                .shadow(color: .black.opacity(0.2), radius: 10)
+        )
+    }
+}
+
 struct EnhancedTrainingPlanCard: View {
     @Binding var selectedTab: Int
     @AppStorage("activeWorkoutId") private var activeWorkoutId: String?
     
-    // Sample workouts (should match TrainingView data)
     let workouts = [
         Workout(
             id: "upper-power-01",
@@ -270,13 +326,11 @@ struct EnhancedTrainingPlanCard: View {
     ]
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            // Header
-            Text("Today's Training")
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            // Workouts List
+        CollapsibleCard(
+            title: "Today's Training",
+            storageKey: "isTodayTrainingCollapsed",
+            defaultCollapsed: false
+        ) {
             VStack(spacing: 16) {
                 ForEach(workouts) { workout in
                     WorkoutRowButton(
@@ -287,12 +341,6 @@ struct EnhancedTrainingPlanCard: View {
                 }
             }
         }
-        .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.17))
-                .shadow(color: .black.opacity(0.2), radius: 10)
-        )
     }
 }
 
@@ -447,24 +495,17 @@ struct VitalsCard: View {
 
 struct RecoveryStatusCard: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Recovery Status")
-                .font(.title3)
-                .fontWeight(.bold)
-            
+        CollapsibleCard(
+            title: "Recovery Status",
+            storageKey: "isRecoveryCollapsed",
+            defaultCollapsed: true
+        ) {
             VStack(spacing: 12) {
                 RecoveryRow(muscle: "Chest", status: "Fresh", color: .green)
                 RecoveryRow(muscle: "Legs", status: "Recovering", color: .orange)
                 RecoveryRow(muscle: "Back", status: "Ready", color: .green)
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.17))
-                .shadow(color: .black.opacity(0.2), radius: 10)
-        )
     }
 }
 
@@ -576,32 +617,20 @@ struct CustomTabBar: View {
 }
 
 struct TomorrowTrainingCard: View {
-    // Sample workouts for tomorrow
     let workouts = [
-        (
-            title: "Long Run",
-            type: "Endurance",
-            duration: "60 min"
-        ),
-        (
-            title: "Lower Body",
-            type: "Strength",
-            duration: "5 sets"
-        )
+        (title: "Long Run", type: "Endurance", duration: "60 min"),
+        (title: "Lower Body", type: "Strength", duration: "5 sets")
     ]
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            // Header
-            Text("Tomorrow's Training")
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            // Workouts List
+        CollapsibleCard(
+            title: "Tomorrow's Training",
+            storageKey: "isTomorrowTrainingCollapsed",
+            defaultCollapsed: true
+        ) {
             VStack(spacing: 16) {
                 ForEach(workouts, id: \.title) { workout in
                     HStack {
-                        // Workout Info
                         VStack(alignment: .leading, spacing: 6) {
                             Text(workout.title)
                                 .font(.headline)
@@ -614,7 +643,6 @@ struct TomorrowTrainingCard: View {
                         
                         Spacer()
                         
-                        // Duration/Sets
                         Text(workout.duration)
                             .font(.subheadline)
                             .foregroundColor(.gray)
@@ -628,12 +656,6 @@ struct TomorrowTrainingCard: View {
                 }
             }
         }
-        .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.17))
-                .shadow(color: .black.opacity(0.2), radius: 10)
-        )
     }
 }
 
