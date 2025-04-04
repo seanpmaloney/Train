@@ -111,7 +111,7 @@ struct WorkoutCard: View {
     }
 }
 
-struct ActiveWorkoutView: View {
+struct ActiveWorkoutView_Preview: View {
     let workout: Workout
     @AppStorage("activeWorkoutId") private var activeWorkoutId: String?
     
@@ -149,6 +149,7 @@ struct Workout: Identifiable {
     let title: String
     let type: String
     let description: String
+    var exercises: [Exercise] = [] // Optional default empty array
 }
 
 #Preview {
