@@ -12,6 +12,23 @@ class WeightInputAccessoryView: UIInputView {
     private let scrollView = UIScrollView()
     private let buttonStack = UIStackView()
     
+    // Convert SwiftUI colors to UIKit colors
+    private var surfaceColor: UIColor {
+        UIColor(AppStyle.Colors.surface)
+    }
+    
+    private var primaryColor: UIColor {
+        UIColor(AppStyle.Colors.primary)
+    }
+    
+    private var textPrimaryColor: UIColor {
+        UIColor(AppStyle.Colors.textPrimary)
+    }
+    
+    private var textSecondaryColor: UIColor {
+        UIColor(AppStyle.Colors.textSecondary)
+    }
+    
     init(onQuickAdd: @escaping (Double) -> Void, onUndo: @escaping () -> Void, hasUndoValue: Bool) {
         self.onQuickAdd = onQuickAdd
         self.onUndo = onUndo
@@ -28,7 +45,7 @@ class WeightInputAccessoryView: UIInputView {
     }
     
     private func setupView() {
-        backgroundColor = UIColor(white: 0.17, alpha: 1.0)
+        backgroundColor = surfaceColor
         autoresizingMask = [.flexibleWidth]
         
         // Container view
@@ -101,27 +118,25 @@ class WeightInputAccessoryView: UIInputView {
     private func createQuickAddButton(value: Double) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle("+\(Int(value))", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(white: 0.25, alpha: 1.0)
-        button.layer.cornerRadius = 10
+        button.titleLabel?.font = .monospacedDigitSystemFont(ofSize: 17, weight: .medium)
+        button.tintColor = surfaceColor
+        button.backgroundColor = backgroundColor
+        button.layer.cornerRadius = 18
         
-        // Fixed size for buttons
         button.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            button.heightAnchor.constraint(equalToConstant: 36),
-            button.widthAnchor.constraint(greaterThanOrEqualToConstant: 44)
+            button.widthAnchor.constraint(equalToConstant: 60),
+            button.heightAnchor.constraint(equalToConstant: 36)
         ])
         
-        button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
         button.tag = Int(value * 10)
-        button.addTarget(self, action: #selector(quickAddTapped(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(quickAddTapped), for: .touchUpInside)
         return button
     }
     
     private func createDivider() -> UIView {
         let divider = UIView()
-        divider.backgroundColor = UIColor(white: 0.3, alpha: 1.0)
+        divider.backgroundColor = textSecondaryColor.withAlphaComponent(0.3)
         divider.translatesAutoresizingMaskIntoConstraints = false
         return divider
     }
@@ -131,8 +146,8 @@ class WeightInputAccessoryView: UIInputView {
         let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium)
         let image = UIImage(systemName: "arrow.uturn.backward", withConfiguration: config)
         button.setImage(image, for: .normal)
-        button.tintColor = .white
-        button.backgroundColor = UIColor(white: 0.25, alpha: 1.0)
+        button.tintColor = textPrimaryColor
+        button.backgroundColor = surfaceColor.withAlphaComponent(0.6)
         button.layer.cornerRadius = 18
         
         button.translatesAutoresizingMaskIntoConstraints = false

@@ -23,7 +23,7 @@ struct TrainingView: View {
         NavigationStack {
             ZStack {
                 // Background
-                Color(white: 0.12)
+                Color(AppStyle.Colors.background)
                     .ignoresSafeArea()
                 
                 if let activeId = activeWorkoutId,
@@ -68,13 +68,13 @@ struct WorkoutCard: View {
                 
                 Text(workout.type)
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppStyle.Colors.textSecondary)
             }
             
             // Description
             Text(workout.description)
                 .font(.body)
-                .foregroundColor(.gray)
+                .foregroundColor(AppStyle.Colors.textSecondary)
             
             // Buttons
             HStack {
@@ -88,7 +88,7 @@ struct WorkoutCard: View {
                         .padding(.vertical, 12)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.blue)
+                                .fill(AppStyle.Colors.primary)
                         )
                 }
                 
@@ -97,7 +97,7 @@ struct WorkoutCard: View {
                 }) {
                     Image(systemName: "info.circle.fill")
                         .font(.title2)
-                        .foregroundColor(.gray)
+                        .foregroundColor(AppStyle.Colors.textPrimary)
                         .padding(.horizontal, 8)
                 }
             }
@@ -105,7 +105,7 @@ struct WorkoutCard: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.17))
+                .fill(AppStyle.Colors.surface)
                 .shadow(color: .black.opacity(0.2), radius: 10)
         )
     }
@@ -119,7 +119,7 @@ struct ActiveWorkoutView_Preview: View {
         VStack(spacing: 20) {
             Text("Active Workout")
                 .font(.headline)
-                .foregroundColor(.gray)
+                .foregroundColor(AppStyle.Colors.background)
             
             Text(workout.title)
                 .font(.title)
@@ -135,7 +135,7 @@ struct ActiveWorkoutView_Preview: View {
                     .padding(.vertical, 12)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.red)
+                            .fill(AppStyle.Colors.danger)
                     )
             }
             .padding(.horizontal)

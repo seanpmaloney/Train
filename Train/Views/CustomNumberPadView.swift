@@ -31,91 +31,100 @@ struct CustomNumberPadView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            HStack {
-                Text(title)
-                    .font(.headline)
-                Spacer()
-                Text(formattedValue)
-                    .font(.system(size: 34, weight: .medium, design: .rounded))
-                    .minimumScaleFactor(0.5)
-                    .frame(width: 120, alignment: .trailing)
-            }
-            .padding()
-            .background(Color(white: 0.19))
-            
-            // Quick-add buttons for weight mode
-            if mode == .weight {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(quickAddValues, id: \.self) { value in
-                            Button(action: {
-                                addValue(value)
-                            }) {
-                                Text("+\(value == 2.5 ? "2.5" : String(Int(value)))")
-                                    .font(.system(.body, design: .rounded))
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 8)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(Color(white: 0.25))
-                                    )
-                            }
-                        }
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                // Main content
+                VStack(spacing: 0) {
+                    // Header
+                    HStack {
+                        Text(title)
+                            .font(.headline)
+                        Spacer()
+                        Text(formattedValue)
+                            .font(.system(size: 34, weight: .medium, design: .rounded))
+                            .minimumScaleFactor(0.5)
+                            .frame(width: 120, alignment: .trailing)
                     }
                     .padding()
-                }
-            }
-            
-            // Number pad
-            VStack(spacing: 1) {
-                ForEach(0..<3) { row in
-                    HStack(spacing: 1) {
-                        ForEach(1...3, id: \.self) { col in
-                            numberButton(number: row * 3 + col)
+                    .background(AppStyle.Colors.surface)
+                    
+                    // Quick-add buttons for weight mode
+                    if mode == .weight {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(quickAddValues, id: \.self) { value in
+                                    Button(action: {
+                                        addValue(value)
+                                    }) {
+                                        Text("+\(value == 2.5 ? "2.5" : String(Int(value)))")
+                                            .font(.system(.body, design: .rounded))
+                                            .foregroundColor(AppStyle.Colors.textPrimary)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .fill(AppStyle.Colors.surface)
+                                            )
+                                    }
+                                }
+                            }
+                            .padding()
+                        }
+                    }
+                    
+                    // Number pad
+                    VStack(spacing: 1) {
+                        ForEach(0..<3) { row in
+                            HStack(spacing: 1) {
+                                ForEach(1...3, id: \.self) { col in
+                                    numberButton(number: row * 3 + col)
+                                }
+                            }
+                        }
+                        
+                        // Bottom row
+                        HStack(spacing: 1) {
+                            // Empty space
+                            AppStyle.Colors.surface
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 54)
+                            
+                            numberButton(number: 0)
+                            
+                            // Backspace
+                            Button(action: backspace) {
+                                Image(systemName: "delete.left.fill")
+                                    .font(.title2)
+                                    .foregroundColor(AppStyle.Colors.textPrimary)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 54)
+                                    .background(AppStyle.Colors.surface)
+                            }
                         }
                     }
                 }
                 
-                // Bottom row
-                HStack(spacing: 1) {
-                    // Empty space
-                    Color(white: 0.17)
+                // Spacer to push content up and done button down
+                Spacer(minLength: 0)
+                
+                // Done button
+                Button(action: {
+                    if let value = Double(inputString) {
+                        onDone(value)
+                    }
+                    dismiss()
+                }) {
+                    Text("Done")
+                        .font(.headline)
+                        .foregroundColor(AppStyle.Colors.textPrimary)
                         .frame(maxWidth: .infinity)
                         .frame(height: 54)
-                    
-                    numberButton(number: 0)
-                    
-                    // Backspace
-                    Button(action: backspace) {
-                        Image(systemName: "delete.left.fill")
-                            .font(.title2)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 54)
-                            .background(Color(white: 0.17))
-                    }
+                        .background(AppStyle.Colors.primary)
                 }
             }
-            
-            // Done button
-            Button(action: {
-                if let value = Double(inputString) {
-                    onDone(value)
-                }
-                dismiss()
-            }) {
-                Text("Done")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 54)
-                    .background(Color.blue)
-            }
+            .frame(maxHeight: geometry.size.height)
         }
-        .background(Color(white: 0.12))
+        .background(AppStyle.Colors.background)
     }
     
     private var formattedValue: String {
@@ -133,10 +142,10 @@ struct CustomNumberPadView: View {
         }) {
             Text(String(number))
                 .font(.title)
-                .foregroundColor(.white)
+                .foregroundColor(AppStyle.Colors.textPrimary)
                 .frame(maxWidth: .infinity)
                 .frame(height: 54)
-                .background(Color(white: 0.17))
+                .background(AppStyle.Colors.surface)
         }
     }
     
@@ -181,7 +190,7 @@ struct CustomNumberPadView: View {
 
 #Preview {
     ZStack {
-        Color(white: 0.12).ignoresSafeArea()
+        AppStyle.Colors.background.ignoresSafeArea()
         CustomNumberPadView(
             title: "Weight",
             initialValue: 135,

@@ -74,7 +74,7 @@ struct ActiveWorkoutView: View {
                             .padding(.vertical, 12)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.red)
+                                    .fill(AppStyle.Colors.danger)
                             )
                     }
                     .padding(.horizontal)
@@ -122,7 +122,7 @@ struct ExerciseCard: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.17))
+                .fill(AppStyle.Colors.surface)
                 .shadow(color: .black.opacity(0.2), radius: 10)
         )
     }
@@ -158,7 +158,7 @@ struct SetRow: View {
                 }
                 
                 Text("lbs")
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppStyle.Colors.textSecondary)
             }
             
             // Reps Input
@@ -184,7 +184,7 @@ struct SetRow: View {
                 }
                 
                 Text("reps")
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppStyle.Colors.textSecondary)
             }
             
             Spacer()
@@ -202,7 +202,7 @@ struct SetRow: View {
             }) {
                 Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
-                    .foregroundColor(set.isComplete ? .green : .gray)
+                    .foregroundColor(set.isComplete ? AppStyle.Colors.success : AppStyle.Colors.textSecondary)
             }
         }
         .opacity(set.isComplete ? 0.6 : 1)
@@ -224,7 +224,7 @@ struct TimerButton: View {
                 .frame(width: 52, height: 52)
                 .background(
                     Circle()
-                        .fill(Color(white: 0.17))
+                        .fill(AppStyle.Colors.surface)
                         .shadow(color: .black.opacity(0.2), radius: 10)
                 )
                 .contentShape(Circle())
@@ -249,7 +249,7 @@ struct ExerciseSet: Identifiable {
 
 #Preview {
     ZStack {
-        Color(white: 0.12).ignoresSafeArea()
+        Color(AppStyle.Colors.background).ignoresSafeArea()
         ActiveWorkoutView(
             workout: Workout(
                 id: "back-biceps-01",

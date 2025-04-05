@@ -180,10 +180,6 @@ struct ContentView: View {
                                     }
                                     .padding(.horizontal)
                                     
-                                    // Tomorrow's Training
-                                    TomorrowTrainingCard()
-                                        .padding(.horizontal)
-                                    
                                     // Recovery Status
                                     RecoveryStatusCard()
                                         .padding(.horizontal)

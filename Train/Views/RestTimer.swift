@@ -16,6 +16,7 @@ struct RestTimer: View {
             // Timer display
             Text(timeString(from: currentTime))
                 .font(.system(size: 48, weight: .medium, design: .monospaced))
+                .foregroundColor(AppStyle.Colors.textPrimary)
                 .padding(.top, 16)
             
             // Controls
@@ -24,7 +25,7 @@ struct RestTimer: View {
                 Button(action: toggleTimer) {
                     Image(systemName: isRunning ? "pause.circle.fill" : "play.circle.fill")
                         .font(.system(size: 44))
-                        .foregroundColor(isRunning ? .orange : .green)
+                        .foregroundColor(isRunning ? AppStyle.Colors.secondary : AppStyle.Colors.success)
                         .frame(width: 60, height: 60)
                 }
                 
@@ -32,7 +33,7 @@ struct RestTimer: View {
                 Button(action: stopTimer) {
                     Image(systemName: "stop.circle.fill")
                         .font(.system(size: 44))
-                        .foregroundColor(.red)
+                        .foregroundColor(AppStyle.Colors.danger)
                         .frame(width: 60, height: 60)
                 }
             }
@@ -41,8 +42,8 @@ struct RestTimer: View {
         .frame(width: 260)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.17))
-                .shadow(color: .black.opacity(0.2), radius: 10)
+                .fill(AppStyle.Colors.surface)
+                .shadow(color: AppStyle.Colors.background.opacity(0.2), radius: 10)
         )
         .onAppear {
             if isRunning {
