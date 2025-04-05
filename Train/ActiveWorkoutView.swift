@@ -130,30 +130,59 @@ struct ExerciseCard: View {
 
 struct SetRow: View {
     @Binding var set: ExerciseSet
+    @State private var showingWeightPad = false
+    @State private var showingRepsPad = false
     
     var body: some View {
         HStack(spacing: 16) {
             // Weight Input
             HStack {
-                TextField("Weight", value: $set.weight, format: .number)
-                    .keyboardType(.decimalPad)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 70)
-                    .disabled(set.isComplete)
+                Button(action: {
+                    showingWeightPad = true
+                }) {
+                    Text(String(format: "%.1f", set.weight))
+                        .font(.body)
+                        .foregroundColor(.white)
+                        .frame(width: 70, alignment: .trailing)
+                }
+                .disabled(set.isComplete)
+                .sheet(isPresented: $showingWeightPad) {
+                    CustomNumberPadView(
+                        title: "Weight",
+                        initialValue: set.weight,
+                        mode: .weight
+                    ) { newValue in
+                        set.weight = newValue
+                    }
+                    .presentationDetents([.height(400)])
+                }
+                
                 Text("lbs")
                     .foregroundColor(.gray)
             }
             
             // Reps Input
             HStack {
-                TextField("Reps", value: Binding(
-                    get: { set.completedReps ?? set.targetReps },
-                    set: { set.completedReps = $0 }
-                ), format: .number)
-                    .keyboardType(.numberPad)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 50)
-                    .disabled(set.isComplete)
+                Button(action: {
+                    showingRepsPad = true
+                }) {
+                    Text("\(set.completedReps ?? set.targetReps)")
+                        .font(.body)
+                        .foregroundColor(.white)
+                        .frame(width: 50, alignment: .trailing)
+                }
+                .disabled(set.isComplete)
+                .sheet(isPresented: $showingRepsPad) {
+                    CustomNumberPadView(
+                        title: "Reps",
+                        initialValue: Double(set.completedReps ?? set.targetReps),
+                        mode: .reps
+                    ) { newValue in
+                        set.completedReps = Int(newValue)
+                    }
+                    .presentationDetents([.height(350)])
+                }
+                
                 Text("reps")
                     .foregroundColor(.gray)
             }

@@ -15,6 +15,8 @@
 		8B7BCFA02D9F6AE20089F6D3 /* TrainingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCF9F2D9F6AE20089F6D3 /* TrainingView.swift */; };
 		8B7BCFA22D9F6D640089F6D3 /* ActiveWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFA12D9F6D640089F6D3 /* ActiveWorkoutView.swift */; };
 		8B7BCFA42DA018B70089F6D3 /* RestTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFA32DA018B70089F6D3 /* RestTimer.swift */; };
+		8B7BCFB42DA070930089F6D3 /* WeightInputAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFB32DA070930089F6D3 /* WeightInputAccessory.swift */; };
+		8B7BCFB62DA0763C0089F6D3 /* CustomNumberPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFB52DA0763C0089F6D3 /* CustomNumberPadView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		8B7BCF9F2D9F6AE20089F6D3 /* TrainingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrainingView.swift; sourceTree = "<group>"; };
 		8B7BCFA12D9F6D640089F6D3 /* ActiveWorkoutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutView.swift; sourceTree = "<group>"; };
 		8B7BCFA32DA018B70089F6D3 /* RestTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestTimer.swift; sourceTree = "<group>"; };
+		8B7BCFB32DA070930089F6D3 /* WeightInputAccessory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeightInputAccessory.swift; sourceTree = "<group>"; };
+		8B7BCFB52DA0763C0089F6D3 /* CustomNumberPadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNumberPadView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +68,8 @@
 				8B7BCF8E2D9DFD3F0089F6D3 /* TrainApp.swift */,
 				8B7BCF902D9DFD3F0089F6D3 /* ContentView.swift */,
 				8B7BCFA12D9F6D640089F6D3 /* ActiveWorkoutView.swift */,
+				8B7BCFB52DA0763C0089F6D3 /* CustomNumberPadView.swift */,
+				8B7BCFB32DA070930089F6D3 /* WeightInputAccessory.swift */,
 				8B7BCFA32DA018B70089F6D3 /* RestTimer.swift */,
 				8B7BCF9F2D9F6AE20089F6D3 /* TrainingView.swift */,
 				8B7BCF9C2D9E05AF0089F6D3 /* HealthKitManager.swift */,
@@ -151,12 +157,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B7BCFB62DA0763C0089F6D3 /* CustomNumberPadView.swift in Sources */,
 				8B7BCFA02D9F6AE20089F6D3 /* TrainingView.swift in Sources */,
 				8B7BCF912D9DFD3F0089F6D3 /* ContentView.swift in Sources */,
 				8B7BCF8F2D9DFD3F0089F6D3 /* TrainApp.swift in Sources */,
 				8B7BCFA42DA018B70089F6D3 /* RestTimer.swift in Sources */,
 				8B7BCFA22D9F6D640089F6D3 /* ActiveWorkoutView.swift in Sources */,
 				8B7BCF9D2D9E05AF0089F6D3 /* HealthKitManager.swift in Sources */,
+				8B7BCFB42DA070930089F6D3 /* WeightInputAccessory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
