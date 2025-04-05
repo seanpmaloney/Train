@@ -25,11 +25,15 @@ class CalendarCardViewModel: ObservableObject {
         
         var dates: [Date?] = Array(repeating: nil, count: firstWeekday - 1)
         
-        for day in 1...daysInMonth {
-            if let date = calendar.date(from: calendar.dateComponents([.year, .month, .day], from: displayedMonth.addingTimeInterval(TimeInterval(60*60*24*(day-1))))) {
+        let components = calendar.dateComponents([.year, .month], from: displayedMonth)
+        guard let firstOfMonth = calendar.date(from: components) else { return [] }
+
+        for day in 0..<daysInMonth {
+            if let date = calendar.date(byAdding: .day, value: day, to: firstOfMonth) {
                 dates.append(date)
             }
         }
+
         
         while dates.count % 7 != 0 {
             dates.append(nil)

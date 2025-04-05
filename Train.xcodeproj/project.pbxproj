@@ -20,6 +20,7 @@
 		8B7BCFE22DA1460F0089F6D3 /* CustomNumberPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFDC2DA1460F0089F6D3 /* CustomNumberPadView.swift */; };
 		8B7BCFE32DA1460F0089F6D3 /* TrainingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFDD2DA1460F0089F6D3 /* TrainingView.swift */; };
 		8B7BCFE42DA1460F0089F6D3 /* RestTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFDE2DA1460F0089F6D3 /* RestTimer.swift */; };
+		8B7BCFEC2DA155280089F6D3 /* AppStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFEA2DA155280089F6D3 /* AppStyle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		8B7BCFDC2DA1460F0089F6D3 /* CustomNumberPadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNumberPadView.swift; sourceTree = "<group>"; };
 		8B7BCFDD2DA1460F0089F6D3 /* TrainingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrainingView.swift; sourceTree = "<group>"; };
 		8B7BCFDE2DA1460F0089F6D3 /* RestTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestTimer.swift; sourceTree = "<group>"; };
+		8B7BCFEA2DA155280089F6D3 /* AppStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppStyle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 			children = (
 				8B7BCFD92DA1460F0089F6D3 /* ActiveWorkoutView.swift */,
 				8B7BCFDA2DA1460F0089F6D3 /* ContentView.swift */,
+				8B7BCFEB2DA155280089F6D3 /* Style */,
 				8B7BCFDC2DA1460F0089F6D3 /* CustomNumberPadView.swift */,
 				8B7BCFDE2DA1460F0089F6D3 /* RestTimer.swift */,
 				8B7BCFDD2DA1460F0089F6D3 /* TrainingView.swift */,
@@ -118,6 +121,14 @@
 				8B7BCFBB2DA145110089F6D3 /* TrainingSession.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		8B7BCFEB2DA155280089F6D3 /* Style */ = {
+			isa = PBXGroup;
+			children = (
+				8B7BCFEA2DA155280089F6D3 /* AppStyle.swift */,
+			);
+			path = Style;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -193,6 +204,7 @@
 				8B7BCFE32DA1460F0089F6D3 /* TrainingView.swift in Sources */,
 				8B7BCFE42DA1460F0089F6D3 /* RestTimer.swift in Sources */,
 				8B7BCFE12DA1460F0089F6D3 /* WeightInputAccessory.swift in Sources */,
+				8B7BCFEC2DA155280089F6D3 /* AppStyle.swift in Sources */,
 				8B7BCFE02DA1460F0089F6D3 /* ContentView.swift in Sources */,
 				8B7BCFD82DA145F20089F6D3 /* HealthKitManager.swift in Sources */,
 				8B7BCFBE2DA145110089F6D3 /* CalendarCardView.swift in Sources */,

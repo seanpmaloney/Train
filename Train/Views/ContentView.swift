@@ -7,47 +7,6 @@
 
 import SwiftUI
 
-struct CircularStatView: View {
-    let title: String
-    let value: String
-    let status: String
-    let ringColor: Color
-    let progress: Double // 0.0 to 1.0
-    
-    var body: some View {
-        VStack(spacing: 6) {
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.gray)
-            
-            ZStack {
-                // Background circle
-                Circle()
-                    .stroke(Color(white: 0.2), lineWidth: 6)
-                    .frame(width: 70, height: 70)
-                
-                // Progress ring
-                Circle()
-                    .trim(from: 0, to: progress)
-                    .stroke(ringColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-                    .frame(width: 70, height: 70)
-                    .rotationEffect(.degrees(-90))
-                
-                // Value
-                Text(value)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .minimumScaleFactor(0.5)
-                    .lineLimit(1)
-            }
-            
-            Text(status)
-                .font(.caption2)
-                .foregroundColor(ringColor)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
 struct VitalStat: View {
     let icon: String
     let label: String
@@ -62,10 +21,10 @@ struct VitalStat: View {
                 // Label row
                 HStack(spacing: 4) {
                     Image(systemName: icon)
-                        .foregroundColor(.white)
+                        .foregroundColor(AppStyle.Colors.textPrimary)
                     Text(label)
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(AppStyle.Colors.textSecondary)
                 }
                 
                 // Value
@@ -120,7 +79,7 @@ struct VitalsRow: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(white: 0.17))
+                .fill(AppStyle.Colors.surface)
         )
         .padding(.horizontal)
     }
@@ -144,24 +103,24 @@ struct VitalsRow: View {
     }
     
     private func getHRVStatus(_ value: Double?) -> (status: String, color: Color) {
-        guard let value = value else { return ("No Data", .gray) }
-        if value > 50 { return ("Good", .green) }
-        if value > 30 { return ("Average", .yellow) }
-        return ("Poor", .red)
+        guard let value = value else { return ("No Data", AppStyle.Colors.textSecondary) }
+        if value > 50 { return ("Good", AppStyle.Colors.success) }
+        if value > 30 { return ("Average", AppStyle.Colors.secondary) }
+        return ("Poor", AppStyle.Colors.danger)
     }
     
     private func getSleepStatus(_ hours: Double?) -> (status: String, color: Color) {
-        guard let hours = hours else { return ("No Data", .gray) }
-        if hours >= 7 { return ("Good", .green) }
-        if hours >= 6 { return ("Average", .yellow) }
-        return ("Poor", .red)
+        guard let hours = hours else { return ("No Data", AppStyle.Colors.textSecondary) }
+        if hours >= 7 { return ("Good", AppStyle.Colors.success) }
+        if hours >= 6 { return ("Average", AppStyle.Colors.secondary) }
+        return ("Poor", AppStyle.Colors.danger)
     }
     
     private func getHeartRateStatus(_ bpm: Double?) -> (status: String, color: Color) {
-        guard let bpm = bpm else { return ("No Data", .gray) }
-        if bpm < 60 { return ("Excellent", .green) }
-        if bpm < 70 { return ("Good", .yellow) }
-        return ("Average", .red)
+        guard let bpm = bpm else { return ("No Data", AppStyle.Colors.textSecondary) }
+        if bpm < 60 { return ("Excellent", AppStyle.Colors.success) }
+        if bpm < 70 { return ("Good", AppStyle.Colors.secondary) }
+        return ("Average", AppStyle.Colors.danger)
     }
 }
 
@@ -173,7 +132,7 @@ struct ContentView: View {
         NavigationStack {
             ZStack {
                 // Background color
-                Color(white: 0.12)
+                Color(AppStyle.Colors.background)
                     .ignoresSafeArea()
                 
                 Group {
@@ -185,7 +144,7 @@ struct ContentView: View {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text("Good morning")
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(AppStyle.Colors.textSecondary)
                                         Text("Sean")
                                             .font(.title)
                                             .fontWeight(.bold)
@@ -193,11 +152,11 @@ struct ContentView: View {
                                     Spacer()
                                     
                                     Circle()
-                                        .fill(Color(white: 0.2))
+                                        .fill(AppStyle.Colors.surface)
                                         .frame(width: 40, height: 40)
                                         .overlay(
                                             Image(systemName: "bell")
-                                                .foregroundColor(.gray)
+                                                .foregroundColor(AppStyle.Colors.textSecondary)
                                         )
                                 }
                                 .padding(.horizontal)
@@ -212,9 +171,14 @@ struct ContentView: View {
                                     EnhancedTrainingPlanCard(selectedTab: $selectedTab)
                                         .padding(.horizontal)
                                     
-                                    CalendarCardView()
-                                        .frame(maxWidth: .infinity)
-                                        .padding()
+                                    CollapsibleCard(
+                                        title: "Calendar",
+                                        storageKey: "isCalendarCollapsed",
+                                        defaultCollapsed: false
+                                    ) {
+                                        CalendarCardView()
+                                    }
+                                    .padding(.horizontal)
                                     
                                     // Tomorrow's Training
                                     TomorrowTrainingCard()
@@ -231,12 +195,12 @@ struct ContentView: View {
                         
                     case 1:
                         Text("History")
-                            .foregroundColor(.white)
+                            .foregroundColor(AppStyle.Colors.textPrimary)
                     case 2:
                         TrainingView()
                     case 3:
                         Text("Profile")
-                            .foregroundColor(.white)
+                            .foregroundColor(AppStyle.Colors.textPrimary)
                     default:
                         EmptyView()
                     }
@@ -291,7 +255,7 @@ struct CollapsibleCard<Content: View>: View {
                 }) {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.gray)
+                        .foregroundColor(AppStyle.Colors.textSecondary)
                         .rotationEffect(.degrees(isCollapsed ? 0 : 90))
                 }
             }
@@ -304,7 +268,7 @@ struct CollapsibleCard<Content: View>: View {
         .padding(24)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.17))
+                .fill(AppStyle.Colors.surface)
                 .shadow(color: .black.opacity(0.2), radius: 10)
         )
     }
@@ -364,11 +328,11 @@ struct WorkoutRowButton: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(workout.title)
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(AppStyle.Colors.textPrimary)
                     
                     Text(workout.type)
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(AppStyle.Colors.textSecondary)
                 }
                 
                 Spacer()
@@ -376,13 +340,13 @@ struct WorkoutRowButton: View {
                 // Arrow indicator
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppStyle.Colors.textSecondary)
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(white: 0.2))
+                    .fill(AppStyle.Colors.surface)
             )
         }
     }
@@ -404,7 +368,7 @@ struct TrainingPlanCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.17))
+                .fill(AppStyle.Colors.surface)
                 .shadow(color: .black.opacity(0.2), radius: 10)
         )
     }
@@ -446,7 +410,7 @@ struct VitalsCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(white: 0.17))
+                .fill(AppStyle.Colors.surface)
                 .shadow(color: .black.opacity(0.2), radius: 10)
         )
         .task {
@@ -505,9 +469,9 @@ struct RecoveryStatusCard: View {
             defaultCollapsed: true
         ) {
             VStack(spacing: 12) {
-                RecoveryRow(muscle: "Chest", status: "Fresh", color: .green)
-                RecoveryRow(muscle: "Legs", status: "Recovering", color: .orange)
-                RecoveryRow(muscle: "Back", status: "Ready", color: .green)
+                RecoveryRow(muscle: "Chest", status: "Fresh", color: AppStyle.Colors.success)
+                RecoveryRow(muscle: "Legs", status: "Recovering", color: AppStyle.Colors.secondary)
+                RecoveryRow(muscle: "Back", status: "Ready", color: AppStyle.Colors.success)
             }
         }
     }
@@ -525,11 +489,11 @@ struct WorkoutRow: View {
                     .fontWeight(.semibold)
                 Text(type)
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppStyle.Colors.textSecondary)
             }
             Spacer()
             Text(sets)
-                .foregroundColor(.gray)
+                .foregroundColor(AppStyle.Colors.textSecondary)
         }
     }
 }
@@ -544,7 +508,7 @@ struct VitalMetric: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: icon)
-                    .foregroundColor(.white)
+                    .foregroundColor(AppStyle.Colors.textPrimary)
                 Text(title)
                     .fontWeight(.medium)
             }
@@ -553,7 +517,7 @@ struct VitalMetric: View {
                 .fontWeight(.bold)
             Text(status)
                 .font(.subheadline)
-                .foregroundColor(.gray)
+                .foregroundColor(AppStyle.Colors.textSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -590,13 +554,13 @@ struct CustomTabBar: View {
                         Text(tabTitle(for: index))
                             .font(.caption)
                     }
-                    .foregroundColor(selectedTab == index ? .white : .gray)
+                    .foregroundColor(selectedTab == index ? AppStyle.Colors.textPrimary : AppStyle.Colors.textSecondary)
                     .frame(maxWidth: .infinity)
                 }
             }
         }
         .padding(.vertical, 8)
-        .background(Color(white: 0.15))
+        .background(AppStyle.Colors.surface)
     }
     
     private func tabIcon(for index: Int) -> String {
@@ -638,24 +602,24 @@ struct TomorrowTrainingCard: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text(workout.title)
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(AppStyle.Colors.textPrimary)
                             
                             Text(workout.type)
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundColor(AppStyle.Colors.textSecondary)
                         }
                         
                         Spacer()
                         
                         Text(workout.duration)
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(AppStyle.Colors.textSecondary)
                     }
                     .padding(.vertical, 12)
                     .padding(.horizontal, 16)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(white: 0.2))
+                            .fill(AppStyle.Colors.surface)
                     )
                 }
             }
