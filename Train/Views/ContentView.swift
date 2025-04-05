@@ -212,6 +212,10 @@ struct ContentView: View {
                                     EnhancedTrainingPlanCard(selectedTab: $selectedTab)
                                         .padding(.horizontal)
                                     
+                                    CalendarCardView()
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                    
                                     // Tomorrow's Training
                                     TomorrowTrainingCard()
                                         .padding(.horizontal)
