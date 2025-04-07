@@ -193,11 +193,6 @@ struct SetRow: View {
             Button(action: {
                 withAnimation {
                     set.isComplete.toggle()
-                    if set.isComplete {
-                        set.completedReps = set.targetReps
-                    } else {
-                        set.completedReps = nil
-                    }
                 }
             }) {
                 Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
