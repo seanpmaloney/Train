@@ -3,7 +3,7 @@ import Foundation
 class TrainingDataRoot: ObservableObject, Codable {
     @Published var trainingPlans: [TrainingPlanEntity]
     @Published var workouts: [WorkoutEntity]
-    @Published var exercises: [ExerciseEntity]
+    @Published var exercises: [MovementEntity]
     @Published var exerciseInstances: [ExerciseInstanceEntity]
     @Published var exerciseSets: [ExerciseSetEntity]
     @Published var muscleGroups: [MuscleGroupEntity]
@@ -11,7 +11,7 @@ class TrainingDataRoot: ObservableObject, Codable {
     init(
         trainingPlans: [TrainingPlanEntity] = [],
         workouts: [WorkoutEntity] = [],
-        exercises: [ExerciseEntity] = [],
+        exercises: [MovementEntity] = [],
         exerciseInstances: [ExerciseInstanceEntity] = [],
         exerciseSets: [ExerciseSetEntity] = [],
         muscleGroups: [MuscleGroupEntity] = []
@@ -29,7 +29,7 @@ class TrainingDataRoot: ObservableObject, Codable {
     enum CodingKeys: String, CodingKey {
         case trainingPlans
         case workouts
-        case exercises
+        case movements
         case exerciseInstances
         case exerciseSets
         case muscleGroups
@@ -39,7 +39,7 @@ class TrainingDataRoot: ObservableObject, Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.trainingPlans = try container.decode([TrainingPlanEntity].self, forKey: .trainingPlans)
         self.workouts = try container.decode([WorkoutEntity].self, forKey: .workouts)
-        self.exercises = try container.decode([ExerciseEntity].self, forKey: .exercises)
+        self.exercises = try container.decode([MovementEntity].self, forKey: .movements)
         self.exerciseInstances = try container.decode([ExerciseInstanceEntity].self, forKey: .exerciseInstances)
         self.exerciseSets = try container.decode([ExerciseSetEntity].self, forKey: .exerciseSets)
         self.muscleGroups = try container.decode([MuscleGroupEntity].self, forKey: .muscleGroups)
@@ -49,7 +49,7 @@ class TrainingDataRoot: ObservableObject, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(trainingPlans, forKey: .trainingPlans)
         try container.encode(workouts, forKey: .workouts)
-        try container.encode(exercises, forKey: .exercises)
+        try container.encode(exercises, forKey: .movements)
         try container.encode(exerciseInstances, forKey: .exerciseInstances)
         try container.encode(exerciseSets, forKey: .exerciseSets)
         try container.encode(muscleGroups, forKey: .muscleGroups)

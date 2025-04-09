@@ -116,8 +116,8 @@ class TrainingDataStore: ObservableObject {
         data.workouts.append(workout)
     }
     
-    func addExercise(_ exercise: ExerciseEntity) {
-        data.exercises.append(exercise)
+    func addMovement(_ movement: MovementEntity) {
+        data.exercises.append(movement)
     }
     
     func addExerciseInstance(_ instance: ExerciseInstanceEntity) {
@@ -142,7 +142,7 @@ class TrainingDataStore: ObservableObject {
         data.workouts.first { $0.id == id }
     }
     
-    func getExercise(withId id: UUID) -> ExerciseEntity? {
+    func getMovement(withId id: UUID) -> MovementEntity? {
         data.exercises.first { $0.id == id }
     }
     

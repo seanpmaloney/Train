@@ -5,29 +5,32 @@ class MockDataProvider {
     
     // MARK: - Sample Data
     
-    let benchPress = ExerciseEntity(
+    let benchPress = MovementEntity(
         name: "Bench Press",
         notes: "Standard barbell bench press",
         videoURL: "https://example.com/bench-press"
     )
     
-    let overheadPress = ExerciseEntity(
+    let overheadPress = MovementEntity(
         name: "Overhead Press",
         notes: "Standing overhead press with barbell",
         videoURL: "https://example.com/ohp"
     )
     
-    let squat = ExerciseEntity(
+    let squat = MovementEntity(
         name: "Back Squat",
         notes: "High bar back squat",
         videoURL: "https://example.com/squat"
     )
     
-    let deadlift = ExerciseEntity(
+    let deadlift = MovementEntity(
         name: "Deadlift",
         notes: "Conventional deadlift",
         videoURL: "https://example.com/deadlift"
     )
+    
+    let hypertophySet = ExerciseSetEntity(weight: 135.0, completedReps: 0, targetReps: 12, isComplete: false)
+    let strengthSet = ExerciseSetEntity(weight: 135.0, completedReps: 0, targetReps: 12, isComplete: false)
     
     // MARK: - Mock Data Creation
     
@@ -48,38 +51,37 @@ class MockDataProvider {
         
         // Create exercise instances
         let benchInstance = ExerciseInstanceEntity(
-            exercise: benchPress,
+            movement: benchPress,
             exerciseType: "strength",
+            sets: [strengthSet, strengthSet, strengthSet],
             note: "Focus on form"
         )
         
         let ohpInstance = ExerciseInstanceEntity(
-            exercise: overheadPress,
+            movement: overheadPress,
             exerciseType: "hypertrophy",
+            sets: [hypertophySet, hypertophySet, hypertophySet],
             note: "Keep core tight"
         )
         
-        // Create sets for exercises
-        let benchSets = [
-            ExerciseSetEntity(weight: 135, reps: 8),
-            ExerciseSetEntity(weight: 155, reps: 6),
-            ExerciseSetEntity(weight: 175, reps: 4)
-        ]
+        let squatInstance = ExerciseInstanceEntity(
+            movement: squat,
+            exerciseType: "hypertrophy",
+            sets: [hypertophySet, hypertophySet, hypertophySet],
+            note: "Keep core tight"
+        )
         
-        let ohpSets = [
-            ExerciseSetEntity(weight: 95, reps: 10),
-            ExerciseSetEntity(weight: 105, reps: 8),
-            ExerciseSetEntity(weight: 115, reps: 6)
-        ]
-        
-        // Add sets to instances
-        benchInstance.sets = benchSets
-        ohpInstance.sets = ohpSets
+        let deadliftInstance = ExerciseInstanceEntity(
+            movement: deadlift,
+            exerciseType: "strength",
+            sets: [strengthSet, strengthSet, strengthSet],
+            note: "Keep core tight"
+        )
         
         // Create workout
         let workout = WorkoutEntity(
             title: "Upper Body Strength",
-            notes: "Focus on compound movements",
+            description: "Focus on compound movements",
             scheduledDate: Date()
         )
         
@@ -101,7 +103,7 @@ class MockDataProvider {
         root.workouts = [workout]
         root.exercises = [benchPress, overheadPress, squat, deadlift]
         root.exerciseInstances = [benchInstance, ohpInstance]
-        root.exerciseSets = benchSets + ohpSets
+        root.exerciseSets = benchInstance.sets + ohpInstance.sets
         root.muscleGroups = [chest, shoulders, legs, back]
         
         return root

@@ -11,11 +11,11 @@ import Combine
 @MainActor
 class ActiveWorkoutViewModel: ObservableObject {
     // MARK: - Properties
-    @Published private(set) var workout: Workout
+    @Published private(set) var workout: WorkoutEntity
     private let dataStore: TrainingDataStore
     
     // MARK: - Initialization
-    init(workout: Workout, dataStore: TrainingDataStore = .shared) {
+    init(workout: WorkoutEntity, dataStore: TrainingDataStore = .shared) {
         self.workout = workout
         self.dataStore = dataStore
     }
@@ -23,7 +23,7 @@ class ActiveWorkoutViewModel: ObservableObject {
     // MARK: - Set Management
     
     func addSet(to exercise: Exercise) {
-        let set = ExerciseSet(weight: 0, targetReps: 8)
+        let set = ExerciseSetEntity(weight: 100.0, completedReps: 0, targetReps: 8, isComplete: false)
         
         if let index = workout.exercises.firstIndex(where: { $0.id == exercise.id }) {
             workout.exercises[index].sets.append(set)

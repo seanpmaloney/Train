@@ -1,6 +1,6 @@
 import Foundation
 
-class ExerciseEntity: ObservableObject, Identifiable, Codable {
+class MovementEntity: ObservableObject, Identifiable, Codable {
     let id: UUID = UUID()
     @Published var name: String
     @Published var notes: String?

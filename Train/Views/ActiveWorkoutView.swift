@@ -1,43 +1,15 @@
 import SwiftUI
 
 struct ActiveWorkoutView: View {
-    let workout: Workout
+    var workout = sampleWorkout
     @AppStorage("activeWorkoutId") private var activeWorkoutId: String?
-    @State private var exercises: [Exercise]
+    @State private var exercises: [ExerciseInstanceEntity]
     @State private var isTimerExpanded = false
     
-    // Initialize with workout and create exercise state
-    init(workout: Workout) {
-        self.workout = workout
-        // Initialize exercise state with sample data
-        let sampleExercises = [
-            Exercise(
-                name: "Pull-ups",
-                sets: [
-                    ExerciseSet(weight: 0, targetReps: 8),
-                    ExerciseSet(weight: 0, targetReps: 8),
-                    ExerciseSet(weight: 0, targetReps: 8)
-                ]
-            ),
-            Exercise(
-                name: "Barbell Rows",
-                sets: [
-                    ExerciseSet(weight: 135, targetReps: 12),
-                    ExerciseSet(weight: 135, targetReps: 12),
-                    ExerciseSet(weight: 135, targetReps: 12)
-                ]
-            ),
-            Exercise(
-                name: "Bicep Curls",
-                sets: [
-                    ExerciseSet(weight: 30, targetReps: 12),
-                    ExerciseSet(weight: 30, targetReps: 12),
-                    ExerciseSet(weight: 25, targetReps: 12)
-                ]
-            )
-        ]
-        _exercises = State(initialValue: sampleExercises)
-    }
+    init(workout: WorkoutEntity) {
+            self.workout = workout
+            _exercises = State(initialValue: workout.exercises)
+        }
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -59,8 +31,8 @@ struct ActiveWorkoutView: View {
                     
                     // Rest of workout content
                     LazyVStack(spacing: 16) {
-                        ForEach($exercises) { $exercise in
-                            ExerciseCard(exercise: $exercise)
+                        ForEach(exercises) { exercise in
+                            ExerciseCard(exerciseInstance: exercise)
                         }
                     }
                     
@@ -105,17 +77,17 @@ struct ActiveWorkoutView: View {
 }
 
 struct ExerciseCard: View {
-    @Binding var exercise: Exercise
+    @ObservedObject var exerciseInstance: ExerciseInstanceEntity
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(exercise.name)
+            Text(exerciseInstance.movement.name)
                 .font(.title3)
                 .fontWeight(.bold)
             
             VStack(spacing: 12) {
-                ForEach($exercise.sets) { $set in
-                    SetRow(set: $set)
+                ForEach(exerciseInstance.sets) { set in
+                    SetRow(set: set)
                 }
             }
         }
@@ -129,7 +101,7 @@ struct ExerciseCard: View {
 }
 
 struct SetRow: View {
-    @Binding var set: ExerciseSet
+    @ObservedObject var set: ExerciseSetEntity
     @State private var showingWeightPad = false
     @State private var showingRepsPad = false
     
@@ -166,7 +138,7 @@ struct SetRow: View {
                 Button(action: {
                     showingRepsPad = true
                 }) {
-                    Text("\(set.completedReps ?? set.targetReps)")
+                    Text("\(set.completedReps)")
                         .font(.body)
                         .foregroundColor(.white)
                         .frame(width: 50, alignment: .trailing)
@@ -175,7 +147,7 @@ struct SetRow: View {
                 .sheet(isPresented: $showingRepsPad) {
                     CustomNumberPadView(
                         title: "Reps",
-                        initialValue: Double(set.completedReps ?? set.targetReps),
+                        initialValue: Double(set.completedReps),
                         mode: .reps
                     ) { newValue in
                         set.completedReps = Int(newValue)
@@ -243,16 +215,5 @@ struct ExerciseSet: Identifiable {
 }
 
 #Preview {
-    ZStack {
-        Color(AppStyle.Colors.background).ignoresSafeArea()
-        ActiveWorkoutView(
-            workout: Workout(
-                id: "back-biceps-01",
-                title: "Back & Biceps",
-                type: "Strength",
-                description: "Pull-ups, rows, and bicep work"
-            )
-        )
-    }
-    .preferredColorScheme(.dark)
-} 
+    ActiveWorkoutView(workout: sampleWorkout)
+}

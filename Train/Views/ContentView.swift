@@ -275,16 +275,12 @@ struct EnhancedTrainingPlanCard: View {
     @AppStorage("activeWorkoutId") private var activeWorkoutId: String?
     
     let workouts = [
-        Workout(
-            id: "upper-power-01",
+        WorkoutEntity(
             title: "Upper Body Power",
-            type: "Chest & Shoulders",
             description: "Explosive pushing movements focusing on power development"
         ),
-        Workout(
-            id: "core-01",
+        WorkoutEntity(
             title: "Core Stability",
-            type: "Abs & Lower Back",
             description: "Dynamic core training with anti-rotation focus"
         )
     ]
@@ -309,14 +305,14 @@ struct EnhancedTrainingPlanCard: View {
 }
 
 struct WorkoutRowButton: View {
-    let workout: Workout
+    let workout: WorkoutEntity
     @Binding var selectedTab: Int
     @Binding var activeWorkoutId: String?
     
     var body: some View {
         Button(action: {
             // Set active workout and switch to training tab
-            activeWorkoutId = workout.id
+            activeWorkoutId = workout.title
             selectedTab = 2 // Index of Training tab
         }) {
             HStack {
@@ -326,7 +322,7 @@ struct WorkoutRowButton: View {
                         .font(.headline)
                         .foregroundColor(AppStyle.Colors.textPrimary)
                     
-                    Text(workout.type)
+                    Text(workout.exercises.first?.exerciseType ?? "Strength")
                         .font(.subheadline)
                         .foregroundColor(AppStyle.Colors.textSecondary)
                 }

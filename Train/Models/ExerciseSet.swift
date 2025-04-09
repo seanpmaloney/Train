@@ -6,13 +6,15 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
     @Published var targetReps: Int
     @Published var completedReps: Int
     @Published var timestamp: Date
+    @Published var isComplete: Bool
 
-    init(weight: Double = 0, reps: Int = 0) {
+    init(weight: Double = 0, completedReps: Int = 0, targetReps: Int = 0, isComplete: Bool = false) {
         self.id = UUID()
         self.weight = weight
-        self.targetReps = reps
-        self.completedReps = reps
+        self.targetReps = targetReps
+        self.completedReps = completedReps
         self.timestamp = Date()
+        self.isComplete = isComplete
     }
     
     // MARK: - Codable
@@ -22,6 +24,7 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
         case targetReps
         case completedReps
         case timestamp
+        case isComplete
     }
     
     required init(from decoder: Decoder) throws {
@@ -31,6 +34,7 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
         self.targetReps = try container.decode(Int.self, forKey: .targetReps)
         self.completedReps = try container.decode(Int.self, forKey: .completedReps)
         self.timestamp = try container.decode(Date.self, forKey: .timestamp)
+        self.isComplete = try container.decode(Bool.self, forKey: .isComplete)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -39,5 +43,6 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
         try container.encode(weight, forKey: .weight)
         try container.encode(targetReps, forKey: .targetReps)
         try container.encode(completedReps, forKey: .completedReps)
+        try container.encode(isComplete, forKey: .isComplete)
     }
-} 
+}
