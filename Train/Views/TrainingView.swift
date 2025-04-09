@@ -7,11 +7,13 @@ var squats = MovementEntity(name: "Squat")
 var rdl = MovementEntity(name: "Romanian Deadlift")
 var legExt = MovementEntity(name: "Leg Extension")
 
-var set1 = ExerciseSetEntity(weight: 100.0, completedReps: 0, targetReps: 8, isComplete: false)
-var set2 = ExerciseSetEntity(weight: 100.0, completedReps: 0, targetReps: 8, isComplete: false)
-var set3 = ExerciseSetEntity(weight: 100.0, completedReps: 0, targetReps: 8, isComplete: false)
+func makeDefaultSets(count: Int = 3, weight: Double = 100.0, reps: Int = 8) -> [ExerciseSetEntity] {
+    (0..<count).map { _ in
+        ExerciseSetEntity(weight: weight, completedReps: 0, targetReps: reps, isComplete: false)
+    }
+}
 
-var exercisesToDo = [ExerciseInstanceEntity(movement: pullUps, exerciseType: "Hypertrophy", sets: [set1, set2, set3]), ExerciseInstanceEntity(movement: dbRow, exerciseType: "Strength", sets: [set1, set2, set3]), ExerciseInstanceEntity(movement: bicepCurls, exerciseType: "Hypertrophy", sets: [set1, set2, set3])]
+var exercisesToDo = [ExerciseInstanceEntity(movement: pullUps, exerciseType: "Hypertrophy", sets: makeDefaultSets()), ExerciseInstanceEntity(movement: dbRow, exerciseType: "Strength", sets: makeDefaultSets()), ExerciseInstanceEntity(movement: bicepCurls, exerciseType: "Hypertrophy", sets: makeDefaultSets())]
 
 var sampleWorkout = WorkoutEntity(
     title: "Back & Biceps",
@@ -19,7 +21,7 @@ var sampleWorkout = WorkoutEntity(
     exercises: exercisesToDo
 )
 
-var legExercisesToDo = [ExerciseInstanceEntity(movement: squats, exerciseType: "Hypertrophy", sets: [set1, set2, set3]), ExerciseInstanceEntity(movement: rdl, exerciseType: "Strength", sets: [set1, set2, set3]), ExerciseInstanceEntity(movement: legExt, exerciseType: "Hypertrophy", sets: [set1, set2, set3])]
+var legExercisesToDo = [ExerciseInstanceEntity(movement: squats, exerciseType: "Hypertrophy", sets: makeDefaultSets()), ExerciseInstanceEntity(movement: rdl, exerciseType: "Strength", sets: makeDefaultSets()), ExerciseInstanceEntity(movement: legExt, exerciseType: "Hypertrophy", sets: makeDefaultSets())]
 
 var sampleWorkout2 = WorkoutEntity(
     title: "Legs",
@@ -42,7 +44,7 @@ struct TrainingView: View {
                 
                 if let activeId = activeWorkoutId,
                    let workout = workouts.first(where: { $0.title == activeId }) {
-                    ActiveWorkoutView(workout: workout)
+                    ActiveWorkoutView(workout: workout, viewModel: ActiveWorkoutViewModel(workout: workout))
                 } else {
                     WorkoutListView(workouts: workouts)
                 }

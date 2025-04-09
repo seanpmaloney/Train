@@ -5,11 +5,13 @@ struct ActiveWorkoutView: View {
     @AppStorage("activeWorkoutId") private var activeWorkoutId: String?
     @State private var exercises: [ExerciseInstanceEntity]
     @State private var isTimerExpanded = false
+    @State private var activeWorkoutModel: ActiveWorkoutViewModel
     
-    init(workout: WorkoutEntity) {
-            self.workout = workout
-            _exercises = State(initialValue: workout.exercises)
-        }
+    init(workout: WorkoutEntity, viewModel: ActiveWorkoutViewModel) {
+        self.workout = workout
+        _exercises = State(initialValue: workout.exercises)
+        _activeWorkoutModel = State(initialValue: viewModel)
+    }
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -164,7 +166,7 @@ struct SetRow: View {
             // Complete Checkbox
             Button(action: {
                 withAnimation {
-                    set.isComplete.toggle()
+                    set.toggleComplete()
                 }
             }) {
                 Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
@@ -215,5 +217,5 @@ struct ExerciseSet: Identifiable {
 }
 
 #Preview {
-    ActiveWorkoutView(workout: sampleWorkout)
+    ActiveWorkoutView(workout: sampleWorkout, viewModel: ActiveWorkoutViewModel(workout: sampleWorkout)).preferredColorScheme(.dark)
 }

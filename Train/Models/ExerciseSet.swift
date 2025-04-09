@@ -45,4 +45,8 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
         try container.encode(completedReps, forKey: .completedReps)
         try container.encode(isComplete, forKey: .isComplete)
     }
+    
+    func toggleComplete() {
+        isComplete.toggle()
+    }
 }
