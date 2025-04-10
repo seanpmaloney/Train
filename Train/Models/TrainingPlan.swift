@@ -6,6 +6,10 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
     @Published var notes: String?
     @Published var startDate: Date
     @Published var workouts: [WorkoutEntity] = []
+    
+    var endDate: Date {
+        workouts.map { $0.scheduledDate ?? startDate }.max() ?? startDate
+    }
 
     init(name: String, notes: String? = nil, startDate: Date) {
         self.name = name
@@ -34,4 +38,4 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
         try container.encode(startDate, forKey: .startDate)
         try container.encode(workouts, forKey: .workouts)
     }
-} 
+}
