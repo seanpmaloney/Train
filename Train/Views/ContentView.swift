@@ -190,7 +190,7 @@ struct ContentView: View {
                         }
                         
                     case 1:
-                        Text("History")
+                        Text("Plans")
                             .foregroundColor(AppStyle.Colors.textPrimary)
                     case 2:
                         TrainingView()
@@ -557,9 +557,9 @@ struct CustomTabBar: View {
     
     private func tabIcon(for index: Int) -> String {
         switch index {
-        case 0: return "dumbbell.fill"
-        case 1: return "clock.fill"
-        case 2: return "chart.bar.fill"
+        case 0: return "list.bullet.clipboard.fill"
+        case 1: return "chart.bar.fill"
+        case 2: return "dumbbell.fill"
         case 3: return "person.fill"
         default: return ""
         }
@@ -568,7 +568,7 @@ struct CustomTabBar: View {
     private func tabTitle(for index: Int) -> String {
         switch index {
         case 0: return "Dashboard"
-        case 1: return "History"
+        case 1: return "Plans"
         case 2: return "Training"
         case 3: return "Profile"
         default: return ""

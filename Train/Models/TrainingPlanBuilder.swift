@@ -69,27 +69,146 @@ class TrainingPlanBuilder {
         return plan
     }
 
-    private func generateSchedule(config: PlanConfig) -> [[[MuscleGroup]]] {
-        // Simple round-robin allocation based on split
-        let emphasis = config.emphasisMuscles
-        var allMuscles = emphasis
-        let all = MuscleGroup.allCases
-        let nonEmphasis = all.filter { group in
-            !emphasis.contains(where: { $0 == group })
+    private struct VolumeTargets {
+        static let emphasisMinSets = 10
+        static let emphasisMaxSets = 20
+        static let maintenanceMinSets = 4
+        static let maintenanceMaxSets = 6
+    }
+    
+    private struct MuscleVolumeInfo {
+        var currentSets: Int = 0
+        let targetSets: Int
+        let isEmphasis: Bool
+        
+        var hasMetMinimumVolume: Bool {
+            if isEmphasis {
+                return currentSets >= VolumeTargets.emphasisMinSets
+            }
+            return currentSets >= VolumeTargets.maintenanceMinSets
         }
-        allMuscles += nonEmphasis
+        
+        var hasMetMaximumVolume: Bool {
+            if isEmphasis {
+                return currentSets >= VolumeTargets.emphasisMaxSets
+            }
+            return currentSets >= VolumeTargets.maintenanceMaxSets
+        }
+    }
+    
+    private func calculateWeeklyVolumeDistribution(for muscleGroups: [[MuscleGroup]], isEmphasis: (MuscleGroup) -> Bool) -> [MuscleGroup: Int] {
+        // Initialize volume tracking for all muscle groups
+        var volumeInfo = Dictionary(uniqueKeysWithValues: MuscleGroup.allCases.map { muscle in
+            let emphasis = isEmphasis(muscle)
+            let targetSets = emphasis ? VolumeTargets.emphasisMaxSets : VolumeTargets.maintenanceMaxSets
+            return (muscle, MuscleVolumeInfo(targetSets: targetSets, isEmphasis: emphasis))
+        })
+        
+        // Count frequency of each muscle group's appearance in the week
+        let appearances = Dictionary(grouping: muscleGroups.flatMap { $0 }) { $0 }
+            .mapValues { $0.count }
+        
+        // Calculate sets per appearance to distribute volume evenly
+        var distribution: [MuscleGroup: Int] = [:]
+        
+        for muscle in MuscleGroup.allCases {
+            let info = volumeInfo[muscle]!
+            let daysScheduled = appearances[muscle] ?? 0
+            
+            if daysScheduled > 0 {
+                // Calculate base sets per day to meet minimum volume
+                let minSets = info.isEmphasis ? VolumeTargets.emphasisMinSets : VolumeTargets.maintenanceMinSets
+                let maxSets = info.isEmphasis ? VolumeTargets.emphasisMaxSets : VolumeTargets.maintenanceMaxSets
+                
+                // Distribute sets evenly across available days
+                let setsPerDay = min(
+                    maxSets / daysScheduled, // Don't exceed max volume
+                    max(2, minSets / daysScheduled) // At least 2 sets per day when scheduled
+                )
+                
+                distribution[muscle] = setsPerDay
+            } else {
+                distribution[muscle] = 0
+            }
+        }
+        
+        return distribution
+    }
 
+    private func generateSchedule(config: PlanConfig) -> [[[MuscleGroup]]] {
+        let splitDays = splitMuscleGroupMapping(for: config.split)
         var schedule: [[[MuscleGroup]]] = []
+        
+        // Handle custom split differently
+        if config.split == .custom {
+            // Use existing round-robin logic for custom splits
+            let emphasis = config.emphasisMuscles
+            var allMuscles = emphasis
+            let all = MuscleGroup.allCases
+            let nonEmphasis = all.filter { group in
+                !emphasis.contains(where: { $0 == group })
+            }
+            allMuscles += nonEmphasis
+
+            for _ in 0..<config.weeks {
+                var week: [[MuscleGroup]] = []
+                for day in 0..<config.daysPerWeek {
+                    let group = allMuscles[day % allMuscles.count]
+                    week.append([group])
+                }
+                schedule.append(week)
+            }
+            return schedule
+        }
+        
+        // For predefined splits, use the mapping
         for _ in 0..<config.weeks {
             var week: [[MuscleGroup]] = []
-            for day in 0..<config.daysPerWeek {
-                let group = allMuscles[day % allMuscles.count]
-                week.append([group])
+            for dayIndex in 0..<config.daysPerWeek {
+                // For 5-day split, use all 5 days if daysPerWeek allows
+                if config.split == .fiveDaySplit && dayIndex < splitDays.count {
+                    week.append(splitDays[dayIndex])
+                } else {
+                    // For other splits, rotate through the available days
+                    week.append(splitDays[dayIndex % splitDays.count])
+                }
             }
             schedule.append(week)
         }
-
+        
         return schedule
+    }
+    
+    private func splitMuscleGroupMapping(for split: SplitStyle) -> [[MuscleGroup]] {
+        switch split {
+        case .pushPullLegs:
+            return [
+                [.chest, .shoulders, .triceps],     // Push
+                [.back, .biceps],                   // Pull
+                [.quads, .hamstrings, .glutes]      // Legs
+            ]
+            
+        case .upperLower:
+            return [
+                [.chest, .back, .shoulders, .biceps, .triceps],  // Upper
+                [.quads, .hamstrings, .calves, .glutes]         // Lower
+            ]
+            
+        case .fiveDaySplit:
+            return [
+                [.chest, .shoulders, .triceps],     // Push
+                [.back, .biceps],                   // Pull
+                [.quads, .hamstrings, .glutes],     // Legs
+                [.chest, .back, .shoulders],        // Upper
+                [.quads, .hamstrings, .calves]     // Lower
+            ]
+            
+        case .fullBody:
+            return [MuscleGroup.allCases.filter { $0 != .abs }]  // Full body, abs excluded as they can be added to any day
+            
+        case .custom:
+            return []  // Empty array for custom splits - will be handled separately in generateSchedule
+        }
     }
 
     private func generateDeloadWeek(config: PlanConfig, allMovements: [MovementEntity], startDate: Date) -> [WorkoutEntity] {
