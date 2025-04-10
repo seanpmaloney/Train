@@ -6,7 +6,7 @@ class TrainingDataRoot: ObservableObject, Codable {
     @Published var exercises: [MovementEntity]
     @Published var exerciseInstances: [ExerciseInstanceEntity]
     @Published var exerciseSets: [ExerciseSetEntity]
-    @Published var muscleGroups: [MuscleGroupEntity]
+    @Published var muscleGroups: [MuscleGroup]
     
     init(
         trainingPlans: [TrainingPlanEntity] = [],
@@ -14,7 +14,7 @@ class TrainingDataRoot: ObservableObject, Codable {
         exercises: [MovementEntity] = [],
         exerciseInstances: [ExerciseInstanceEntity] = [],
         exerciseSets: [ExerciseSetEntity] = [],
-        muscleGroups: [MuscleGroupEntity] = []
+        muscleGroups: [MuscleGroup] = []
     ) {
         self.trainingPlans = trainingPlans
         self.workouts = workouts
@@ -42,7 +42,7 @@ class TrainingDataRoot: ObservableObject, Codable {
         self.exercises = try container.decode([MovementEntity].self, forKey: .movements)
         self.exerciseInstances = try container.decode([ExerciseInstanceEntity].self, forKey: .exerciseInstances)
         self.exerciseSets = try container.decode([ExerciseSetEntity].self, forKey: .exerciseSets)
-        self.muscleGroups = try container.decode([MuscleGroupEntity].self, forKey: .muscleGroups)
+        self.muscleGroups = try container.decode([MuscleGroup].self, forKey: .muscleGroups)
     }
     
     func encode(to encoder: Encoder) throws {

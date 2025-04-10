@@ -38,16 +38,16 @@ class MockDataProvider {
         let root = TrainingDataRoot()
         
         // Create muscle groups
-        let chest = MuscleGroupEntity(name: "Chest")
-        let shoulders = MuscleGroupEntity(name: "Shoulders")
-        let legs = MuscleGroupEntity(name: "Legs")
-        let back = MuscleGroupEntity(name: "Back")
+        let chest = MuscleGroup.chest
+        let shoulders = MuscleGroup.shoulders
+        let legs = [MuscleGroup.quads, MuscleGroup.hamstrings, MuscleGroup.glutes]
+        let back = MuscleGroup.back
         
         // Add muscle groups to exercises
         benchPress.muscleGroups = [chest, shoulders]
         overheadPress.muscleGroups = [shoulders]
-        squat.muscleGroups = [legs]
-        deadlift.muscleGroups = [back, legs]
+        squat.muscleGroups = legs
+        deadlift.muscleGroups = [back] + legs
         
         // Create exercise instances
         let benchInstance = ExerciseInstanceEntity(
@@ -104,7 +104,7 @@ class MockDataProvider {
         root.exercises = [benchPress, overheadPress, squat, deadlift]
         root.exerciseInstances = [benchInstance, ohpInstance]
         root.exerciseSets = benchInstance.sets + ohpInstance.sets
-        root.muscleGroups = [chest, shoulders, legs, back]
+        root.muscleGroups = [chest, shoulders, back] + legs
         
         return root
     }

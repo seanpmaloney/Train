@@ -128,10 +128,6 @@ class TrainingDataStore: ObservableObject {
         data.exerciseSets.append(set)
     }
     
-    func addMuscleGroup(_ group: MuscleGroupEntity) {
-        data.muscleGroups.append(group)
-    }
-    
     // MARK: - Data Query Methods
     
     func getTrainingPlan(withId id: UUID) -> TrainingPlanEntity? {
@@ -152,10 +148,6 @@ class TrainingDataStore: ObservableObject {
     
     func getExerciseSet(withId id: UUID) -> ExerciseSetEntity? {
         data.exerciseSets.first { $0.id == id }
-    }
-    
-    func getMuscleGroup(withId id: UUID) -> MuscleGroupEntity? {
-        data.muscleGroups.first { $0.id == id }
     }
     
     // MARK: - Convenience Methods

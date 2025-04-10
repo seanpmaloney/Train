@@ -5,7 +5,7 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
     @Published var name: String
     @Published var notes: String?
     @Published var videoURL: String?
-    @Published var muscleGroups: [MuscleGroupEntity] = []
+    @Published var muscleGroups: [MuscleGroup] = []
 
     init(name: String, notes: String? = nil, videoURL: String? = nil) {
         self.name = name
@@ -23,7 +23,7 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
         name = try container.decode(String.self, forKey: .name)
         notes = try container.decodeIfPresent(String.self, forKey: .notes)
         videoURL = try container.decodeIfPresent(String.self, forKey: .videoURL)
-        muscleGroups = try container.decode([MuscleGroupEntity].self, forKey: .muscleGroups)
+        muscleGroups = try container.decode([MuscleGroup].self, forKey: .muscleGroups)
     }
     
     func encode(to encoder: Encoder) throws {

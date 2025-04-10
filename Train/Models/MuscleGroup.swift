@@ -1,30 +1,22 @@
 import Foundation
 
-class MuscleGroupEntity: ObservableObject, Identifiable, Codable {
-    let id: UUID = UUID()
-    @Published var name: String
-    @Published var notes: String?
+enum MuscleGroup: String, CaseIterable, Codable, Identifiable {
+    case chest, back, quads, hamstrings, glutes, calves, biceps, triceps, shoulders, abs
 
-    init(name: String, notes: String? = nil) {
-        self.name = name
-        self.notes = notes
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .chest: return "Chest"
+        case .back: return "Back"
+        case .quads: return "Quads"
+        case .hamstrings: return "Hamstrings"
+        case .glutes: return "Glutes"
+        case .calves: return "Calves"
+        case .biceps: return "Biceps"
+        case .triceps: return "Triceps"
+        case .shoulders: return "Shoulders"
+        case .abs: return "Abs"
+        }
     }
-    
-    // MARK: - Codable
-    enum CodingKeys: String, CodingKey {
-        case id, name, notes
-    }
-    
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        name = try container.decode(String.self, forKey: .name)
-        notes = try container.decodeIfPresent(String.self, forKey: .notes)
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
-        try container.encode(name, forKey: .name)
-        try container.encodeIfPresent(notes, forKey: .notes)
-    }
-} 
+}
