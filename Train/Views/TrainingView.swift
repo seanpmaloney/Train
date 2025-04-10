@@ -1,11 +1,39 @@
 import SwiftUI
 
-var pullUps = MovementEntity(name: "Pull-Up")
-var dbRow = MovementEntity(name: "Dumbell Row")
-var bicepCurls = MovementEntity(name: "Biceps Curl")
-var squats = MovementEntity(name: "Squat")
-var rdl = MovementEntity(name: "Romanian Deadlift")
-var legExt = MovementEntity(name: "Leg Extension")
+var pullUps = MovementEntity(
+    name: "Pull-Up",
+    primaryMuscles: [.back],
+    secondaryMuscles: [.biceps],
+    equipment: .bodyweight
+)
+var dbRow = MovementEntity(
+    name: "Dumbell Row",
+    primaryMuscles: [.back],
+    secondaryMuscles: [.biceps],
+    equipment: .dumbbell
+)
+var bicepCurls = MovementEntity(
+    name: "Biceps Curl",
+    primaryMuscles: [.biceps],
+    equipment: .dumbbell
+)
+var squats = MovementEntity(
+    name: "Squat",
+    primaryMuscles: [.quads],
+    secondaryMuscles: [.glutes, .hamstrings],
+    equipment: .barbell
+)
+var rdl = MovementEntity(
+    name: "Romanian Deadlift",
+    primaryMuscles: [.hamstrings],
+    secondaryMuscles: [.glutes, .back],
+    equipment: .barbell
+)
+var legExt = MovementEntity(
+    name: "Leg Extension",
+    primaryMuscles: [.quads],
+    equipment: .machine
+)
 
 func makeDefaultSets(count: Int = 3, weight: Double = 100.0, reps: Int = 8) -> [ExerciseSetEntity] {
     (0..<count).map { _ in

@@ -7,24 +7,36 @@ class MockDataProvider {
     
     let benchPress = MovementEntity(
         name: "Bench Press",
+        primaryMuscles: [.chest],
+        secondaryMuscles: [.shoulders, .triceps],
+        equipment: .barbell,
         notes: "Standard barbell bench press",
         videoURL: "https://example.com/bench-press"
     )
     
     let overheadPress = MovementEntity(
         name: "Overhead Press",
+        primaryMuscles: [.shoulders],
+        secondaryMuscles: [.triceps],
+        equipment: .barbell,
         notes: "Standing overhead press with barbell",
         videoURL: "https://example.com/ohp"
     )
     
     let squat = MovementEntity(
         name: "Back Squat",
+        primaryMuscles: [.quads],
+        secondaryMuscles: [.glutes, .hamstrings],
+        equipment: .barbell,
         notes: "High bar back squat",
         videoURL: "https://example.com/squat"
     )
     
     let deadlift = MovementEntity(
         name: "Deadlift",
+        primaryMuscles: [.back],
+        secondaryMuscles: [.glutes, .hamstrings],
+        equipment: .barbell,
         notes: "Conventional deadlift",
         videoURL: "https://example.com/deadlift"
     )
@@ -42,12 +54,6 @@ class MockDataProvider {
         let shoulders = MuscleGroup.shoulders
         let legs = [MuscleGroup.quads, MuscleGroup.hamstrings, MuscleGroup.glutes]
         let back = MuscleGroup.back
-        
-        // Add muscle groups to exercises
-        benchPress.muscleGroups = [chest, shoulders]
-        overheadPress.muscleGroups = [shoulders]
-        squat.muscleGroups = legs
-        deadlift.muscleGroups = [back] + legs
         
         // Create exercise instances
         let benchInstance = ExerciseInstanceEntity(
@@ -108,4 +114,4 @@ class MockDataProvider {
         
         return root
     }
-} 
+}

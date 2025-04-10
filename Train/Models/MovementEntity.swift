@@ -1,21 +1,45 @@
 import Foundation
 
+enum EquipmentType: String, Codable, CaseIterable {
+    case barbell = "Barbell"
+    case dumbbell = "Dumbbell"
+    case machine = "Machine"
+    case bodyweight = "Bodyweight"
+    case cable = "Cable"
+}
+
 class MovementEntity: ObservableObject, Identifiable, Codable {
     let id: UUID = UUID()
     @Published var name: String
     @Published var notes: String?
     @Published var videoURL: String?
-    @Published var muscleGroups: [MuscleGroup] = []
+    @Published var primaryMuscles: [MuscleGroup]
+    @Published var secondaryMuscles: [MuscleGroup]
+    @Published var equipment: EquipmentType
+    
+    var muscleGroups: [MuscleGroup] {
+        primaryMuscles + secondaryMuscles
+    }
 
-    init(name: String, notes: String? = nil, videoURL: String? = nil) {
+    init(
+        name: String,
+        primaryMuscles: [MuscleGroup],
+        secondaryMuscles: [MuscleGroup] = [],
+        equipment: EquipmentType,
+        notes: String? = nil,
+        videoURL: String? = nil
+    ) {
         self.name = name
+        self.primaryMuscles = primaryMuscles
+        self.secondaryMuscles = secondaryMuscles
+        self.equipment = equipment
         self.notes = notes
         self.videoURL = videoURL
     }
     
     // MARK: - Codable
     enum CodingKeys: String, CodingKey {
-        case id, name, notes, videoURL, muscleGroups
+        case id, name, notes, videoURL, primaryMuscles, secondaryMuscles, equipment
     }
     
     required init(from decoder: Decoder) throws {
@@ -23,7 +47,9 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
         name = try container.decode(String.self, forKey: .name)
         notes = try container.decodeIfPresent(String.self, forKey: .notes)
         videoURL = try container.decodeIfPresent(String.self, forKey: .videoURL)
-        muscleGroups = try container.decode([MuscleGroup].self, forKey: .muscleGroups)
+        primaryMuscles = try container.decode([MuscleGroup].self, forKey: .primaryMuscles)
+        secondaryMuscles = try container.decode([MuscleGroup].self, forKey: .secondaryMuscles)
+        equipment = try container.decode(EquipmentType.self, forKey: .equipment)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -32,6 +58,8 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
         try container.encode(name, forKey: .name)
         try container.encodeIfPresent(notes, forKey: .notes)
         try container.encodeIfPresent(videoURL, forKey: .videoURL)
-        try container.encode(muscleGroups, forKey: .muscleGroups)
+        try container.encode(primaryMuscles, forKey: .primaryMuscles)
+        try container.encode(secondaryMuscles, forKey: .secondaryMuscles)
+        try container.encode(equipment, forKey: .equipment)
     }
-} 
+}
