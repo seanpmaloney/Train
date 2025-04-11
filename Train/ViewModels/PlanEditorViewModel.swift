@@ -27,11 +27,12 @@ class PlanEditorViewModel: ObservableObject {
         weeks.append(emptyWeek)
     }
     
-    func addMovement(_ movement: MovementEntity, to dayIndex: Int, weekIndex: Int) {
+    func addMovement(_ movement: [MovementEntity], to dayIndex: Int, weekIndex: Int) {
         guard weeks.indices.contains(weekIndex),
               weeks[weekIndex].indices.contains(dayIndex) else { return }
-        
-        weeks[weekIndex][dayIndex].movements.append(movement)
+        for movement in movement {
+            weeks[weekIndex][dayIndex].movements.append(movement)
+        }
         objectWillChange.send()
     }
     

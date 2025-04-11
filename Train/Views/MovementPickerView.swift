@@ -3,7 +3,7 @@ import SwiftUI
 struct MovementPickerView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = MovementPickerViewModel()
-    let onMovementSelected: (MovementEntity) -> Void
+    let onMovementSelected: ([MovementEntity]) -> Void
     
     var body: some View {
         NavigationStack {
@@ -29,6 +29,13 @@ struct MovementPickerView: View {
                         dismiss()
                     }
                 }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        onMovementSelected(viewModel.getSelectedMovements())
+                        dismiss()
+                    }
+                    .disabled(!viewModel.hasSelections)
+                }
             }
         }
     }
@@ -53,7 +60,7 @@ struct MovementPickerView: View {
                 filterButton(nil, title: "All")
                 
                 ForEach(MuscleGroup.allCases, id: \.self) { muscle in
-                    filterButton(muscle, title: muscle.rawValue)
+                    filterButton(muscle, title: muscle.displayName)
                 }
             }
         }
@@ -87,18 +94,14 @@ struct MovementPickerView: View {
                     .foregroundColor(AppStyle.Colors.textSecondary)
                 
                 ForEach(viewModel.suggestedMovements) { movement in
-                    MovementCard(movement: movement) {
-                        selectMovement(movement)
+                    MovementCard(movement: movement, isSelected: viewModel.isSelected(movement)) {
+                        viewModel.toggleSelection(movement)
                     }
                 }
                 
                 Divider()
                     .padding(.vertical)
             }
-            
-            Text("All Movements")
-                .font(AppStyle.Typography.headline())
-                .foregroundColor(AppStyle.Colors.textSecondary)
         }
     }
     
@@ -106,23 +109,18 @@ struct MovementPickerView: View {
         ScrollView {
             LazyVStack(spacing: AppStyle.Layout.compactSpacing) {
                 ForEach(viewModel.filteredMovements) { movement in
-                    MovementCard(movement: movement) {
-                        selectMovement(movement)
+                    MovementCard(movement: movement, isSelected: viewModel.isSelected(movement)) {
+                        viewModel.toggleSelection(movement)
                     }
                 }
             }
         }
     }
-    
-    private func selectMovement(_ movement: MovementEntity) {
-        viewModel.addToRecentlyUsed(movement)
-        onMovementSelected(movement)
-        dismiss()
-    }
 }
 
 struct MovementCard: View {
     let movement: MovementEntity
+    let isSelected: Bool
     let onAdd: () -> Void
     
     var body: some View {
@@ -159,13 +157,14 @@ struct MovementCard: View {
             Spacer()
             
             Button(action: onAdd) {
-                Image(systemName: "plus.circle.fill")
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "plus.circle")
                     .font(.title2)
-                    .foregroundColor(AppStyle.Colors.primary)
+                    .foregroundColor(isSelected ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary)
             }
         }
         .padding()
         .cardStyle()
+        .opacity(isSelected ? 1 : 0.8)
     }
     
     private var equipmentTag: some View {
@@ -179,7 +178,7 @@ struct MovementCard: View {
     }
     
     private func musclePill(_ muscle: MuscleGroup, isPrimary: Bool) -> some View {
-        Text(muscle.rawValue)
+        Text(muscle.displayName)
             .font(AppStyle.Typography.caption())
             .foregroundColor(isPrimary ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary)
             .padding(.horizontal, 8)
