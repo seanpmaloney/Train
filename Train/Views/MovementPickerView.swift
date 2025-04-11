@@ -132,9 +132,27 @@ struct MovementCard: View {
                     .font(AppStyle.Typography.body())
                     .foregroundColor(AppStyle.Colors.textPrimary)
                 
-                HStack(spacing: 8) {
-                    equipmentTag
-                    muscleGroups
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 8) {
+                        equipmentTag
+                        // Primary muscles first line
+                        ForEach(movement.primaryMuscles.prefix(2), id: \.self) { muscle in
+                            musclePill(muscle, isPrimary: true)
+                        }
+                    }
+                    
+                    if movement.primaryMuscles.count > 2 || !movement.secondaryMuscles.isEmpty {
+                        FlowLayout(spacing: 8) {
+                            // Remaining primary muscles
+                            ForEach(Array(movement.primaryMuscles.dropFirst(2)), id: \.self) { muscle in
+                                musclePill(muscle, isPrimary: true)
+                            }
+                            // Secondary muscles
+                            ForEach(movement.secondaryMuscles, id: \.self) { muscle in
+                                musclePill(muscle, isPrimary: false)
+                            }
+                        }
+                    }
                 }
             }
             
@@ -153,25 +171,21 @@ struct MovementCard: View {
     private var equipmentTag: some View {
         Text(movement.equipment.rawValue)
             .font(AppStyle.Typography.caption())
-            .foregroundColor(AppStyle.Colors.textSecondary)
+            .foregroundColor(AppStyle.Colors.secondary)
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
             .background(AppStyle.Colors.secondary.opacity(0.2))
             .cornerRadius(4)
     }
     
-    private var muscleGroups: some View {
-        HStack(spacing: 4) {
-            ForEach(movement.primaryMuscles, id: \.self) { muscle in
-                Text(muscle.rawValue)
-                    .font(AppStyle.Typography.caption())
-                    .foregroundColor(AppStyle.Colors.primary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(AppStyle.Colors.primary.opacity(0.2))
-                    .clipShape(Capsule())
-            }
-        }
+    private func musclePill(_ muscle: MuscleGroup, isPrimary: Bool) -> some View {
+        Text(muscle.rawValue)
+            .font(AppStyle.Typography.caption())
+            .foregroundColor(isPrimary ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background((isPrimary ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary).opacity(0.2))
+            .clipShape(Capsule())
     }
 }
 
