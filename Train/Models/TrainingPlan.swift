@@ -5,21 +5,27 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
     @Published var name: String
     @Published var notes: String?
     @Published var startDate: Date
+    @Published var endDate: Date
+    @Published var daysPerWeek: Int
+    @Published var isCompleted: Bool
     @Published var workouts: [WorkoutEntity] = []
     
-    var endDate: Date {
+    var calculatedEndDate: Date {
         workouts.map { $0.scheduledDate ?? startDate }.max() ?? startDate
     }
 
-    init(name: String, notes: String? = nil, startDate: Date) {
+    init(name: String, notes: String? = nil, startDate: Date, daysPerWeek: Int = 3, isCompleted: Bool = false) {
         self.name = name
         self.notes = notes
         self.startDate = startDate
+        self.endDate = startDate
+        self.daysPerWeek = daysPerWeek
+        self.isCompleted = isCompleted
     }
     
     // MARK: - Codable
     enum CodingKeys: String, CodingKey {
-        case id, name, notes, startDate, workouts
+        case id, name, notes, startDate, endDate, daysPerWeek, isCompleted, workouts
     }
     
     required init(from decoder: Decoder) throws {
@@ -27,6 +33,9 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
         name = try container.decode(String.self, forKey: .name)
         notes = try container.decodeIfPresent(String.self, forKey: .notes)
         startDate = try container.decode(Date.self, forKey: .startDate)
+        endDate = try container.decode(Date.self, forKey: .endDate)
+        daysPerWeek = try container.decode(Int.self, forKey: .daysPerWeek)
+        isCompleted = try container.decode(Bool.self, forKey: .isCompleted)
         workouts = try container.decode([WorkoutEntity].self, forKey: .workouts)
     }
     
@@ -36,6 +45,9 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
         try container.encode(name, forKey: .name)
         try container.encodeIfPresent(notes, forKey: .notes)
         try container.encode(startDate, forKey: .startDate)
+        try container.encode(endDate, forKey: .endDate)
+        try container.encode(daysPerWeek, forKey: .daysPerWeek)
+        try container.encode(isCompleted, forKey: .isCompleted)
         try container.encode(workouts, forKey: .workouts)
     }
 }

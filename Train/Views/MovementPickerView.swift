@@ -7,11 +7,8 @@ struct MovementPickerView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                searchBar
-                
-                muscleGroupFilter
-                    .padding(.vertical)
+            VStack(spacing: AppStyle.Layout.compactSpacing) {
+                searchAndFilterSection
                 
                 if viewModel.searchText.isEmpty && viewModel.selectedMuscleGroup == nil {
                     suggestedSection
@@ -40,28 +37,30 @@ struct MovementPickerView: View {
         }
     }
     
-    private var searchBar: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(AppStyle.Colors.textSecondary)
-            
-            TextField("Search movements", text: $viewModel.searchText)
-                .textFieldStyle(.plain)
-                .foregroundColor(AppStyle.Colors.textPrimary)
-        }
-        .padding()
-        .background(AppStyle.Colors.background.opacity(0.5))
-        .cornerRadius(10)
-    }
-    
-    private var muscleGroupFilter: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: AppStyle.Layout.compactSpacing) {
-                filterButton(nil, title: "All")
+    private var searchAndFilterSection: some View {
+        VStack(spacing: AppStyle.Layout.compactSpacing) {
+            // Search bar
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(AppStyle.Colors.textSecondary)
                 
-                ForEach(MuscleGroup.allCases, id: \.self) { muscle in
-                    filterButton(muscle, title: muscle.displayName)
+                TextField("Search movements", text: $viewModel.searchText)
+                    .textFieldStyle(.plain)
+                    .foregroundColor(AppStyle.Colors.textPrimary)
+            }
+            .padding()
+            .background(AppStyle.Colors.surface)
+            .cornerRadius(12)
+            
+            // Muscle group filter
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: AppStyle.Layout.compactSpacing) {
+                    filterButton(nil, title: "All")
+                    ForEach(MuscleGroup.allCases, id: \.self) { muscle in
+                        filterButton(muscle, title: muscle.displayName)
+                    }
                 }
+                .padding(.vertical, 4)
             }
         }
     }
@@ -73,25 +72,26 @@ struct MovementPickerView: View {
             }
         } label: {
             Text(title)
-                .font(AppStyle.Typography.body())
-                .foregroundColor(viewModel.selectedMuscleGroup == muscle ? .white : AppStyle.Colors.textPrimary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+                .font(AppStyle.Typography.caption())
+                .foregroundColor(viewModel.selectedMuscleGroup == muscle ? .white : AppStyle.Colors.textSecondary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
                 .background(
                     viewModel.selectedMuscleGroup == muscle ?
                     AppStyle.Colors.primary :
-                    AppStyle.Colors.background.opacity(0.5)
+                    AppStyle.Colors.surface
                 )
-                .cornerRadius(20)
+                .cornerRadius(8)
         }
     }
     
     private var suggestedSection: some View {
-        VStack(alignment: .leading, spacing: AppStyle.Layout.standardSpacing) {
+        VStack(alignment: .leading, spacing: AppStyle.Layout.compactSpacing) {
             if !viewModel.suggestedMovements.isEmpty {
                 Text("Recently Used")
-                    .font(AppStyle.Typography.headline())
+                    .font(AppStyle.Typography.caption())
                     .foregroundColor(AppStyle.Colors.textSecondary)
+                    .padding(.top, 4)
                 
                 ForEach(viewModel.suggestedMovements) { movement in
                     MovementCard(movement: movement, isSelected: viewModel.isSelected(movement)) {
@@ -100,7 +100,8 @@ struct MovementPickerView: View {
                 }
                 
                 Divider()
-                    .padding(.vertical)
+                    .background(AppStyle.Colors.textSecondary.opacity(0.2))
+                    .padding(.vertical, 8)
             }
         }
     }
@@ -124,28 +125,19 @@ struct MovementCard: View {
     let onAdd: () -> Void
     
     var body: some View {
-        HStack(spacing: AppStyle.Layout.standardSpacing) {
-            VStack(alignment: .leading, spacing: 8) {
+        HStack(spacing: AppStyle.Layout.compactSpacing) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(movement.name)
                     .font(AppStyle.Typography.body())
                     .foregroundColor(AppStyle.Colors.textPrimary)
                 
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(spacing: 8) {
-                        equipmentTag
-                        // Primary muscles first line
-                        ForEach(movement.primaryMuscles.prefix(2), id: \.self) { muscle in
-                            musclePill(muscle, isPrimary: true)
-                        }
-                    }
-                    
-                    if movement.primaryMuscles.count > 2 || !movement.secondaryMuscles.isEmpty {
-                        FlowLayout(spacing: 8) {
-                            // Remaining primary muscles
-                            ForEach(Array(movement.primaryMuscles.dropFirst(2)), id: \.self) { muscle in
+                HStack(spacing: 4) {
+                    equipmentTag
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 4) {
+                            ForEach(movement.primaryMuscles, id: \.self) { muscle in
                                 musclePill(muscle, isPrimary: true)
                             }
-                            // Secondary muscles
                             ForEach(movement.secondaryMuscles, id: \.self) { muscle in
                                 musclePill(muscle, isPrimary: false)
                             }
@@ -158,20 +150,20 @@ struct MovementCard: View {
             
             Button(action: onAdd) {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "plus.circle")
-                    .font(.title2)
+                    .font(.title3)
                     .foregroundColor(isSelected ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary)
             }
         }
         .padding()
-        .cardStyle()
-        .opacity(isSelected ? 1 : 0.8)
+        .background(AppStyle.Colors.surface)
+        .cornerRadius(12)
     }
     
     private var equipmentTag: some View {
         Text(movement.equipment.rawValue)
             .font(AppStyle.Typography.caption())
             .foregroundColor(AppStyle.Colors.secondary)
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 6)
             .padding(.vertical, 2)
             .background(AppStyle.Colors.secondary.opacity(0.2))
             .cornerRadius(4)
@@ -181,7 +173,7 @@ struct MovementCard: View {
         Text(muscle.displayName)
             .font(AppStyle.Typography.caption())
             .foregroundColor(isPrimary ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary)
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 6)
             .padding(.vertical, 2)
             .background((isPrimary ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary).opacity(0.2))
             .clipShape(Capsule())

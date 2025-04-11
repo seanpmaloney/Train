@@ -30,7 +30,7 @@ struct PlanTemplate: Identifiable {
             title: "Push/Pull/Legs",
             goal: .hypertrophy,
             schedule: "Mon-Fri",
-            daysPerWeek: 5,
+            daysPerWeek: 3,
             suggestedDuration: "12-16 weeks",
             type: .pushPullLegs
         ),

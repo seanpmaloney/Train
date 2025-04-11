@@ -7,37 +7,33 @@ struct PlanTemplatePickerView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppStyle.Colors.background
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: AppStyle.Layout.standardSpacing) {
-                        // Custom Plan Option
+            ScrollView {
+                VStack(spacing: AppStyle.Layout.compactSpacing) {
+                    // Custom Plan Option
+                    NavigationLink {
+                        PlanEditorView(template: nil)
+                            .navigationBarBackButtonHidden()
+                    } label: {
+                        customPlanCard
+                    }
+                    
+                    // Template Options
+                    ForEach(PlanTemplate.templates) { template in
                         NavigationLink {
-                            PlanEditorView(template: nil)
+                            PlanEditorView(template: template)
                                 .navigationBarBackButtonHidden()
                         } label: {
-                            customPlanCard
-                        }
-                        
-                        // Template Options
-                        ForEach(PlanTemplate.templates) { template in
-                            NavigationLink {
-                                PlanEditorView(template: template)
-                                    .navigationBarBackButtonHidden()
-                            } label: {
-                                templateCard(template)
-                            }
+                            templateCard(template)
                         }
                     }
-                    .padding()
                 }
+                .padding()
             }
+            .background(AppStyle.Colors.background)
             .navigationTitle("Choose Template")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         dismiss()
                     }
@@ -47,48 +43,61 @@ struct PlanTemplatePickerView: View {
     }
     
     private var customPlanCard: some View {
-        VStack(alignment: .leading, spacing: AppStyle.Layout.compactSpacing) {
-            Text("Custom Plan")
-                .font(AppStyle.Typography.title())
-                .foregroundColor(AppStyle.Colors.textPrimary)
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Custom Plan")
+                    .font(AppStyle.Typography.headline())
+                    .foregroundColor(AppStyle.Colors.textPrimary)
+                
+                Text("Build your own training plan from scratch")
+                    .font(AppStyle.Typography.caption())
+                    .foregroundColor(AppStyle.Colors.textSecondary)
+            }
             
-            Text("Build your own training plan from scratch")
-                .font(AppStyle.Typography.body())
-                .foregroundColor(AppStyle.Colors.textSecondary)
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .foregroundColor(AppStyle.Colors.textSecondary.opacity(0.5))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .cardStyle()
+        .padding()
+        .background(AppStyle.Colors.surface)
+        .cornerRadius(12)
     }
     
     private func templateCard(_ template: PlanTemplate) -> some View {
         VStack(alignment: .leading, spacing: AppStyle.Layout.compactSpacing) {
-            Text(template.title)
-                .font(AppStyle.Typography.title())
-                .foregroundColor(AppStyle.Colors.textPrimary)
-            
-            Text(template.suggestedDuration)
-                .font(AppStyle.Typography.body())
-                .foregroundColor(AppStyle.Colors.textSecondary)
-                .lineLimit(2)
-            
-            HStack {
-                templateMetric(title: "Goal", value: template.goal.rawValue)
-                Spacer()
-                templateMetric(title: "Duration", value: (template.suggestedDuration))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(template.title)
+                    .font(AppStyle.Typography.headline())
+                    .foregroundColor(AppStyle.Colors.textPrimary)
+            }
+            //add divider
+            Divider()
+            VStack(alignment: .leading, spacing: 4) {
+                Text(template.schedule)
+                    .font(AppStyle.Typography.caption())
+                    .foregroundColor(AppStyle.Colors.textPrimary)
             }
         }
-        .cardStyle()
+        
+        .padding()
+        .background(AppStyle.Colors.surface)
+        .cornerRadius(12)
     }
     
-    private func templateMetric(title: String, value: String) -> some View {
+    private func metricPill(title: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(AppStyle.Typography.caption())
                 .foregroundColor(AppStyle.Colors.textSecondary)
             Text(value)
-                .font(AppStyle.Typography.body())
+                .font(AppStyle.Typography.caption())
                 .foregroundColor(AppStyle.Colors.textPrimary)
         }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(AppStyle.Colors.background.opacity(0.5))
+        .cornerRadius(8)
     }
 }
 
