@@ -5,7 +5,13 @@ class PlanEditorViewModel: ObservableObject {
     @Published var days: [DayPlan]
     @Published var planLength: Int = 4
     @Published var planName: String = ""
-    @Published var planStartDate: Date = Date()
+    
+    var planStartDate: Date {
+        get { _planStartDate }
+        set { _planStartDate = Calendar.current.startOfDay(for: newValue) }
+    }
+
+    @Published private var _planStartDate: Date = Calendar.current.startOfDay(for: Date())
     
     let template: PlanTemplate?
     let appState: AppState
@@ -110,6 +116,9 @@ class PlanEditorViewModel: ObservableObject {
         // Generate workouts for each week
         let calendar = Calendar.current
         
+        // Get start of week for plan start date
+        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: planStartDate))!
+        
         // For each week in the plan
         for weekIndex in 0..<planLength {
             // For each day that has movements
@@ -136,19 +145,21 @@ class PlanEditorViewModel: ObservableObject {
                 }
                 
                 // Calculate the date for this workout
-                // Find next occurrence of this day of week
-                var dateComponents = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: planStartDate)
+                var dateComponents = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: startOfWeek)
                 dateComponents.weekday = dayIndex + 1 // weekday is 1-based
                 dateComponents.weekOfYear! += weekIndex // Advance to correct week
                 
                 if let workoutDate = calendar.date(from: dateComponents) {
-                    workout.scheduledDate = workoutDate
-                    
-                    // Add workout to plan
-                    plan.workouts.append(workout)
-                    
-                    // Schedule workout in calendar
-                    appState.scheduleWorkout(workout)
+                    // Only include workouts on or after the plan start date
+                    if workoutDate >= planStartDate {
+                        workout.scheduledDate = workoutDate
+                        
+                        // Add workout to plan
+                        plan.workouts.append(workout)
+                        
+                        // Schedule workout in calendar
+                        appState.scheduleWorkout(workout)
+                    }
                 }
             }
         }

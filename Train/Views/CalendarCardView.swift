@@ -36,7 +36,7 @@ struct CalendarCardView: View {
             // Calendar grid
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
                 ForEach(viewModel.weeks.flatMap { $0 }.indices, id: \.self) { index in
-                    if let date = viewModel.weeks.flatMap { $0 }[index] {
+                    if let date = viewModel.weeks.flatMap({ $0 })[index] {
                         DayCell(
                             date: date,
                             isSelected: Calendar.current.isDate(date, inSameDayAs: viewModel.selectedDate),
@@ -45,9 +45,7 @@ struct CalendarCardView: View {
                         )
                         .onTapGesture {
                             if viewModel.isDateSelectable(date) {
-                                withAnimation {
                                     viewModel.selectedDate = date
-                                }
                             }
                         }
                     } else {
@@ -100,21 +98,22 @@ struct DayCell: View {
                 .fontWeight(isSelected ? .bold : .regular)
                 .foregroundColor(isSelectable ? .primary : .secondary)
             
-            if workoutType != .none {
-                Circle()
-                    .fill(Color(hex: workoutType.color))
-                    .frame(width: 4, height: 4)
-            }
         }
         .frame(height: 32)
         .background(
             isSelected ?
             Circle()
                 .fill(Color(hex: "#00B4D8").opacity(0.2))
-                .frame(width: 32, height: 32)
+                .frame(width: 40, height: 40)
             : nil
         )
-    }
+        .background(
+            workoutType != .none ?
+                Circle()
+                    .stroke(Color(hex: workoutType.color), lineWidth: 1)
+                    .frame(width: 34, height: 34)
+            : nil)
+            }
 }
 
 struct WorkoutPreview: View {
@@ -182,4 +181,8 @@ extension Color {
             opacity: Double(a) / 255
         )
     }
+}
+
+#Preview {
+    CalendarCardView(appState: AppState()).preferredColorScheme(.dark)
 }
