@@ -10,10 +10,23 @@ class PlanEditorViewModel: ObservableObject {
     let maxWeeks = 8
     let dayNames = Calendar.current.weekdaySymbols
     
+    struct MovementConfig: Identifiable {
+        let id = UUID()
+        let movement: MovementEntity
+        var targetSets: Int
+        var targetReps: Int
+        
+        init(movement: MovementEntity, targetSets: Int = 3, targetReps: Int = 10) {
+            self.movement = movement
+            self.targetSets = targetSets
+            self.targetReps = targetReps
+        }
+    }
+    
     struct DayPlan: Identifiable {
         let id = UUID()
         let label: String
-        var movements: [MovementEntity]
+        var movements: [MovementConfig]
     }
     
     init(template: PlanTemplate?) {
@@ -26,7 +39,8 @@ class PlanEditorViewModel: ObservableObject {
     func addMovement(_ movement: [MovementEntity], to dayIndex: Int) {
         guard days.indices.contains(dayIndex) else { return }
         for movement in movement {
-            days[dayIndex].movements.append(movement)
+            let config = MovementConfig(movement: movement)
+            days[dayIndex].movements.append(config)
         }
         objectWillChange.send()
     }
@@ -40,6 +54,20 @@ class PlanEditorViewModel: ObservableObject {
     func moveMovement(from source: IndexSet, to destination: Int, in dayIndex: Int) {
         guard days.indices.contains(dayIndex) else { return }
         days[dayIndex].movements.move(fromOffsets: source, toOffset: destination)
+        objectWillChange.send()
+    }
+    
+    func updateSets(_ sets: Int, for movementId: UUID, in dayIndex: Int) {
+        guard days.indices.contains(dayIndex),
+              let movementIndex = days[dayIndex].movements.firstIndex(where: { $0.id == movementId }) else { return }
+        days[dayIndex].movements[movementIndex].targetSets = min(sets, 20)
+        objectWillChange.send()
+    }
+    
+    func updateReps(_ reps: Int, for movementId: UUID, in dayIndex: Int) {
+        guard days.indices.contains(dayIndex),
+              let movementIndex = days[dayIndex].movements.firstIndex(where: { $0.id == movementId }) else { return }
+        days[dayIndex].movements[movementIndex].targetReps = min(reps, 100)
         objectWillChange.send()
     }
     

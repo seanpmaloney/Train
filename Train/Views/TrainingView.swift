@@ -46,6 +46,7 @@ var exercisesToDo = [ExerciseInstanceEntity(movement: pullUps, exerciseType: "Hy
 var sampleWorkout = WorkoutEntity(
     title: "Back & Biceps",
     description: "Pull-ups, rows, and bicep work",
+    isComplete: false,
     exercises: exercisesToDo
 )
 
@@ -54,6 +55,7 @@ var legExercisesToDo = [ExerciseInstanceEntity(movement: squats, exerciseType: "
 var sampleWorkout2 = WorkoutEntity(
     title: "Legs",
     description: "Squats, RDLs, and some leg extensions",
+    isComplete: false,
     exercises: legExercisesToDo
 )
 

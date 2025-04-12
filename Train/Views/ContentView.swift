@@ -42,7 +42,7 @@ struct VitalStat: View {
 }
 
 struct VitalsRow: View {
-    @StateObject private var healthKit = HealthKitManager.shared
+    @ObservedObject private var healthKit = HealthKitManager.shared
     
     var body: some View {
         VStack(spacing: 8) {
@@ -278,11 +278,13 @@ struct EnhancedTrainingPlanCard: View {
     let workouts = [
         WorkoutEntity(
             title: "Upper Body Power",
-            description: "Explosive pushing movements focusing on power development"
+            description: "Explosive pushing movements focusing on power development",
+            isComplete: false
         ),
         WorkoutEntity(
             title: "Core Stability",
-            description: "Dynamic core training with anti-rotation focus"
+            description: "Dynamic core training with anti-rotation focus",
+            isComplete: false
         )
     ]
     
@@ -364,93 +366,6 @@ struct TrainingPlanCard: View {
                 .fill(AppStyle.Colors.surface)
                 .shadow(color: .black.opacity(0.2), radius: 10)
         )
-    }
-}
-
-struct VitalsCard: View {
-    @StateObject private var healthKit = HealthKitManager.shared
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Daily Vitals")
-                .font(.title3)
-                .fontWeight(.bold)
-            
-            HStack(spacing: 20) {
-                VitalMetric(
-                    icon: "heart.fill",
-                    title: "HRV",
-                    value: formatHRV(healthKit.hrvValue),
-                    status: getHRVStatus(healthKit.hrvValue)
-                )
-                
-                VitalMetric(
-                    icon: "bed.double.fill",
-                    title: "Sleep",
-                    value: formatSleep(healthKit.sleepHours),
-                    status: getSleepStatus(healthKit.sleepHours)
-                )
-                
-                VitalMetric(
-                    icon: "heart.circle.fill",
-                    title: "Resting HR",
-                    value: formatHeartRate(healthKit.restingHeartRate),
-                    status: getHeartRateStatus(healthKit.restingHeartRate)
-                )
-            }
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(AppStyle.Colors.surface)
-                .shadow(color: .black.opacity(0.2), radius: 10)
-        )
-        .task {
-            if !healthKit.isAuthorized {
-                _ = await healthKit.requestAuthorization()
-            }
-            await healthKit.fetchTodayData()
-        }
-    }
-    
-    private func formatHRV(_ value: Double?) -> String {
-        guard let value = value else { return "--" }
-        return String(format: "%.0f ms", value)
-    }
-    
-    private func formatSleep(_ hours: Double?) -> String {
-        guard let hours = hours else { return "--" }
-        let totalMinutes = Int(hours * 60)
-        let hrs = totalMinutes / 60
-        let mins = totalMinutes % 60
-        return String(format: "%dh %dm", hrs, mins)
-    }
-    
-    private func formatHeartRate(_ bpm: Double?) -> String {
-        guard let bpm = bpm else { return "--" }
-        return String(format: "%.0f bpm", bpm)
-    }
-    
-    private func getHRVStatus(_ value: Double?) -> String {
-        guard let value = value else { return "No Data" }
-        if value > 50 { return "Good" }
-        if value > 30 { return "Average" }
-        return "Poor"
-    }
-    
-    private func getSleepStatus(_ hours: Double?) -> String {
-        guard let hours = hours else { return "No Data" }
-        if hours >= 7 { return "Good" }
-        if hours >= 6 { return "Average" }
-        return "Poor"
-    }
-    
-    private func getHeartRateStatus(_ bpm: Double?) -> String {
-        guard let bpm = bpm else { return "No Data" }
-        if bpm < 60 { return "Excellent" }
-        if bpm < 70 { return "Good" }
-        return "Average"
     }
 }
 

@@ -30,7 +30,7 @@ class PlanSummaryViewModel: ObservableObject {
         for week in weeks {
             for day in week {
                 for movement in day.movements {
-                    for muscle in movement.primaryMuscles {
+                    for muscle in movement.movement.primaryMuscles {
                         emphasis[muscle, default: 0] += 1
                     }
                 }
@@ -66,10 +66,11 @@ class PlanSummaryViewModel: ObservableObject {
                 let workout = WorkoutEntity(
                     title: "\(planName) - \(day.label)",
                     description: "Week \(weekIndex + 1), \(day.label)",
+                    isComplete: false,
                     scheduledDate: workoutDate,
                     exercises: day.movements.map { movement in
                         ExerciseInstanceEntity(
-                            movement: movement,
+                            movement: movement.movement,
                             exerciseType: template?.goal == .strength ? "Strength" : "Hypertrophy",
                             sets: (0..<3).map { _ in // Default to 3 sets, could be made configurable
                                 ExerciseSetEntity(

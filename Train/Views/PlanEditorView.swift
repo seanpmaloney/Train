@@ -2,29 +2,93 @@ import SwiftUI
 
 struct PlanEditorView: View {
     @StateObject private var viewModel: PlanEditorViewModel
-    @State private var showingMovementPicker = false
-    @State private var selectedDayIndex: Int? = 0
+    @State private var scrollTarget: ScrollTarget?
+    @State private var requiredPadding: CGFloat = 0
+    
+    private let numberPadHeight: CGFloat = 390
+    private let desiredSpaceAboveKeyboard: CGFloat = 40
+    
+    enum ActiveSheet: Identifiable {
+        case movementPicker(dayIndex: Int)
+
+        var id: String {
+            switch self {
+            case .movementPicker(let dayIndex):
+                return "movementPicker_\(dayIndex)"
+            }
+        }
+    }
+    @State private var activeSheet: ActiveSheet?
+    
+    struct ScrollTarget: Equatable {
+        let id: UUID
+        let buttonFrame: CGRect
+        
+        static func == (lhs: ScrollTarget, rhs: ScrollTarget) -> Bool {
+            lhs.id == rhs.id
+        }
+    }
     
     init(template: PlanTemplate?) {
         _viewModel = StateObject(wrappedValue: PlanEditorViewModel(template: template))
     }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: AppStyle.Layout.compactSpacing) {
-                planLengthPicker
-                daysSection
-            }
-            .padding(.horizontal)
-            .padding(.vertical, AppStyle.Layout.standardSpacing)
-        }
-        .background(AppStyle.Colors.background)
-        .navigationTitle("Create Plan")
-        .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingMovementPicker) {
-            if let dayIndex = selectedDayIndex {
-                MovementPickerView { movement in
-                    viewModel.addMovement(movement, to: dayIndex)
+        GeometryReader { geometry in
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: AppStyle.Layout.compactSpacing) {
+                        planLengthPicker
+                        daysSection
+                        
+                        // Dynamic padding based on button position
+                        Color.clear
+                            .frame(height: requiredPadding)
+                            .animation(.easeInOut(duration: 0.25), value: requiredPadding)
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, AppStyle.Layout.standardSpacing)
+                    .onChange(of: scrollTarget) { target in
+                        if let target = target {
+                            // Calculate if and how much padding we need
+                            let screenHeight = UIScreen.main.bounds.height
+                            let buttonBottomY = target.buttonFrame.maxY + 20
+                            let keyboardTopY = screenHeight - numberPadHeight
+                            
+                            // If button would be hidden by keyboard
+                            if buttonBottomY > keyboardTopY {
+                                // Calculate padding needed to show button above keyboard
+                                let overlap = buttonBottomY - keyboardTopY
+                                let padding = overlap + desiredSpaceAboveKeyboard
+                                
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    requiredPadding = padding
+                                    proxy.scrollTo(target.id, anchor: .center)
+                                }
+                            } else {
+                                // Button is already visible above keyboard
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    requiredPadding = 0
+                                }
+                            }
+                        } else {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                requiredPadding = 0
+                            }
+                        }
+                    }
+                }
+                .background(AppStyle.Colors.background)
+                .navigationTitle("Create Plan")
+                .navigationBarTitleDisplayMode(.inline)
+                .sheet(item: $activeSheet) { sheet in
+                    switch sheet {
+                    case .movementPicker(let dayIndex):
+                        MovementPickerView { movement in
+                            viewModel.addMovement(movement, to: dayIndex)
+                            activeSheet = nil
+                        }
+                    }
                 }
             }
         }
@@ -76,9 +140,12 @@ struct PlanEditorView: View {
             ForEach(viewModel.days.indices, id: \.self) { dayIndex in
                 DayView(
                     day: viewModel.days[dayIndex],
+                    dayIndex: dayIndex,
+                    viewModel: viewModel,
+                    scrollTarget: $scrollTarget,
+                    numberPadShowing: (false),
                     onAddMovement: {
-                        selectedDayIndex = dayIndex
-                        showingMovementPicker = true
+                        activeSheet = .movementPicker(dayIndex: dayIndex)
                     },
                     onRemoveMovement: { indexSet in
                         viewModel.removeMovement(at: indexSet, from: dayIndex)
@@ -94,6 +161,10 @@ struct PlanEditorView: View {
 
 private struct DayView: View {
     let day: PlanEditorViewModel.DayPlan
+    let dayIndex: Int
+    let viewModel: PlanEditorViewModel
+    @Binding var scrollTarget: PlanEditorView.ScrollTarget?
+    let numberPadShowing: Bool
     let onAddMovement: () -> Void
     let onRemoveMovement: (IndexSet) -> Void
     let onMoveMovement: (IndexSet, Int) -> Void
@@ -130,7 +201,12 @@ private struct DayView: View {
     private var movementsList: some View {
         VStack(spacing: AppStyle.Layout.compactSpacing) {
             ForEach(day.movements) { movement in
-                MovementRow(movement: movement)
+                MovementRow(
+                    movement: movement,
+                    dayIndex: dayIndex,
+                    viewModel: viewModel,
+                    scrollTarget: $scrollTarget
+                )
             }
             .onMove(perform: onMoveMovement)
             .onDelete(perform: onRemoveMovement)
@@ -149,26 +225,107 @@ private struct DayView: View {
 }
 
 private struct MovementRow: View {
-    let movement: MovementEntity
+    let movement: PlanEditorViewModel.MovementConfig
+    let dayIndex: Int
+    @ObservedObject var viewModel: PlanEditorViewModel
+    @Binding var scrollTarget: PlanEditorView.ScrollTarget?
+    @State private var showingSetsEditor = false
+    @State private var showingRepsEditor = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(movement.name)
-                .font(AppStyle.Typography.body())
-                .foregroundColor(AppStyle.Colors.textPrimary)
-            
-            HStack(spacing: 4) {
-                equipmentTag
-                muscleGroupTags
+        GeometryReader { geometry in
+            VStack(alignment: .leading, spacing: 4) {
+                Text(movement.movement.name)
+                    .font(AppStyle.Typography.body())
+                    .foregroundColor(AppStyle.Colors.textPrimary)
+                
+                HStack(spacing: 4) {
+                    equipmentTag
+                    muscleGroupTags
+                }
+                
+                Divider()
+                    .background(AppStyle.Colors.textSecondary.opacity(0.2))
+                    .padding(.vertical, 4)
+                
+                HStack(spacing: AppStyle.Layout.standardSpacing) {
+                    Button(action: {
+                        let frame = geometry.frame(in: .global)
+                        scrollTarget = PlanEditorView.ScrollTarget(id: movement.id, buttonFrame: frame)
+                        showingSetsEditor = true
+                    }) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Sets")
+                                .font(AppStyle.Typography.caption())
+                                .foregroundColor(AppStyle.Colors.textSecondary)
+                            Text("\(movement.targetSets)")
+                                .font(AppStyle.Typography.body())
+                                .foregroundColor(AppStyle.Colors.textPrimary)
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .cornerRadius(8)
+                    }
+                    
+                    Button(action: {
+                        let frame = geometry.frame(in: .global)
+                        scrollTarget = PlanEditorView.ScrollTarget(id: movement.id, buttonFrame: frame)
+                        showingRepsEditor = true
+                    }) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Reps")
+                                .font(AppStyle.Typography.caption())
+                                .foregroundColor(AppStyle.Colors.textSecondary)
+                            Text("\(movement.targetReps)")
+                                .font(AppStyle.Typography.body())
+                                .foregroundColor(AppStyle.Colors.textPrimary)
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .cornerRadius(8)
+                    }
+                    
+                    Spacer()
+                }
+            }
+            .id(movement.id)
+            .padding()
+            .background(AppStyle.Colors.background.opacity(0.5))
+            .cornerRadius(8)
+            .sheet(isPresented: $showingSetsEditor) {
+                CustomNumberPadView(
+                    title: "Sets",
+                    initialValue: Double(movement.targetSets),
+                    mode: .reps
+                ) { newValue in
+                    viewModel.updateSets(Int(newValue), for: movement.id, in: dayIndex)
+                    scrollTarget = nil
+                }
+                .presentationDetents([.height(350)])
+                .onDisappear {
+                    scrollTarget = nil
+                }
+            }
+            .sheet(isPresented: $showingRepsEditor) {
+                CustomNumberPadView(
+                    title: "Reps",
+                    initialValue: Double(movement.targetReps),
+                    mode: .reps
+                ) { newValue in
+                    viewModel.updateReps(Int(newValue), for: movement.id, in: dayIndex)
+                    scrollTarget = nil
+                }
+                .presentationDetents([.height(350)])
+                .onDisappear {
+                    scrollTarget = nil
+                }
             }
         }
-        .padding()
-        .background(AppStyle.Colors.background.opacity(0.5))
-        .cornerRadius(8)
+        .frame(height: 140)
     }
     
     private var equipmentTag: some View {
-        Text(movement.equipment.rawValue)
+        Text(movement.movement.equipment.rawValue)
             .font(AppStyle.Typography.caption())
             .foregroundColor(AppStyle.Colors.secondary)
             .padding(.horizontal, 8)
@@ -180,10 +337,10 @@ private struct MovementRow: View {
     private var muscleGroupTags: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 4) {
-                ForEach(movement.primaryMuscles, id: \.self) { muscle in
+                ForEach(movement.movement.primaryMuscles, id: \.self) { muscle in
                     muscleBadge(muscle.rawValue, isPrimary: true)
                 }
-                ForEach(movement.secondaryMuscles, id: \.self) { muscle in
+                ForEach(movement.movement.secondaryMuscles, id: \.self) { muscle in
                     muscleBadge(muscle.rawValue, isPrimary: false)
                 }
             }

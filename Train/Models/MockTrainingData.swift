@@ -88,6 +88,7 @@ class MockDataProvider {
         let workout = WorkoutEntity(
             title: "Upper Body Strength",
             description: "Focus on compound movements",
+            isComplete: false,
             scheduledDate: Date()
         )
         

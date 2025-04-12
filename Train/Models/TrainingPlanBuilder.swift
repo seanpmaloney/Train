@@ -50,6 +50,7 @@ class TrainingPlanBuilder {
                 let workout = WorkoutEntity(
                     title: "Day \(weekIndex * 7 + dayIndex + 1)",
                     description: "Auto-generated workout",
+                    isComplete: false,
                     scheduledDate: date,
                     exercises: exercises
                 )
@@ -248,6 +249,7 @@ class TrainingPlanBuilder {
             let workout = WorkoutEntity(
                 title: "Deload Day \(dayIndex + 1)",
                 description: "Deload workout - reduced volume, higher RIR",
+                isComplete: false,
                 scheduledDate: date,
                 exercises: exercises
             )

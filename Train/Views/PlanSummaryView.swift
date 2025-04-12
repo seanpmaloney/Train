@@ -4,6 +4,7 @@ struct PlanSummaryView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel: PlanSummaryViewModel
+    @Environment(\.presentationMode) private var presentationMode
     
     init(weeks: [[PlanEditorViewModel.DayPlan]], template: PlanTemplate?) {
         _viewModel = StateObject(wrappedValue: PlanSummaryViewModel(weeks: weeks, template: template))
@@ -16,12 +17,7 @@ struct PlanSummaryView: View {
                     // Plan Name
                     TextField("Plan Name", text: $viewModel.planName)
                         .font(AppStyle.Typography.title())
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    // Notes
-                    TextField("Notes (optional)", text: $viewModel.notes, axis: .vertical)
-                        .lineLimit(3...6)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .cardStyle()
                     
                     // Start Date
                     DatePicker(
@@ -40,6 +36,8 @@ struct PlanSummaryView: View {
                     Button {
                         let plan = viewModel.createPlan()
                         appState.setCurrentPlan(plan)
+                        // Pop back to root view
+                        presentationMode.wrappedValue.dismiss()
                         dismiss()
                     } label: {
                         Text("Start Plan")
