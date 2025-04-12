@@ -8,10 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */; };
+		8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */; };
+		8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A352DAAA08300404F43 /* TrainingType.swift */; };
 		8B7BCF8F2D9DFD3F0089F6D3 /* TrainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCF8E2D9DFD3F0089F6D3 /* TrainApp.swift */; };
 		8B7BCF932D9DFD430089F6D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B7BCF922D9DFD430089F6D3 /* Assets.xcassets */; };
 		8B7BCF962D9DFD430089F6D3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B7BCF952D9DFD430089F6D3 /* Preview Assets.xcassets */; };
-		8B7BCFBD2DA145110089F6D3 /* CalendarCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFB72DA145110089F6D3 /* CalendarCardViewModel.swift */; };
 		8B7BCFBE2DA145110089F6D3 /* CalendarCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFB92DA145110089F6D3 /* CalendarCardView.swift */; };
 		8B7BCFBF2DA145110089F6D3 /* TrainingSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFBB2DA145110089F6D3 /* TrainingSession.swift */; };
 		8B7BCFD82DA145F20089F6D3 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BCFD72DA145F20089F6D3 /* HealthKitManager.swift */; };
@@ -46,14 +47,26 @@
 		8B7BD05F2DA757900089F6D3 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BD05D2DA757900089F6D3 /* AppState.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		8B7A5A2E2DAA783D00404F43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B7BCF832D9DFD3F0089F6D3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B7BCF8A2D9DFD3F0089F6D3;
+			remoteInfo = Train;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
+		8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardViewModel.swift; sourceTree = "<group>"; };
+		8B7A5A352DAAA08300404F43 /* TrainingType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrainingType.swift; sourceTree = "<group>"; };
 		8B7BCF8B2D9DFD3F0089F6D3 /* Train.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Train.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B7BCF8E2D9DFD3F0089F6D3 /* TrainApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainApp.swift; sourceTree = "<group>"; };
 		8B7BCF922D9DFD430089F6D3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8B7BCF952D9DFD430089F6D3 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		8B7BCF9E2D9E0AF90089F6D3 /* Train.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Train.entitlements; sourceTree = "<group>"; };
-		8B7BCFB72DA145110089F6D3 /* CalendarCardViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardViewModel.swift; sourceTree = "<group>"; };
 		8B7BCFB92DA145110089F6D3 /* CalendarCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardView.swift; sourceTree = "<group>"; };
 		8B7BCFBB2DA145110089F6D3 /* TrainingSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrainingSession.swift; sourceTree = "<group>"; };
 		8B7BCFD72DA145F20089F6D3 /* HealthKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HealthKitManager.swift; path = Train/ViewModels/HealthKitManager.swift; sourceTree = SOURCE_ROOT; };
@@ -89,6 +102,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		8B7A5A272DAA783D00404F43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B7BCF882D9DFD3F0089F6D3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -99,11 +119,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8B7A5A192DA9FC4500404F43 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		8B7BCF822D9DFD3F0089F6D3 = {
 			isa = PBXGroup;
 			children = (
 				8B7BCF8D2D9DFD3F0089F6D3 /* Train */,
 				8B7BCF8C2D9DFD3F0089F6D3 /* Products */,
+				8B7A5A192DA9FC4500404F43 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -111,6 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				8B7BCF8B2D9DFD3F0089F6D3 /* Train.app */,
+				8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -146,7 +175,7 @@
 				8B7BD0592DA757440089F6D3 /* PlanSummaryViewModel.swift */,
 				8B7BD0572DA756B00089F6D3 /* MovementPickerViewModel.swift */,
 				8B7BCFD72DA145F20089F6D3 /* HealthKitManager.swift */,
-				8B7BCFB72DA145110089F6D3 /* CalendarCardViewModel.swift */,
+				8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -188,6 +217,7 @@
 				8B7BD0432DA6BA630089F6D3 /* TrainingPlanBuilder.swift */,
 				8B7BD0152DA357FB0089F6D3 /* Workout.swift */,
 				8B7BCFBB2DA145110089F6D3 /* TrainingSession.swift */,
+				8B7A5A352DAAA08300404F43 /* TrainingType.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -212,6 +242,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		8B7A5A292DAA783D00404F43 /* TrainTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8B7A5A302DAA783D00404F43 /* Build configuration list for PBXNativeTarget "TrainTests" */;
+			buildPhases = (
+				8B7A5A262DAA783D00404F43 /* Sources */,
+				8B7A5A272DAA783D00404F43 /* Frameworks */,
+				8B7A5A282DAA783D00404F43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8B7A5A2F2DAA783D00404F43 /* PBXTargetDependency */,
+			);
+			name = TrainTests;
+			productName = TrainTests;
+			productReference = 8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		8B7BCF8A2D9DFD3F0089F6D3 /* Train */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8B7BCF992D9DFD430089F6D3 /* Build configuration list for PBXNativeTarget "Train" */;
@@ -239,6 +287,10 @@
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
+					8B7A5A292DAA783D00404F43 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 8B7BCF8A2D9DFD3F0089F6D3;
+					};
 					8B7BCF8A2D9DFD3F0089F6D3 = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -258,11 +310,19 @@
 			projectRoot = "";
 			targets = (
 				8B7BCF8A2D9DFD3F0089F6D3 /* Train */,
+				8B7A5A292DAA783D00404F43 /* TrainTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		8B7A5A282DAA783D00404F43 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B7BCF892D9DFD3F0089F6D3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -275,6 +335,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		8B7A5A262DAA783D00404F43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B7BCF872D9DFD3F0089F6D3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -301,15 +368,16 @@
 				8B7BD01B2DA357FB0089F6D3 /* Workout.swift in Sources */,
 				8B7BD0522DA755EB0089F6D3 /* PlanEditorView.swift in Sources */,
 				8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */,
-				8B7BCFBD2DA145110089F6D3 /* CalendarCardViewModel.swift in Sources */,
 				8B7BCFE22DA1460F0089F6D3 /* CustomNumberPadView.swift in Sources */,
 				8B7BCF8F2D9DFD3F0089F6D3 /* TrainApp.swift in Sources */,
 				8B7BD0232DA35A540089F6D3 /* TrainingDataRoot.swift in Sources */,
+				8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */,
 				8B7BD0502DA755060089F6D3 /* PlanTemplate.swift in Sources */,
 				8B7BD0192DA357FB0089F6D3 /* ExerciseSet.swift in Sources */,
 				8B7BCFDF2DA1460F0089F6D3 /* ActiveWorkoutView.swift in Sources */,
 				8B7BD01E2DA357FB0089F6D3 /* ExerciseInstance.swift in Sources */,
 				8B7BD0442DA6BA630089F6D3 /* TrainingPlanBuilder.swift in Sources */,
+				8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */,
 				8B7BD0262DA35A630089F6D3 /* ActiveWorkoutViewModel.swift in Sources */,
 				8B7BCFBF2DA145110089F6D3 /* TrainingSession.swift in Sources */,
 				8B7BD0282DA5EFD20089F6D3 /* MovementEntity.swift in Sources */,
@@ -319,7 +387,51 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		8B7A5A2F2DAA783D00404F43 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B7BCF8A2D9DFD3F0089F6D3 /* Train */;
+			targetProxy = 8B7A5A2E2DAA783D00404F43 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		8B7A5A312DAA783D00404F43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7229M3R3PU;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = seanmaloney.TrainTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Train.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Train";
+			};
+			name = Debug;
+		};
+		8B7A5A322DAA783D00404F43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7229M3R3PU;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = seanmaloney.TrainTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Train.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Train";
+			};
+			name = Release;
+		};
 		8B7BCF972D9DFD430089F6D3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -462,6 +574,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				"OTHER_LDFLAGS[arch=*]" = "";
 				PRODUCT_BUNDLE_IDENTIFIER = seanmaloney.Train;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -493,6 +606,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = seanmaloney.Train;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -504,6 +618,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		8B7A5A302DAA783D00404F43 /* Build configuration list for PBXNativeTarget "TrainTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B7A5A312DAA783D00404F43 /* Debug */,
+				8B7A5A322DAA783D00404F43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		8B7BCF862D9DFD3F0089F6D3 /* Build configuration list for PBXProject "Train" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

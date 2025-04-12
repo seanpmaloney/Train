@@ -4,6 +4,7 @@ struct PlanDetailView: View {
     let plan: TrainingPlanEntity
     @Environment(\.dismiss) private var dismiss
     @State private var showingEditor = false
+    @EnvironmentObject var appState: AppState
     
     var body: some View {
         ScrollView {
@@ -52,7 +53,7 @@ struct PlanDetailView: View {
             }
         }
         .sheet(isPresented: $showingEditor) {
-            PlanEditorView(template: nil)
+            PlanEditorView(template: nil, appState: appState)
         }
     }
     

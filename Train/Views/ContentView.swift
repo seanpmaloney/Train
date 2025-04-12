@@ -81,7 +81,6 @@ struct VitalsRow: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(AppStyle.Colors.surface)
         )
-        .padding(.horizontal)
     }
     
     private func formatHRV(_ value: Double?) -> String {
@@ -167,19 +166,15 @@ struct ContentView: View {
                                 VStack(spacing: 24) {
                                     // Vitals Row
                                     VitalsRow()
-                                    
-                                    // Today's Training
-                                    EnhancedTrainingPlanCard(selectedTab: $selectedTab)
                                         .padding(.horizontal)
                                     
-                                    CollapsibleCard(
-                                        title: "Calendar",
-                                        storageKey: "isCalendarCollapsed",
-                                        defaultCollapsed: false
-                                    ) {
-                                        CalendarCardView()
-                                    }
-                                    .padding(.horizontal)
+                                    // Calendar
+                                    CalendarCardView(appState: appState)
+                                        .padding(.horizontal)
+                                    
+                                    // Today's Training
+                                    TomorrowTrainingCard()
+                                        .padding(.horizontal)
                                     
                                     // Recovery Status
                                     RecoveryStatusCard()

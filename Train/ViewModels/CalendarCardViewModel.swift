@@ -4,14 +4,14 @@ import SwiftUI
 class CalendarCardViewModel: ObservableObject {
     @Published var selectedDate: Date
     @Published var displayedMonth: Date
-    @Published var sessions: [Date: [TrainingSession]]
     
     private let calendar = Calendar.current
+    private let appState: AppState
     
-    init(sessions: [Date: [TrainingSession]] = TrainingSession.mockData) {
+    init(appState: AppState = AppState()) {
         self.selectedDate = Date()
         self.displayedMonth = Date()
-        self.sessions = sessions
+        self.appState = appState
     }
     
     var monthTitle: String {
@@ -33,7 +33,6 @@ class CalendarCardViewModel: ObservableObject {
                 dates.append(date)
             }
         }
-
         
         while dates.count % 7 != 0 {
             dates.append(nil)
@@ -42,9 +41,8 @@ class CalendarCardViewModel: ObservableObject {
         return dates.chunked(into: 7)
     }
     
-    var selectedDaySessions: [TrainingSession] {
-        let startOfDay = calendar.startOfDay(for: selectedDate)
-        return sessions[startOfDay, default: []]
+    var selectedDayWorkouts: [WorkoutEntity] {
+        appState.getWorkouts(for: selectedDate)
     }
     
     func isDateSelectable(_ date: Date) -> Bool {
@@ -57,15 +55,17 @@ class CalendarCardViewModel: ObservableObject {
         }
     }
     
-    func getTrainingType(for date: Date) -> TrainingType? {
-        let startOfDay = calendar.startOfDay(for: date)
-        guard let sessions = sessions[startOfDay], !sessions.isEmpty else { return nil }
+    func getWorkoutType(for date: Date) -> TrainingType {
+        let workouts = appState.getWorkouts(for: date)
+        guard !workouts.isEmpty else { return .none }
         
-        let types = Set(sessions.map { session in session.type })
-        if types.count > 1 {
+        if workouts.count > 1 {
             return .hybrid
         }
-        return types.first
+        
+        // For now just return strength for single workouts
+        // TODO: Add workout type to WorkoutEntity and use that
+        return .strength
     }
 }
 

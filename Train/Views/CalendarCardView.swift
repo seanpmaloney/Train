@@ -1,7 +1,11 @@
 import SwiftUI
 
 struct CalendarCardView: View {
-    @StateObject private var viewModel = CalendarCardViewModel()
+    @StateObject private var viewModel: CalendarCardViewModel
+    
+    init(appState: AppState) {
+        _viewModel = StateObject(wrappedValue: CalendarCardViewModel(appState: appState))
+    }
     
     var body: some View {
         VStack(spacing: 16) {
@@ -37,7 +41,7 @@ struct CalendarCardView: View {
                             date: date,
                             isSelected: Calendar.current.isDate(date, inSameDayAs: viewModel.selectedDate),
                             isSelectable: viewModel.isDateSelectable(date),
-                            trainingType: viewModel.getTrainingType(for: date)
+                            workoutType: viewModel.getWorkoutType(for: date)
                         )
                         .onTapGesture {
                             if viewModel.isDateSelectable(date) {
@@ -52,11 +56,11 @@ struct CalendarCardView: View {
                 }
             }
             
-            // Training preview section
-            if !viewModel.selectedDaySessions.isEmpty {
+            // Workouts preview section
+            if !viewModel.selectedDayWorkouts.isEmpty {
                 VStack(spacing: 12) {
-                    ForEach(viewModel.selectedDaySessions) { session in
-                        TrainingSessionPreview(session: session)
+                    ForEach(viewModel.selectedDayWorkouts) { workout in
+                        WorkoutPreview(workout: workout)
                     }
                 }
                 .padding(.top, 8)
@@ -87,7 +91,7 @@ struct DayCell: View {
     let date: Date
     let isSelected: Bool
     let isSelectable: Bool
-    let trainingType: TrainingType?
+    let workoutType: TrainingType
     
     var body: some View {
         VStack(spacing: 4) {
@@ -96,9 +100,9 @@ struct DayCell: View {
                 .fontWeight(isSelected ? .bold : .regular)
                 .foregroundColor(isSelectable ? .primary : .secondary)
             
-            if let type = trainingType {
+            if workoutType != .none {
                 Circle()
-                    .fill(Color(hex: type.color))
+                    .fill(Color(hex: workoutType.color))
                     .frame(width: 4, height: 4)
             }
         }
@@ -113,36 +117,34 @@ struct DayCell: View {
     }
 }
 
-struct TrainingSessionPreview: View {
-    let session: TrainingSession
+struct WorkoutPreview: View {
+    let workout: WorkoutEntity
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(session.title)
+                Text(workout.title)
                     .font(.headline)
                 
                 Spacer()
                 
-                if let startTime = session.startTime {
-                    Text(startTime.formatted(date: .omitted, time: .shortened))
+                if let scheduledDate = workout.scheduledDate {
+                    Text(scheduledDate.formatted(date: .omitted, time: .shortened))
                         .foregroundColor(.secondary)
                 }
             }
             
-            if let summary = session.summary {
-                Text(summary)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
+            Text(workout.description)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
             
             HStack {
-                Text(session.type.rawValue.capitalized)
+                Text("\(workout.exercises.count) exercises")
                     .font(.caption)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color(hex: session.type.color).opacity(0.2))
-                    .foregroundColor(Color(hex: session.type.color))
+                    .background(Color(hex: "#00B4D8").opacity(0.2))
+                    .foregroundColor(Color(hex: "#00B4D8"))
                     .cornerRadius(8)
                 
                 Spacer()

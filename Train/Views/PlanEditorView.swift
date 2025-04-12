@@ -4,17 +4,21 @@ struct PlanEditorView: View {
     @StateObject private var viewModel: PlanEditorViewModel
     @State private var scrollTarget: ScrollTarget?
     @State private var requiredPadding: CGFloat = 0
+    @Environment(\.dismiss) private var dismiss
     
     private let numberPadHeight: CGFloat = 390
     private let desiredSpaceAboveKeyboard: CGFloat = 40
     
     enum ActiveSheet: Identifiable {
         case movementPicker(dayIndex: Int)
+        case datePicker
 
         var id: String {
             switch self {
             case .movementPicker(let dayIndex):
                 return "movementPicker_\(dayIndex)"
+            case .datePicker:
+                return "datePicker"
             }
         }
     }
@@ -29,8 +33,8 @@ struct PlanEditorView: View {
         }
     }
     
-    init(template: PlanTemplate?) {
-        _viewModel = StateObject(wrappedValue: PlanEditorViewModel(template: template))
+    init(template: PlanTemplate?, appState: AppState) {
+        _viewModel = StateObject(wrappedValue: PlanEditorViewModel(template: template, appState: appState))
     }
     
     var body: some View {
@@ -38,6 +42,7 @@ struct PlanEditorView: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(spacing: AppStyle.Layout.compactSpacing) {
+                        planDetailsSection
                         planLengthPicker
                         daysSection
                         
@@ -81,6 +86,15 @@ struct PlanEditorView: View {
                 .background(AppStyle.Colors.background)
                 .navigationTitle("Create Plan")
                 .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Create") {
+                            viewModel.finalizePlan()
+                            dismiss()
+                        }
+                        .disabled(viewModel.planName.isEmpty || viewModel.totalMovementCount == 0)
+                    }
+                }
                 .sheet(item: $activeSheet) { sheet in
                     switch sheet {
                     case .movementPicker(let dayIndex):
@@ -88,10 +102,43 @@ struct PlanEditorView: View {
                             viewModel.addMovement(movement, to: dayIndex)
                             activeSheet = nil
                         }
+                    case .datePicker:
+                        DatePicker(
+                            "Start Date",
+                            selection: $viewModel.planStartDate,
+                            in: Date()...,
+                            displayedComponents: [.date]
+                        )
+                        .datePickerStyle(.graphical)
+                        .presentationDetents([.medium])
                     }
                 }
             }
         }
+    }
+    
+    private var planDetailsSection: some View {
+        VStack(spacing: AppStyle.Layout.compactSpacing) {
+            TextField("Plan Name", text: $viewModel.planName)
+                .textFieldStyle(.roundedBorder)
+                .font(AppStyle.Typography.body())
+            
+            Button(action: {
+                activeSheet = .datePicker
+            }) {
+                HStack {
+                    Text("Start Date")
+                        .font(AppStyle.Typography.body())
+                    Spacer()
+                    Text(viewModel.planStartDate.formatted(date: .abbreviated, time: .omitted))
+                        .font(AppStyle.Typography.body())
+                        .foregroundColor(AppStyle.Colors.textSecondary)
+                }
+            }
+        }
+        .padding()
+        .background(AppStyle.Colors.surface)
+        .cornerRadius(12)
     }
     
     private var planLengthPicker: some View {
@@ -363,7 +410,7 @@ private struct MovementRow: View {
 
 #Preview {
     NavigationStack {
-        PlanEditorView(template: PlanTemplate.templates.first)
+        PlanEditorView(template: PlanTemplate.templates.first, appState: AppState())
             .preferredColorScheme(.dark)
     }
 }

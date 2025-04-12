@@ -11,7 +11,7 @@ struct PlanTemplatePickerView: View {
                 VStack(spacing: AppStyle.Layout.compactSpacing) {
                     // Custom Plan Option
                     NavigationLink {
-                        PlanEditorView(template: nil)
+                        PlanEditorView(template: nil, appState: appState)
                             .navigationBarBackButtonHidden()
                     } label: {
                         customPlanCard
@@ -20,7 +20,7 @@ struct PlanTemplatePickerView: View {
                     // Template Options
                     ForEach(PlanTemplate.templates) { template in
                         NavigationLink {
-                            PlanEditorView(template: template)
+                            PlanEditorView(template: template, appState: appState)
                                 .navigationBarBackButtonHidden()
                         } label: {
                             templateCard(template)

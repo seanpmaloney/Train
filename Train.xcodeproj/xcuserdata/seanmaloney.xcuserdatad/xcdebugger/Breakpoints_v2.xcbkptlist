@@ -14,8 +14,8 @@
             filePath = "Train/TrainApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "19"
-            endingLineNumber = "19"
+            startingLineNumber = "20"
+            endingLineNumber = "20"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -177,6 +177,22 @@
             startingLineNumber = "9"
             endingLineNumber = "9"
             landmarkName = "body"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "89B6088E-3B1C-45B8-A704-D1B2EFB18A3B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/ViewModels/CalendarCardViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
+            landmarkName = "weeks"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>

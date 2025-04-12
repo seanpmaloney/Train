@@ -1,19 +1,5 @@
 import Foundation
 
-enum TrainingType: String {
-    case strength
-    case endurance
-    case hybrid
-    
-    var color: String {
-        switch self {
-        case .strength: return "#EF476F"  // Red
-        case .endurance: return "#00B4D8" // Blue
-        case .hybrid: return "#FFD166"    // Yellow
-        }
-    }
-}
-
 struct TrainingSession: Identifiable {
     let id = UUID()
     let title: String
