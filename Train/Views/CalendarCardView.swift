@@ -137,21 +137,54 @@ struct WorkoutPreview: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
             
-            HStack {
-                Text("\(workout.exercises.count) exercises")
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color(hex: "#00B4D8").opacity(0.2))
-                    .foregroundColor(Color(hex: "#00B4D8"))
-                    .cornerRadius(8)
-                
-                Spacer()
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    Text("\(workout.exercises.count) exercises")
+                        .font(.caption)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color(hex: "#00B4D8").opacity(0.2))
+                        .foregroundColor(Color(hex: "#00B4D8"))
+                        .cornerRadius(8)
+                    
+                    let muscles = getMuscleGroups(from: workout)
+                    ForEach(Array(muscles.primary), id: \.self) { muscle in
+                        musclePill(muscle, isPrimary: true)
+                    }
+                    ForEach(Array(muscles.secondary), id: \.self) { muscle in
+                        musclePill(muscle, isPrimary: false)
+                    }
+                }
             }
         }
         .padding()
         .background(Color(hex: "#0F1115"))
         .cornerRadius(12)
+    }
+    
+    private func musclePill(_ muscle: MuscleGroup, isPrimary: Bool) -> some View {
+        Text(muscle.displayName)
+            .font(.caption)
+            .foregroundColor(isPrimary ? Color(hex: "#00B4D8") : .secondary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background((isPrimary ? Color(hex: "#00B4D8") : .secondary).opacity(0.2))
+            .cornerRadius(8)
+    }
+    
+    private func getMuscleGroups(from workout: WorkoutEntity) -> (primary: Set<MuscleGroup>, secondary: Set<MuscleGroup>) {
+        var primary = Set<MuscleGroup>()
+        var secondary = Set<MuscleGroup>()
+        
+        for exercise in workout.exercises {
+            primary.formUnion(exercise.movement.primaryMuscles)
+            secondary.formUnion(exercise.movement.secondaryMuscles)
+        }
+        
+        // Remove any muscles that are in both sets (keep them only in primary)
+        secondary.subtract(primary)
+        
+        return (primary, secondary)
     }
 }
 

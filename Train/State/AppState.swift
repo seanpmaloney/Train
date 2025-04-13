@@ -37,7 +37,6 @@ class AppState: ObservableObject {
         if !scheduledWorkouts.contains(where: { $0.id == workout.id }) {
             scheduledWorkouts.append(workout)
             sortWorkouts()
-            savePlans()
         }
     }
     

@@ -1,7 +1,8 @@
 import Foundation
+import SwiftUI
 
 enum MuscleGroup: String, CaseIterable, Codable, Identifiable {
-    case chest, back, quads, hamstrings, glutes, calves, biceps, triceps, shoulders, abs
+    case chest, back, quads, hamstrings, glutes, calves, biceps, triceps, shoulders, abs, forearms, obliques, lowerBack, traps, neck
 
     var id: String { rawValue }
 
@@ -17,6 +18,31 @@ enum MuscleGroup: String, CaseIterable, Codable, Identifiable {
         case .triceps: return "Triceps"
         case .shoulders: return "Shoulders"
         case .abs: return "Abs"
+        case .forearms: return "Forearms"
+        case .obliques: return "Obliques"
+        case .lowerBack: return "Lower Back"
+        case .traps: return "Traps"
+        case .neck: return "Neck"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .chest: return AppStyle.MuscleColors.chest
+        case .back: return AppStyle.MuscleColors.back
+        case .quads: return AppStyle.MuscleColors.quads
+        case .hamstrings: return AppStyle.MuscleColors.hamstrings
+        case .glutes: return AppStyle.MuscleColors.glutes
+        case .calves: return AppStyle.MuscleColors.calves
+        case .biceps: return AppStyle.MuscleColors.biceps
+        case .triceps: return AppStyle.MuscleColors.triceps
+        case .shoulders: return AppStyle.MuscleColors.shoulders
+        case .abs: return AppStyle.MuscleColors.abs
+        case .forearms: return AppStyle.MuscleColors.forearms
+        case .obliques: return AppStyle.MuscleColors.obliques
+        case .lowerBack: return AppStyle.MuscleColors.lowerBack
+        case .traps: return AppStyle.MuscleColors.traps
+        case .neck: return AppStyle.MuscleColors.neck
         }
     }
 }

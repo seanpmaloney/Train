@@ -163,17 +163,16 @@ struct ContentView: View {
                                 .padding(.top, 8)
                                 
                                 // Dashboard Content
-                                VStack(spacing: 24) {
-                                    // Vitals Row
-                                    VitalsRow()
+                                VStack(spacing: 12) {
+                                    TodaysTrainingCard(appState: appState)
                                         .padding(.horizontal)
+                                    
+                                    // Vitals Row
+                                    //                                    VitalsRow()
+                                    //                                        .padding(.horizontal)
                                     
                                     // Calendar
                                     CalendarCardView(appState: appState)
-                                        .padding(.horizontal)
-                                    
-                                    // Today's Training
-                                    TomorrowTrainingCard()
                                         .padding(.horizontal)
                                     
                                     // Recovery Status
@@ -184,12 +183,11 @@ struct ContentView: View {
                             // Add bottom padding to clear the tab bar
                             .padding(.bottom, 100)
                         }
-                        
                     case 1:
                         PlansView()
                             .environmentObject(appState)
                     case 2:
-                        TrainingView()
+                        TrainingView(appState: appState)
                     case 3:
                         Text("Profile")
                             .foregroundColor(AppStyle.Colors.textPrimary)
@@ -488,45 +486,101 @@ struct CustomTabBar: View {
 }
 
 struct TomorrowTrainingCard: View {
-    let workouts = [
-        (title: "Long Run", type: "Endurance", duration: "60 min"),
-        (title: "Lower Body", type: "Strength", duration: "5 sets")
-    ]
+    @StateObject private var viewModel: UpcomingTrainingViewModel
+    let appState: AppState
+    
+    init(appState: AppState) {
+        self.appState = appState
+        _viewModel = StateObject(wrappedValue: UpcomingTrainingViewModel(appState: appState))
+    }
     
     var body: some View {
         CollapsibleCard(
-            title: "Tomorrow's Training",
+            title: "Upcoming Training",
             storageKey: "isTomorrowTrainingCollapsed",
             defaultCollapsed: true
         ) {
-            VStack(spacing: 16) {
-                ForEach(workouts, id: \.title) { workout in
-                    HStack {
-                        VStack(alignment: .leading, spacing: 6) {
+            if viewModel.hasCurrentPlan {
+                if let workout = viewModel.nextWorkout {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
                             Text(workout.title)
                                 .font(.headline)
-                                .foregroundColor(AppStyle.Colors.textPrimary)
                             
-                            Text(workout.type)
-                                .font(.subheadline)
-                                .foregroundColor(AppStyle.Colors.textSecondary)
+                            Spacer()
+                            
+                            if let dateString = viewModel.nextWorkoutDateString {
+                                Text(dateString)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         
-                        Spacer()
-                        
-                        Text(workout.duration)
+                        Text(workout.description)
                             .font(.subheadline)
-                            .foregroundColor(AppStyle.Colors.textSecondary)
+                            .foregroundColor(.secondary)
+                        
+                        // Exercise and Muscle Group Tags
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                // Exercise count pill
+                                Text("\(workout.exercises.count) exercises")
+                                    .font(.caption)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color(hex: "#00B4D8").opacity(0.2))
+                                    .foregroundColor(Color(hex: "#00B4D8"))
+                                    .cornerRadius(8)
+                                
+                                let muscles = getMuscleGroups(from: workout)
+                                ForEach(Array(muscles.primary), id: \.self) { muscle in
+                                    musclePill(muscle, isPrimary: true)
+                                }
+                                ForEach(Array(muscles.secondary), id: \.self) { muscle in
+                                    musclePill(muscle, isPrimary: false)
+                                }
+                            }
+                        }
                     }
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(AppStyle.Colors.surface)
-                    )
+                    .padding()
+                    .background(Color(hex: "#0F1115"))
+                    .cornerRadius(12)
+                } else {
+                    Text("No upcoming workouts scheduled")
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 16)
+                }
+            } else {
+                NavigationLink(destination: PlanEditorView(template: nil, appState: appState)) {
+                    Text("Create a plan to get started")
+                        .foregroundColor(AppStyle.Colors.primary)
                 }
             }
         }
+    }
+    
+    private func musclePill(_ muscle: MuscleGroup, isPrimary: Bool) -> some View {
+        Text(muscle.displayName)
+            .font(.caption)
+            .foregroundColor(isPrimary ? Color(hex: "#00B4D8") : .secondary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background((isPrimary ? Color(hex: "#00B4D8") : .secondary).opacity(0.2))
+            .cornerRadius(8)
+    }
+    
+    private func getMuscleGroups(from workout: WorkoutEntity) -> (primary: Set<MuscleGroup>, secondary: Set<MuscleGroup>) {
+        var primary = Set<MuscleGroup>()
+        var secondary = Set<MuscleGroup>()
+        
+        for exercise in workout.exercises {
+            primary.formUnion(exercise.movement.primaryMuscles)
+            secondary.formUnion(exercise.movement.secondaryMuscles)
+        }
+        
+        // Remove any muscles that are in both sets (keep them only in primary)
+        secondary.subtract(primary)
+        
+        return (primary, secondary)
     }
 }
 

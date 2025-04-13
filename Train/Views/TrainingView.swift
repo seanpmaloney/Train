@@ -60,10 +60,14 @@ var sampleWorkout2 = WorkoutEntity(
 )
 
 struct TrainingView: View {
+    @StateObject private var viewModel: TrainingViewModel
+    @State private var activeWorkout: WorkoutEntity?
+    @EnvironmentObject var appState: AppState
     @AppStorage("activeWorkoutId") private var activeWorkoutId: String?
     
-    // Sample workout data
-    private let workouts = [sampleWorkout, sampleWorkout2]
+    init(appState: AppState) {
+        _viewModel = StateObject(wrappedValue: TrainingViewModel(appState: appState))
+    }
     
     var body: some View {
         NavigationStack {
@@ -73,10 +77,10 @@ struct TrainingView: View {
                     .ignoresSafeArea()
                 
                 if let activeId = activeWorkoutId,
-                   let workout = workouts.first(where: { $0.title == activeId }) {
+                   let workout = viewModel.upcomingWorkouts.first(where: { $0.title == activeId }) {
                     ActiveWorkoutView(workout: workout, viewModel: ActiveWorkoutViewModel(workout: workout))
                 } else {
-                    WorkoutListView(workouts: workouts)
+                    WorkoutListView(workouts: viewModel.upcomingWorkouts, viewModel: viewModel)
                 }
             }
             .navigationTitle("Training")
@@ -84,82 +88,67 @@ struct TrainingView: View {
     }
 }
 
-struct WorkoutListView: View {
-    let workouts: [WorkoutEntity]
-    @AppStorage("activeWorkoutId") private var activeWorkoutId: String?
-    
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                ForEach(workouts) { workout in
-                    WorkoutCard(workout: workout)
-                }
-            }
-            .padding()
-        }
-    }
-}
-
 struct WorkoutCard: View {
     let workout: WorkoutEntity
-    @AppStorage("activeWorkoutId") private var activeWorkoutId: String?
-    @State private var exercises: [ExerciseInstanceEntity]
-    
-    init(workout: WorkoutEntity) {
-            self.workout = workout
-            _exercises = State(initialValue: workout.exercises)
-        }
+    let isNextWorkout: Bool
+    let onStart: () -> Void
+    let viewModel: TrainingViewModel
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Header
-            VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header with date
+            HStack {
                 Text(workout.title)
-                    .font(.title3)
-                    .fontWeight(.bold)
+                    .font(.headline)
                 
-                Text(workout.exercises.first?.exerciseType ?? "Strength")
-                    .font(.subheadline)
-                    .foregroundColor(AppStyle.Colors.textSecondary)
+                Spacer()
+                
+                if let scheduledDate = workout.scheduledDate {
+                    Text(viewModel.formatDate(scheduledDate))
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
             }
             
             // Description
-            Text(workout.description)
-                .font(.body)
-                .foregroundColor(AppStyle.Colors.textSecondary)
+                Text(workout.description)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             
-            // Buttons
-            HStack {
-                Button(action: {
-                    activeWorkoutId = workout.title
-                }) {
-                    Text("Start")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(AppStyle.Colors.primary)
-                        )
+            // Muscle tags
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(viewModel.getMuscleGroups(from: workout), id: \.self) { muscle in
+                        Text(muscle.displayName)
+                            .font(.caption)
+                            .foregroundColor(AppStyle.MuscleColors.color(for: muscle))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(AppStyle.MuscleColors.color(for: muscle).opacity(0.2))
+                            .cornerRadius(8)
+                    }
                 }
-                
-                Button(action: {
-                    // Info action (to be implemented)
-                }) {
-                    Image(systemName: "info.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(AppStyle.Colors.textPrimary)
-                        .padding(.horizontal, 8)
+            }
+            
+            // Start button for next workout
+            if isNextWorkout {
+                Button(action: onStart) {
+                    HStack {
+                        Spacer()
+                        Text("Start Workout")
+                            .font(.headline)
+                            .foregroundColor(Color(AppStyle.Colors.primary))
+                        Image(systemName: "chevron.right")
+                            .font(.headline)
+                            .foregroundColor(Color(AppStyle.Colors.primary))
+                    }
+                    .padding(.top, 4)
                 }
             }
         }
         .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(AppStyle.Colors.surface)
-                .shadow(color: .black.opacity(0.2), radius: 10)
-        )
+        .background(Color(AppStyle.Colors.surface))
+        .cornerRadius(12)
     }
 }
 
@@ -196,7 +185,70 @@ struct ActiveWorkoutView_Preview: View {
     }
 }
 
+struct WorkoutListView: View {
+    let workouts: [WorkoutEntity]
+    let viewModel: TrainingViewModel
+    @AppStorage("activeWorkoutId") private var activeWorkoutId: String?
+    @EnvironmentObject var appState: AppState
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                if workouts.isEmpty {
+                    emptyState
+                } else {
+                    ForEach(Array(workouts.enumerated()), id: \.element.id) { index, workout in
+                        WorkoutCard(
+                            workout: workout,
+                            isNextWorkout: index == 0,
+                            onStart: { activeWorkoutId = workout.title },
+                            viewModel: viewModel
+                        )
+                    }
+                }
+            }
+            .padding()
+        }
+    }
+    
+    private var emptyState: some View {
+        VStack(spacing: 12) {
+            Text("No upcoming training yet")
+                .font(.headline)
+                .foregroundColor(.primary)
+            
+            NavigationLink(destination: PlanEditorView(template: nil, appState: appState)) {
+                Text("Create a plan to get started")
+                    .font(.subheadline)
+                    .foregroundColor(Color(hex: "#00B4D8"))
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
+    }
+}
+
+
 #Preview {
-    TrainingView()
-        .preferredColorScheme(.dark)
-} 
+    let appState = AppState()
+    let viewModel = TrainingViewModel(appState: appState)
+    return Group {
+        TrainingView(appState: appState)
+            .environmentObject(appState)
+        
+        // Sample workout card
+        WorkoutCard(
+            workout: WorkoutEntity(
+                title: "Sample Workout",
+                description: "A sample workout for preview",
+                isComplete: false,
+                exercises: []
+            ),
+            isNextWorkout: true,
+            onStart: {},
+            viewModel: viewModel
+        )
+        .padding()
+    }
+    .preferredColorScheme(.dark)
+}

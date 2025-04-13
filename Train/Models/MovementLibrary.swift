@@ -27,6 +27,24 @@ struct MovementLibrary {
             secondaryMuscles: [.shoulders],
             equipment: .cable
         ),
+        MovementEntity(
+            name: "Machine Pec Deck",
+            primaryMuscles: [.chest],
+            secondaryMuscles: [.shoulders],
+            equipment: .machine
+        ),
+        MovementEntity(
+            name: "Dumbbell Bench Press",
+            primaryMuscles: [.chest],
+            secondaryMuscles: [.shoulders, .triceps],
+            equipment: .dumbbell
+        ),
+        MovementEntity(
+            name: "Cable Chest Fly",
+            primaryMuscles: [.chest],
+            secondaryMuscles: [.shoulders],
+            equipment: .cable
+        ),
         
         // Back
         MovementEntity(
@@ -58,6 +76,24 @@ struct MovementLibrary {
             primaryMuscles: [.back],
             secondaryMuscles: [.biceps],
             equipment: .cable
+        ),
+        MovementEntity(
+            name: "Dumbbell Row",
+            primaryMuscles: [.back],
+            secondaryMuscles: [.biceps],
+            equipment: .dumbbell
+        ),
+        MovementEntity(
+            name: "Cable Pullover",
+            primaryMuscles: [.back],
+            secondaryMuscles: [.abs],
+            equipment: .cable
+        ),
+        MovementEntity(
+            name: "Chin-Ups",
+            primaryMuscles: [.back, .biceps],
+            secondaryMuscles: [],
+            equipment: .bodyweight
         ),
         
         // Legs
@@ -100,6 +136,24 @@ struct MovementLibrary {
             primaryMuscles: [.hamstrings],
             equipment: .machine
         ),
+        MovementEntity(
+            name: "Goblet Squat",
+            primaryMuscles: [.quads],
+            secondaryMuscles: [.glutes, .hamstrings],
+            equipment: .dumbbell
+        ),
+        MovementEntity(
+            name: "Sled Push",
+            primaryMuscles: [.quads],
+            secondaryMuscles: [.glutes, .calves],
+            equipment: .machine
+        ),
+        MovementEntity(
+            name: "Barbell Front Squat",
+            primaryMuscles: [.quads],
+            secondaryMuscles: [.glutes, .hamstrings],
+            equipment: .barbell
+        ),
         
         // Shoulders
         MovementEntity(
@@ -123,6 +177,17 @@ struct MovementLibrary {
             name: "Front Raise",
             primaryMuscles: [.shoulders],
             equipment: .dumbbell
+        ),
+        MovementEntity(
+            name: "Arnold Press",
+            primaryMuscles: [.shoulders],
+            secondaryMuscles: [.triceps],
+            equipment: .dumbbell
+        ),
+        MovementEntity(
+            name: "Machine Lateral Raise",
+            primaryMuscles: [.shoulders],
+            equipment: .machine
         ),
         
         // Arms
@@ -151,6 +216,22 @@ struct MovementLibrary {
             primaryMuscles: [.biceps],
             equipment: .machine
         ),
+        MovementEntity(
+            name: "Concentration Curl",
+            primaryMuscles: [.biceps],
+            equipment: .dumbbell
+        ),
+        MovementEntity(
+            name: "Overhead Tricep Extension",
+            primaryMuscles: [.triceps],
+            secondaryMuscles: [.shoulders],
+            equipment: .dumbbell
+        ),
+        MovementEntity(
+            name: "Cable Curl",
+            primaryMuscles: [.biceps],
+            equipment: .cable
+        ),
         
         // Core
         MovementEntity(
@@ -171,6 +252,17 @@ struct MovementLibrary {
         MovementEntity(
             name: "Hanging Leg Raise",
             primaryMuscles: [.abs],
+            equipment: .bodyweight
+        ),
+        MovementEntity(
+            name: "Decline Sit-Up",
+            primaryMuscles: [.abs],
+            equipment: .bodyweight
+        ),
+        MovementEntity(
+            name: "Ab Wheel Rollout",
+            primaryMuscles: [.abs],
+            secondaryMuscles: [.shoulders],
             equipment: .bodyweight
         ),
         

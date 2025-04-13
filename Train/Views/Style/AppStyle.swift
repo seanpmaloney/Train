@@ -12,6 +12,53 @@ enum AppStyle {
         static let textSecondary = Color(hex: "#B0B0B0") // Secondary text
     }
     
+    enum MuscleColors {
+        // Upper Body Push
+        static let chest = Color(hex: "#00B4D8")         // Bright Blue
+        static let shoulders = Color(hex: "#0077B6")     // Deep Blue
+        static let triceps = Color(hex: "#90E0EF")       // Light Blue
+        
+        // Upper Body Pull
+        static let back = Color(hex: "#06D6A0")         // Turquoise
+        static let biceps = Color(hex: "#2EC4B6")       // Teal
+        static let forearms = Color(hex: "#80ED99")     // Mint
+        
+        // Core
+        static let abs = Color(hex: "#FFD166")          // Gold
+        static let obliques = Color(hex: "#FFC233")     // Amber
+        static let lowerBack = Color(hex: "#FFAA33")    // Orange
+        
+        // Lower Body
+        static let quads = Color(hex: "#EF476F")        // Pink
+        static let hamstrings = Color(hex: "#E63956")   // Red
+        static let calves = Color(hex: "#FF6B6B")       // Coral
+        static let glutes = Color(hex: "#D64045")       // Deep Red
+        
+        // Other
+        static let traps = Color(hex: "#9B5DE5")        // Purple
+        static let neck = Color(hex: "#845EC2")         // Deep Purple
+        
+        static func color(for muscleGroup: MuscleGroup) -> Color {
+            switch muscleGroup {
+            case .chest: return chest
+            case .shoulders: return shoulders
+            case .triceps: return triceps
+            case .back: return back
+            case .biceps: return biceps
+            case .forearms: return forearms
+            case .abs: return abs
+            case .obliques: return obliques
+            case .lowerBack: return lowerBack
+            case .quads: return quads
+            case .hamstrings: return hamstrings
+            case .calves: return calves
+            case .glutes: return glutes
+            case .traps: return traps
+            case .neck: return neck
+            }
+        }
+    }
+    
     enum Layout {
         static let cardCornerRadius: CGFloat = 16
         static let innerCardCornerRadius: CGFloat = 12

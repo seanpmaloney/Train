@@ -172,10 +172,10 @@ struct MovementCard: View {
     private func musclePill(_ muscle: MuscleGroup, isPrimary: Bool) -> some View {
         Text(muscle.displayName)
             .font(AppStyle.Typography.caption())
-            .foregroundColor(isPrimary ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary)
+            .foregroundColor(isPrimary ? muscle.color: AppStyle.Colors.textSecondary)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background((isPrimary ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary).opacity(0.2))
+            .background((isPrimary ? muscle.color : AppStyle.Colors.textSecondary).opacity(0.2))
             .clipShape(Capsule())
     }
 }

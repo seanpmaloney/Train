@@ -120,7 +120,6 @@ struct PlanEditorView: View {
     private var planDetailsSection: some View {
         VStack(spacing: AppStyle.Layout.compactSpacing) {
             TextField("Plan Name", text: $viewModel.planName)
-                .textFieldStyle(.roundedBorder)
                 .font(AppStyle.Typography.body())
             
             Button(action: {
@@ -162,20 +161,13 @@ struct PlanEditorView: View {
             Divider()
                 .background(AppStyle.Colors.textSecondary.opacity(0.2))
             
-            NavigationLink {
-                PlanSummaryView(weeks: viewModel.generatedWeeks, template: viewModel.template)
-            } label: {
-                HStack {
-                    Text("Review & Start Plan")
-                        .font(AppStyle.Typography.body())
-                        .foregroundColor(AppStyle.Colors.textSecondary)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(AppStyle.Colors.textSecondary.opacity(0.5))
-                }
+            Toggle(isOn: $viewModel.useProgressiveOverload) {
+                Text("Automatic Progressive Overload")
+                    .font(AppStyle.Typography.body())
+                    .foregroundColor(AppStyle.Colors.textSecondary)
             }
-            .disabled(viewModel.totalMovementCount == 0)
-            .opacity(viewModel.totalMovementCount == 0 ? 0.5 : 1)
+            .tint(AppStyle.Colors.primary)
+            
         }
         .padding()
         .background(AppStyle.Colors.surface)
@@ -385,23 +377,23 @@ private struct MovementRow: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 4) {
                 ForEach(movement.movement.primaryMuscles, id: \.self) { muscle in
-                    muscleBadge(muscle.rawValue, isPrimary: true)
+                    muscleBadge(muscle: muscle, isPrimary: true)
                 }
                 ForEach(movement.movement.secondaryMuscles, id: \.self) { muscle in
-                    muscleBadge(muscle.rawValue, isPrimary: false)
+                    muscleBadge(muscle: muscle, isPrimary: false)
                 }
             }
         }
     }
     
-    private func muscleBadge(_ text: String, isPrimary: Bool) -> some View {
-        Text(text)
+    private func muscleBadge(muscle: MuscleGroup, isPrimary: Bool) -> some View {
+        Text(muscle.displayName)
             .font(AppStyle.Typography.caption())
-            .foregroundColor(isPrimary ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary)
+            .foregroundColor(isPrimary ?  muscle.color : AppStyle.Colors.textSecondary)
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
             .background(
-                (isPrimary ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary)
+                (isPrimary ? muscle.color : AppStyle.Colors.textSecondary)
                     .opacity(0.2)
             )
             .clipShape(Capsule())
