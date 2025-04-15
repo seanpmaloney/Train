@@ -149,7 +149,7 @@ struct SetRow: View {
                 .sheet(isPresented: $showingRepsPad) {
                     CustomNumberPadView(
                         title: "Reps",
-                        initialValue: Double(set.completedReps),
+                        initialValue: Double(set.targetReps),
                         mode: .reps
                     ) { newValue in
                         set.completedReps = Int(newValue)

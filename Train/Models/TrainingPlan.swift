@@ -50,4 +50,10 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
         try container.encode(isCompleted, forKey: .isCompleted)
         try container.encode(workouts, forKey: .workouts)
     }
+    
+    func percentageCompleted() -> Double {
+        let totalWorkouts = workouts.count
+        let completedWorkouts = workouts.filter { $0.isComplete }.count
+        return totalWorkouts > 0 ? Double(completedWorkouts) / Double(totalWorkouts) : 0.0
+    }
 }

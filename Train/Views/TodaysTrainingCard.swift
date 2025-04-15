@@ -86,7 +86,7 @@ struct TodaysTrainingCard: View {
             }
         }
         .padding()
-        .background(Color(hex: "#0F1115"))
+        .background(AppStyle.Colors.surface)
         .cornerRadius(12)
     }
     

@@ -40,8 +40,6 @@ class ActiveWorkoutViewModel: ObservableObject {
     }
     
     func toggleSetComplete(_ set: ExerciseSetEntity, to isComplete: Bool) {
-        // In the new model, we don't need to track completion separately
-        // since we're using a single reps value
         set.isComplete = isComplete;
     }
     

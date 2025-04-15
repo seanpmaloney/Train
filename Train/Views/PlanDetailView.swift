@@ -16,7 +16,7 @@ struct PlanDetailView: View {
                         .foregroundColor(AppStyle.Colors.textPrimary)
                     
                     HStack(spacing: AppStyle.Layout.standardSpacing) {
-                        planMetric(title: "Progress", value: "5 of 20 complete")
+                        planMetric(title: "Progress", value: plan.percentageCompleted().formatted(.percent))
                     }
                 }
                 .padding()
@@ -26,7 +26,7 @@ struct PlanDetailView: View {
                 // Weekly Schedule
                 VStack(alignment: .leading, spacing: AppStyle.Layout.compactSpacing) {
                     Text("Weekly Schedule")
-                        .font(AppStyle.Typography.caption())
+                        .font(AppStyle.Typography.body())
                         .foregroundColor(AppStyle.Colors.textSecondary)
                     
                     VStack(spacing: AppStyle.Layout.compactSpacing) {

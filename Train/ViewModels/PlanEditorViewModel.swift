@@ -137,8 +137,11 @@ class PlanEditorViewModel: ObservableObject {
                     let targetReps = useProgressiveOverload ? 
                         movement.targetReps + weekIndex : movement.targetReps
                     
-                    // Create exercise sets based on target sets
-                    let exerciseSets = Array(repeating: ExerciseSetEntity(targetReps: targetReps), count: movement.targetSets)
+                    var exerciseSets = [ExerciseSetEntity]()
+                    for _ in 0..<movement.targetSets {
+                        let setEntity = ExerciseSetEntity(targetReps: targetReps)
+                        exerciseSets.append(setEntity)
+                    }
                     
                     let exercise = ExerciseInstanceEntity(
                         movement: movement.movement,
