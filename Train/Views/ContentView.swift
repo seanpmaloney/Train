@@ -125,7 +125,7 @@ struct VitalsRow: View {
 
 struct ContentView: View {
     @StateObject private var healthKit = HealthKitManager.shared
-    @StateObject private var appState = AppState()
+    @EnvironmentObject private var appState: AppState
     @State private var selectedTab = 0
     
     var body: some View {
@@ -184,7 +184,6 @@ struct ContentView: View {
                             }
                         case 1:
                             PlansView()
-                                .environmentObject(appState)
                         case 2:
                             TrainingView(appState: appState)
                         case 3:
@@ -204,6 +203,7 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .environmentObject(appState)
     }
 }
 

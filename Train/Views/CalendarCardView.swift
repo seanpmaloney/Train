@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CalendarCardView: View {
     @StateObject private var viewModel: CalendarCardViewModel
+    @EnvironmentObject private var appState: AppState
     
     init(appState: AppState) {
         _viewModel = StateObject(wrappedValue: CalendarCardViewModel(appState: appState))

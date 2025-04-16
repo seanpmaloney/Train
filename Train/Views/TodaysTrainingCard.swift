@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TodaysTrainingCard: View {
     @StateObject private var viewModel: TodaysTrainingViewModel
+    @EnvironmentObject private var appState: AppState
     
     init(appState: AppState) {
         _viewModel = StateObject(wrappedValue: TodaysTrainingViewModel(appState: appState))
@@ -29,13 +30,11 @@ struct TodaysTrainingCard: View {
                 
                 Spacer()
                 
-                if let workout = viewModel.todaysWorkout {
-                    CircularProgressView(
-                        progress: viewModel.completionPercentage,
-                        size: 24,
-                        lineWidth: 2
-                    )
-                }
+                CircularProgressView(
+                    progress: viewModel.completionPercentage,
+                    size: 24,
+                    lineWidth: 2
+                )
             }
             
             if let workout = viewModel.todaysWorkout {
@@ -45,7 +44,7 @@ struct TodaysTrainingCard: View {
                         .font(.headline)
                         .foregroundColor(.primary)
                     
-                    Text(workout.description ?? "")
+                    Text(workout.description)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     

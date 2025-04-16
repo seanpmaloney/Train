@@ -119,6 +119,31 @@ class AppState: ObservableObject {
         savePlans()
     }
     
+    func archiveCurrentPlan() {
+        guard let plan = currentPlan else { return }
+        
+        // Set end date to now
+        plan.endDate = Date()
+        plan.isCompleted = true
+        
+        // Move to past plans
+        pastPlans.append(plan)
+        currentPlan = nil
+        
+        // Save changes
+        savePlans()
+    }
+    
+    func deletePastPlan(_ plan: TrainingPlanEntity) {
+        unscheduleWorkoutsForPlan(plan)
+        pastPlans.removeAll { $0.id == plan.id }
+        savePlans()
+    }
+    
+    func isPlanCurrent(_ plan: TrainingPlanEntity) -> Bool {
+        return currentPlan?.id == plan.id
+    }
+    
     public func savePlans() {
         saveQueue.async { [weak self] in
             guard let self = self else { return }

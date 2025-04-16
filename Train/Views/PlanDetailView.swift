@@ -4,6 +4,7 @@ struct PlanDetailView: View {
     let plan: TrainingPlanEntity
     @Environment(\.dismiss) private var dismiss
     @State private var showingEditor = false
+    @State private var showingActionConfirmation = false
     @EnvironmentObject var appState: AppState
     
     var body: some View {
@@ -51,13 +52,41 @@ struct PlanDetailView: View {
         .background(AppStyle.Colors.background)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if !plan.isCompleted {
-                ToolbarItem(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .primaryAction) {
+                if !plan.isCompleted {
                     Button("Edit") {
                         showingEditor = true
                     }
                 }
+                
+                Button(appState.isPlanCurrent(plan) ? "Archive Plan" : "Delete Plan") {
+                    showingActionConfirmation = true
+                }
+                .foregroundColor(appState.isPlanCurrent(plan) ? AppStyle.Colors.textSecondary : AppStyle.Colors.danger)
             }
+        }
+        .confirmationDialog(
+            appState.isPlanCurrent(plan) ? "Archive Plan" : "Delete Plan",
+            isPresented: $showingActionConfirmation,
+            titleVisibility: .visible
+        ) {
+            if appState.isPlanCurrent(plan) {
+                Button("Archive Plan") {
+                    appState.archiveCurrentPlan()
+                    dismiss()
+                }
+            } else {
+                Button("Delete Plan", role: .destructive) {
+                    appState.deletePastPlan(plan)
+                    dismiss()
+                }
+            }
+            
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(appState.isPlanCurrent(plan) 
+                ? "Are you sure you want to archive this plan? It will be moved to your Past Plans."
+                : "Are you sure you want to permanently delete this plan? This action cannot be undone.")
         }
         .sheet(isPresented: $showingEditor) {
             PlanEditorView(template: nil, appState: appState)

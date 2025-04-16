@@ -4,14 +4,13 @@ import SwiftUI
 class CalendarCardViewModel: ObservableObject {
     @Published var selectedDate: Date
     @Published var displayedMonth: Date
-    
+    private var appState: AppState
     private let calendar = Calendar.current
-    private let appState: AppState
     
-    init(appState: AppState = AppState()) {
+    init(appState: AppState) {
+        self.appState = appState
         self.selectedDate = Date()
         self.displayedMonth = Date()
-        self.appState = appState
     }
     
     var monthTitle: String {
