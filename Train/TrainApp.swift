@@ -21,6 +21,7 @@ struct TrainApp: App {
             ContentView()
                 .task {
                     // Initial authorization and data fetch
+                    appState.loadPlans()
                     if !healthKit.isAuthorized {
                         if await healthKit.requestAuthorization() {
                             await healthKit.fetchTodayData()

@@ -5,7 +5,6 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
     @Published var weight: Double
     @Published var targetReps: Int
     @Published var completedReps: Int
-    @Published var timestamp: Date
     @Published var isComplete: Bool
 
     init(weight: Double = 0, completedReps: Int = 0, targetReps: Int = 0, isComplete: Bool = false) {
@@ -13,7 +12,6 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
         self.weight = weight
         self.targetReps = targetReps
         self.completedReps = completedReps
-        self.timestamp = Date()
         self.isComplete = isComplete
     }
     
@@ -23,7 +21,6 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
         case weight
         case targetReps
         case completedReps
-        case timestamp
         case isComplete
     }
     
@@ -33,7 +30,6 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
         self.weight = try container.decode(Double.self, forKey: .weight)
         self.targetReps = try container.decode(Int.self, forKey: .targetReps)
         self.completedReps = try container.decode(Int.self, forKey: .completedReps)
-        self.timestamp = try container.decode(Date.self, forKey: .timestamp)
         self.isComplete = try container.decode(Bool.self, forKey: .isComplete)
     }
     

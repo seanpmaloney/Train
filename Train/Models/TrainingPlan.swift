@@ -1,7 +1,7 @@
 import Foundation
 
 class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
-    let id: UUID = UUID()
+    var id: UUID = UUID()
     @Published var name: String
     @Published var notes: String?
     @Published var startDate: Date
@@ -30,6 +30,7 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
     
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         notes = try container.decodeIfPresent(String.self, forKey: .notes)
         startDate = try container.decode(Date.self, forKey: .startDate)

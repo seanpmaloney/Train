@@ -42,8 +42,8 @@ class WorkoutEntity: ObservableObject, Identifiable, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(title, forKey: .title)
-        try container.encodeIfPresent(description, forKey: .description)
-        try container.encodeIfPresent(isComplete, forKey: .isComplete)
+        try container.encode(description, forKey: .description)
+        try container.encode(isComplete, forKey: .isComplete)
         try container.encodeIfPresent(scheduledDate, forKey: .scheduledDate)
         try container.encode(exercises, forKey: .exercises)
     }

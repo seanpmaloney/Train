@@ -130,76 +130,76 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                // Background color
-                Color(AppStyle.Colors.background)
-                    .ignoresSafeArea()
-                
-                Group {
-                    switch selectedTab {
-                    case 0:
-                        ScrollView(showsIndicators: false) {
-                            VStack(spacing: 24) {
-                                // Header
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Good morning")
-                                            .foregroundColor(AppStyle.Colors.textSecondary)
-                                        Text("Sean")
-                                            .font(.title)
-                                            .fontWeight(.bold)
-                                    }
-                                    Spacer()
-                                    
-                                    Circle()
-                                        .fill(AppStyle.Colors.surface)
-                                        .frame(width: 40, height: 40)
-                                        .overlay(
-                                            Image(systemName: "bell")
+            if !appState.isLoaded {
+                LoadingView()
+            } else {
+                ZStack {
+                    // Background color
+                    Color(AppStyle.Colors.background)
+                        .ignoresSafeArea()
+                    
+                    Group {
+                        switch selectedTab {
+                        case 0:
+                            ScrollView(showsIndicators: false) {
+                                VStack(spacing: 24) {
+                                    // Header
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text("Good morning")
                                                 .foregroundColor(AppStyle.Colors.textSecondary)
-                                        )
+                                            Text("Sean")
+                                                .font(.title)
+                                                .fontWeight(.bold)
+                                        }
+                                        Spacer()
+                                        
+                                        Circle()
+                                            .fill(AppStyle.Colors.surface)
+                                            .frame(width: 40, height: 40)
+                                            .overlay(
+                                                Image(systemName: "bell")
+                                                    .foregroundColor(AppStyle.Colors.textSecondary)
+                                            )
+                                    }
+                                    .padding(.horizontal)
+                                    .padding(.top, 8)
+                                    
+                                    // Dashboard Content
+                                    VStack(spacing: 12) {
+                                        TodaysTrainingCard(appState: appState)
+                                            .padding(.horizontal)
+                                        
+                                        // Calendar
+                                        CalendarCardView(appState: appState)
+                                            .padding(.horizontal)
+                                        
+                                        // Recovery Status
+                                        RecoveryStatusCard()
+                                            .padding(.horizontal)
+                                    }
                                 }
-                                .padding(.horizontal)
-                                .padding(.top, 8)
-                                
-                                // Dashboard Content
-                                VStack(spacing: 12) {
-                                    TodaysTrainingCard(appState: appState)
-                                        .padding(.horizontal)
-                                    
-                                    // Vitals Row
-                                    //                                    VitalsRow()
-                                    //                                        .padding(.horizontal)
-                                    
-                                    // Calendar
-                                    CalendarCardView(appState: appState)
-                                        .padding(.horizontal)
-                                    
-                                    // Recovery Status
-                                    RecoveryStatusCard()
-                                        .padding(.horizontal)
-                                }
+                                // Add bottom padding to clear the tab bar
+                                .padding(.bottom, 100)
                             }
-                            // Add bottom padding to clear the tab bar
-                            .padding(.bottom, 100)
+                        case 1:
+                            PlansView()
+                                .environmentObject(appState)
+                        case 2:
+                            TrainingView(appState: appState)
+                        case 3:
+                            Text("Profile")
+                                .foregroundColor(AppStyle.Colors.textPrimary)
+                        default:
+                            EmptyView()
                         }
-                    case 1:
-                        PlansView()
-                            .environmentObject(appState)
-                    case 2:
-                        TrainingView(appState: appState)
-                    case 3:
-                        Text("Profile")
-                            .foregroundColor(AppStyle.Colors.textPrimary)
-                    default:
-                        EmptyView()
                     }
-                }
-                
-                // Tab Bar
-                VStack {
-                    Spacer()
-                    CustomTabBar(selectedTab: $selectedTab)
+                    
+                    // Tab Bar
+                    VStack {
+                        Spacer()
+                        CustomTabBar(selectedTab: $selectedTab)
+                    }
                 }
             }
         }

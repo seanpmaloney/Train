@@ -4,6 +4,7 @@ class AppState: ObservableObject {
     @Published var currentPlan: TrainingPlanEntity?
     @Published var pastPlans: [TrainingPlanEntity] = []
     @Published var scheduledWorkouts: [WorkoutEntity] = []
+    @Published var isLoaded: Bool = false
     
     private let saveQueue = DispatchQueue(label: "com.train.saveQueue", qos: .background)
     private let fileName = "plans.json"
@@ -163,38 +164,52 @@ class AppState: ObservableObject {
     }
     
     public func loadPlans() {
-        saveQueue.async { [weak self] in
-            guard let self = self else { return }
+        guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) else {
+            print("Could not find document directory")
+            self.isLoaded = true // Still mark as loaded even if no plans exist
+            return
+        }
+        
+        if !FileManager.default.fileExists(atPath: url.path) {
+            print("No saved plans file exists at \(url.path)")
+            self.isLoaded = true // Still mark as loaded for first launch
+            return
+        }
+        
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
             
-            guard let url = self.getDocumentsURL()?.appendingPathComponent(self.fileName) else {
-                print("Error: Could not access documents directory")
-                return
-            }
-            
-            // Check if file exists
-            guard self.getFileManager().fileExists(atPath: url.path) else {
-                print("Plans file does not exist yet")
-                return
-            }
-            
-            do {
-                // Read data from file
-                let data = try Data(contentsOf: url)
-                
-                // Decode JSON
-                let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .iso8601
-                let savedPlans = try decoder.decode(SavedPlans.self, from: data)
-                
-                // Update properties on main thread
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                do {
+                    let savedPlans = try decoder.decode(SavedPlans.self, from: data)
                     self.currentPlan = savedPlans.currentPlan
                     self.pastPlans = savedPlans.pastPlans
                     self.scheduledWorkouts = savedPlans.scheduledWorkouts
+                    self.isLoaded = true
                     print("Successfully loaded plans from \(url.path)")
+                } catch let DecodingError.keyNotFound(key, context) {
+                    print("Decoding error: Missing key '\(key.stringValue)' – \(context.debugDescription)")
+                    self.isLoaded = true // Mark as loaded even on error
+                } catch let DecodingError.typeMismatch(type, context) {
+                    print("Decoding error: Type mismatch for type \(type) – \(context.debugDescription)")
+                    self.isLoaded = true
+                } catch let DecodingError.valueNotFound(value, context) {
+                    print("Decoding error: Missing value of type \(value) – \(context.debugDescription)")
+                    self.isLoaded = true
+                } catch let DecodingError.dataCorrupted(context) {
+                    print("Decoding error: Data corrupted – \(context.debugDescription)")
+                    self.isLoaded = true
+                } catch {
+                    print("Unknown error loading plans: \(error.localizedDescription)")
+                    self.isLoaded = true
                 }
-            } catch {
-                print("Error loading plans: \(error.localizedDescription)")
+            }
+        } catch {
+            print("Error reading plans file: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                self.isLoaded = true
             }
         }
     }
