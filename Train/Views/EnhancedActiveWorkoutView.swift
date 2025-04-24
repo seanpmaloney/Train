@@ -41,9 +41,22 @@ struct EnhancedActiveWorkoutView: View {
                 .padding(.bottom, 60) // Extra padding for safe area
             }
             
-            // Floating timer if expanded
+            // Floating timer overlay
             if isTimerExpanded {
-                TimerOverlayView(isExpanded: $isTimerExpanded)
+                GeometryReader { geometry in
+                    VStack {
+                        HStack {
+                            Spacer()
+                            
+                            RestTimer(isExpanded: $isTimerExpanded)
+                                .padding(.top, 10)
+                                .padding(.trailing)
+                        }
+                        Spacer()
+                    }
+                }
+                .background(Color.clear)
+                .transition(.opacity)
             }
         }
         .background(AppStyle.Colors.background.ignoresSafeArea())
@@ -61,7 +74,22 @@ struct EnhancedActiveWorkoutView: View {
             }
             
             ToolbarItem(placement: .navigationBarTrailing) {
-                TimerButton(isExpanded: $isTimerExpanded)
+                Button(action: {
+                    withAnimation {
+                        isTimerExpanded.toggle()
+                    }
+                }) {
+                    Image(systemName: "clock.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(.white)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            Circle()
+                                .fill(AppStyle.Colors.surface)
+                                .shadow(color: .black.opacity(0.2), radius: 5)
+                        )
+                        .contentShape(Circle())
+                }
             }
         }
         .alert("End Workout", isPresented: $showingEndWorkoutConfirmation) {
@@ -170,144 +198,5 @@ struct EnhancedActiveWorkoutView: View {
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
         return formatter.string(from: date)
-    }
-}
-
-/// Timer button for the workout view
-struct TimerButton: View {
-    @Binding var isExpanded: Bool
-    
-    var body: some View {
-        Button(action: {
-            withAnimation {
-                isExpanded.toggle()
-            }
-        }) {
-            Image(systemName: "timer")
-                .font(.system(size: 18))
-                .foregroundColor(AppStyle.Colors.textPrimary)
-                .padding(8)
-                .background(
-                    Circle()
-                        .fill(AppStyle.Colors.surface)
-                )
-        }
-    }
-}
-
-/// Timer overlay for rest periods
-struct TimerOverlayView: View {
-    @Binding var isExpanded: Bool
-    @State private var timeRemaining: Int = 90
-    @State private var isActive = false
-    @State private var timer: Timer? = nil
-    
-    var body: some View {
-        VStack {
-            Spacer()
-            
-            ZStack {
-                // Timer background
-                Circle()
-                    .fill(AppStyle.Colors.surface)
-                    .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
-                    .frame(width: 200, height: 200)
-                
-                VStack(spacing: 8) {
-                    // Time display
-                    Text(formatTime(timeRemaining))
-                        .font(.system(size: 48, weight: .bold, design: .monospaced))
-                        .foregroundColor(AppStyle.Colors.textPrimary)
-                    
-                    // Rest text
-                    Text("Rest Timer")
-                        .font(.caption)
-                        .foregroundColor(AppStyle.Colors.textSecondary)
-                    
-                    // Controls
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            resetTimer()
-                        }) {
-                            Image(systemName: "arrow.clockwise")
-                                .font(.headline)
-                                .foregroundColor(AppStyle.Colors.textSecondary)
-                        }
-                        
-                        Button(action: {
-                            toggleTimer()
-                        }) {
-                            Image(systemName: isActive ? "pause.fill" : "play.fill")
-                                .font(.title2)
-                                .foregroundColor(isActive ? AppStyle.Colors.danger : AppStyle.Colors.success)
-                        }
-                        
-                        Button(action: {
-                            withAnimation {
-                                isExpanded = false
-                                stopTimer()
-                            }
-                        }) {
-                            Image(systemName: "xmark")
-                                .font(.headline)
-                                .foregroundColor(AppStyle.Colors.textSecondary)
-                        }
-                    }
-                    .padding(.top, 8)
-                }
-            }
-            .frame(width: 200, height: 200)
-            
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
-        .background(Color.black.opacity(0.2))
-        .onAppear {
-            resetTimer()
-        }
-        .onDisappear {
-            stopTimer()
-        }
-    }
-    
-    /// Formats the time remaining into a string
-    private func formatTime(_ seconds: Int) -> String {
-        let minutes = seconds / 60
-        let seconds = seconds % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-    
-    /// Toggles the timer between active and paused
-    private func toggleTimer() {
-        if isActive {
-            stopTimer()
-        } else {
-            startTimer()
-        }
-    }
-    
-    /// Starts the timer
-    private func startTimer() {
-        isActive = true
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            if timeRemaining > 0 {
-                timeRemaining -= 1
-            } else {
-                stopTimer()
-            }
-        }
-    }
-    
-    /// Stops the timer
-    private func stopTimer() {
-        isActive = false
-        timer?.invalidate()
-        timer = nil
-    }
-    
-    /// Resets the timer
-    private func resetTimer() {
-        stopTimer()
-        timeRemaining = 90
     }
 }
