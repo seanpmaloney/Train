@@ -4,6 +4,8 @@ class AppState: ObservableObject {
     @Published var currentPlan: TrainingPlanEntity?
     @Published var pastPlans: [TrainingPlanEntity] = []
     @Published var scheduledWorkouts: [WorkoutEntity] = []
+    @Published var activeWorkout: WorkoutEntity?
+    @Published var activeWorkoutId: UUID?
     @Published var isLoaded: Bool = false
     
     private let saveQueue = DispatchQueue(label: "com.train.saveQueue", qos: .background)
@@ -14,6 +16,7 @@ class AppState: ObservableObject {
         let currentPlan: TrainingPlanEntity?
         let pastPlans: [TrainingPlanEntity]
         let scheduledWorkouts: [WorkoutEntity]
+        let activeWorkout: WorkoutEntity?
     }
     
     init() {
@@ -153,7 +156,8 @@ class AppState: ObservableObject {
                 let savedPlans = SavedPlans(
                     currentPlan: self.currentPlan,
                     pastPlans: self.pastPlans,
-                    scheduledWorkouts: self.scheduledWorkouts
+                    scheduledWorkouts: self.scheduledWorkouts,
+                    activeWorkout: self.activeWorkout
                 )
                 
                 // Encode to JSON
@@ -237,6 +241,23 @@ class AppState: ObservableObject {
                 self.isLoaded = true
             }
         }
+    }
+    
+    public func setActiveWorkout(_ workout: WorkoutEntity) {
+        activeWorkout = workout
+    }
+    
+    public func getActiveWorkout() -> WorkoutEntity {
+        return activeWorkout!
+    }
+    
+    public func getNextWorkout() -> WorkoutEntity {
+        // Return the first incomplete workout, or the first workout if all are complete
+        guard !scheduledWorkouts.isEmpty else {
+            fatalError("No scheduled workouts available")
+        }
+        let index = scheduledWorkouts.firstIndex(where: { !$0.isComplete }) ?? 0
+        return scheduledWorkouts[index]
     }
     
     // Methods that can be overridden for testing

@@ -45,7 +45,7 @@ struct PlanTemplate: Identifiable {
     ]
 }
 
-enum TrainingGoal: String {
+enum TrainingGoal: String, Codable {
     case strength = "Strength"
     case hypertrophy = "Hypertrophy"
     case endurance = "Endurance"

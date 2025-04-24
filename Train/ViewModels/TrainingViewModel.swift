@@ -1,14 +1,30 @@
 import Foundation
 import SwiftUI
+import Combine
 
 class TrainingViewModel: ObservableObject {
     @Published private(set) var upcomingWorkouts: [WorkoutEntity] = []
+    private var cancellables = Set<AnyCancellable>()
     
     private let appState: AppState
     
     init(appState: AppState) {
         self.appState = appState
         updateUpcomingWorkouts()
+        
+        // Subscribe to changes in scheduledWorkouts
+        appState.$scheduledWorkouts
+            .sink { [weak self] _ in
+                self?.updateUpcomingWorkouts()
+            }
+            .store(in: &cancellables)
+            
+        // Subscribe to changes in currentPlan
+        appState.$currentPlan
+            .sink { [weak self] _ in
+                self?.updateUpcomingWorkouts()
+            }
+            .store(in: &cancellables)
     }
     
     func updateUpcomingWorkouts() {

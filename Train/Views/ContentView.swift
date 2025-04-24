@@ -185,7 +185,8 @@ struct ContentView: View {
                         case 1:
                             PlansView()
                         case 2:
-                            TrainingView(appState: appState)
+                            EnhancedTrainingView(appState: appState)
+                                .environmentObject(appState)
                         case 3:
                             Text("Profile")
                                 .foregroundColor(AppStyle.Colors.textPrimary)

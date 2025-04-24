@@ -11,7 +11,7 @@ struct TodaysTrainingCard: View {
     var body: some View {
         NavigationLink(
             destination: viewModel.todaysWorkout.map { workout in
-                ActiveWorkoutView(workout: workout, viewModel: ActiveWorkoutViewModel(workout: workout))
+                EnhancedActiveWorkoutView(workout: workout)
             }
         ) {
             cardContent

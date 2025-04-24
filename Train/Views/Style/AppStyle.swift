@@ -4,6 +4,7 @@ enum AppStyle {
     enum Colors {
         static let background = Color(hex: "#0F1115")    // Main background
         static let surface = Color(hex: "#1A1C20")       // Card surface
+        static let surfaceVariant = Color(hex: "#252830") // Lighter surface variant
         static let primary = Color(hex: "#00B4D8")       // Primary accent
         static let secondary = Color(hex: "#FFD166")     // Secondary accent
         static let success = Color(hex: "#06D6A0")       // Success/completion

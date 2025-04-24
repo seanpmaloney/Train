@@ -41,7 +41,6 @@
 		8B7BD0482DA74FCB0089F6D3 /* MovementLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BD0472DA74FCA0089F6D3 /* MovementLibrary.swift */; };
 		8B7BD04C2DA752650089F6D3 /* PlansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BD04A2DA752650089F6D3 /* PlansView.swift */; };
 		8B7BD04E2DA754F70089F6D3 /* PlanTemplatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BD04D2DA754F70089F6D3 /* PlanTemplatePickerView.swift */; };
-		8B7BD0502DA755060089F6D3 /* PlanTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BD04F2DA755060089F6D3 /* PlanTemplate.swift */; };
 		8B7BD0522DA755EB0089F6D3 /* PlanEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BD0512DA755EB0089F6D3 /* PlanEditorView.swift */; };
 		8B7BD0542DA755F40089F6D3 /* PlanEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BD0532DA755F40089F6D3 /* PlanEditorViewModel.swift */; };
 		8B7BD0562DA756A90089F6D3 /* MovementPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BD0552DA756A90089F6D3 /* MovementPickerView.swift */; };
@@ -50,6 +49,13 @@
 		8B7BD05C2DA757640089F6D3 /* PlanSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BD05B2DA757640089F6D3 /* PlanSummaryView.swift */; };
 		8B7BD05F2DA757900089F6D3 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7BD05D2DA757900089F6D3 /* AppState.swift */; };
 		8B98772D2DAF32D400767AE2 /* LoadingScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B98772C2DAF32D400767AE2 /* LoadingScreenView.swift */; };
+		8B9877312DB0311600767AE2 /* PlanTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877302DB0311600767AE2 /* PlanTemplate.swift */; };
+		8B9877452DB9B7B100767AE2 /* EnhancedTrainingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877432DB9B7B100767AE2 /* EnhancedTrainingView.swift */; };
+		8B9877462DB9B7B100767AE2 /* EnhancedActiveWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877442DB9B7B100767AE2 /* EnhancedActiveWorkoutView.swift */; };
+		8B9877492DB9B7B700767AE2 /* EnhancedTrainingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877472DB9B7B700767AE2 /* EnhancedTrainingViewModel.swift */; };
+		8B98774A2DB9B7B700767AE2 /* EnhancedActiveWorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877482DB9B7B700767AE2 /* EnhancedActiveWorkoutViewModel.swift */; };
+		8B98774E2DB9B88B00767AE2 /* ExerciseEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B98774B2DB9B88B00767AE2 /* ExerciseEditView.swift */; };
+		8B98774F2DB9B88B00767AE2 /* WorkoutCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B98774C2DB9B88B00767AE2 /* WorkoutCardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,7 +106,6 @@
 		8B7BD0472DA74FCA0089F6D3 /* MovementLibrary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MovementLibrary.swift; path = Train/Models/MovementLibrary.swift; sourceTree = SOURCE_ROOT; };
 		8B7BD04A2DA752650089F6D3 /* PlansView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlansView.swift; sourceTree = "<group>"; };
 		8B7BD04D2DA754F70089F6D3 /* PlanTemplatePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanTemplatePickerView.swift; sourceTree = "<group>"; };
-		8B7BD04F2DA755060089F6D3 /* PlanTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PlanTemplate.swift; path = Train/Models/PlanTemplate.swift; sourceTree = SOURCE_ROOT; };
 		8B7BD0512DA755EB0089F6D3 /* PlanEditorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanEditorView.swift; sourceTree = "<group>"; };
 		8B7BD0532DA755F40089F6D3 /* PlanEditorViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanEditorViewModel.swift; sourceTree = "<group>"; };
 		8B7BD0552DA756A90089F6D3 /* MovementPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovementPickerView.swift; sourceTree = "<group>"; };
@@ -109,6 +114,13 @@
 		8B7BD05B2DA757640089F6D3 /* PlanSummaryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanSummaryView.swift; sourceTree = "<group>"; };
 		8B7BD05D2DA757900089F6D3 /* AppState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		8B98772C2DAF32D400767AE2 /* LoadingScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScreenView.swift; sourceTree = "<group>"; };
+		8B9877302DB0311600767AE2 /* PlanTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanTemplate.swift; sourceTree = "<group>"; };
+		8B9877432DB9B7B100767AE2 /* EnhancedTrainingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnhancedTrainingView.swift; sourceTree = "<group>"; };
+		8B9877442DB9B7B100767AE2 /* EnhancedActiveWorkoutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnhancedActiveWorkoutView.swift; sourceTree = "<group>"; };
+		8B9877472DB9B7B700767AE2 /* EnhancedTrainingViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EnhancedTrainingViewModel.swift; path = Train/ViewModels/EnhancedTrainingViewModel.swift; sourceTree = SOURCE_ROOT; };
+		8B9877482DB9B7B700767AE2 /* EnhancedActiveWorkoutViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EnhancedActiveWorkoutViewModel.swift; path = Train/ViewModels/EnhancedActiveWorkoutViewModel.swift; sourceTree = SOURCE_ROOT; };
+		8B98774B2DB9B88B00767AE2 /* ExerciseEditView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExerciseEditView.swift; sourceTree = "<group>"; };
+		8B98774C2DB9B88B00767AE2 /* WorkoutCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutCardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +196,8 @@
 				8B7BD0532DA755F40089F6D3 /* PlanEditorViewModel.swift */,
 				8B7BD0592DA757440089F6D3 /* PlanSummaryViewModel.swift */,
 				8B7BD0572DA756B00089F6D3 /* MovementPickerViewModel.swift */,
+				8B9877482DB9B7B700767AE2 /* EnhancedActiveWorkoutViewModel.swift */,
+				8B9877472DB9B7B700767AE2 /* EnhancedTrainingViewModel.swift */,
 				8B7BCFD72DA145F20089F6D3 /* HealthKitManager.swift */,
 				8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */,
 				8B7A5A372DAB0CEF00404F43 /* UpcomingTrainingViewModel.swift */,
@@ -197,6 +211,9 @@
 			isa = PBXGroup;
 			children = (
 				8B7BCFD92DA1460F0089F6D3 /* ActiveWorkoutView.swift */,
+				8B9877442DB9B7B100767AE2 /* EnhancedActiveWorkoutView.swift */,
+				8B98774D2DB9B88B00767AE2 /* Components */,
+				8B9877432DB9B7B100767AE2 /* EnhancedTrainingView.swift */,
 				8B7BD05B2DA757640089F6D3 /* PlanSummaryView.swift */,
 				8B98772C2DAF32D400767AE2 /* LoadingScreenView.swift */,
 				8B7BD04D2DA754F70089F6D3 /* PlanTemplatePickerView.swift */,
@@ -225,9 +242,9 @@
 				8B7BD0202DA35A540089F6D3 /* TrainingDataRoot.swift */,
 				8B7BD01F2DA35A540089F6D3 /* TrainingDataStore.swift */,
 				8B7BD0182DA357FB0089F6D3 /* ExerciseInstance.swift */,
-				8B7BD04F2DA755060089F6D3 /* PlanTemplate.swift */,
 				8B7BD0132DA357FA0089F6D3 /* ExerciseSet.swift */,
 				8B7BD0172DA357FB0089F6D3 /* MuscleGroup.swift */,
+				8B9877302DB0311600767AE2 /* PlanTemplate.swift */,
 				8B7BD0142DA357FA0089F6D3 /* TrainingPlan.swift */,
 				8B7BD0432DA6BA630089F6D3 /* TrainingPlanBuilder.swift */,
 				8B7BD0152DA357FB0089F6D3 /* Workout.swift */,
@@ -253,6 +270,15 @@
 			name = State;
 			path = Train/State;
 			sourceTree = SOURCE_ROOT;
+		};
+		8B98774D2DB9B88B00767AE2 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				8B98774B2DB9B88B00767AE2 /* ExerciseEditView.swift */,
+				8B98774C2DB9B88B00767AE2 /* WorkoutCardView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -371,8 +397,10 @@
 				8B7BD04C2DA752650089F6D3 /* PlansView.swift in Sources */,
 				8B7BD01A2DA357FB0089F6D3 /* TrainingPlan.swift in Sources */,
 				8B7BCFE02DA1460F0089F6D3 /* ContentView.swift in Sources */,
+				8B9877462DB9B7B100767AE2 /* EnhancedActiveWorkoutView.swift in Sources */,
 				8B7BD0222DA35A540089F6D3 /* TrainingDataStore.swift in Sources */,
 				8B7A5A3C2DABE3D000404F43 /* TrainingViewModel.swift in Sources */,
+				8B9877452DB9B7B100767AE2 /* EnhancedTrainingView.swift in Sources */,
 				8B98772D2DAF32D400767AE2 /* LoadingScreenView.swift in Sources */,
 				8B7BD0482DA74FCB0089F6D3 /* MovementLibrary.swift in Sources */,
 				8B7A5A3E2DABE3E200404F43 /* TodaysTrainingCard.swift in Sources */,
@@ -382,16 +410,20 @@
 				8B7BD05F2DA757900089F6D3 /* AppState.swift in Sources */,
 				8B7BD04E2DA754F70089F6D3 /* PlanTemplatePickerView.swift in Sources */,
 				8B7BD0542DA755F40089F6D3 /* PlanEditorViewModel.swift in Sources */,
+				8B98774F2DB9B88B00767AE2 /* WorkoutCardView.swift in Sources */,
 				8B7A5A3B2DABE3D000404F43 /* TodaysTrainingViewModel.swift in Sources */,
 				8B7BD01D2DA357FB0089F6D3 /* MuscleGroup.swift in Sources */,
 				8B7BD01B2DA357FB0089F6D3 /* Workout.swift in Sources */,
 				8B7BD0522DA755EB0089F6D3 /* PlanEditorView.swift in Sources */,
 				8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */,
+				8B98774E2DB9B88B00767AE2 /* ExerciseEditView.swift in Sources */,
+				8B9877312DB0311600767AE2 /* PlanTemplate.swift in Sources */,
 				8B7BCFE22DA1460F0089F6D3 /* CustomNumberPadView.swift in Sources */,
 				8B7BCF8F2D9DFD3F0089F6D3 /* TrainApp.swift in Sources */,
 				8B7BD0232DA35A540089F6D3 /* TrainingDataRoot.swift in Sources */,
+				8B9877492DB9B7B700767AE2 /* EnhancedTrainingViewModel.swift in Sources */,
+				8B98774A2DB9B7B700767AE2 /* EnhancedActiveWorkoutViewModel.swift in Sources */,
 				8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */,
-				8B7BD0502DA755060089F6D3 /* PlanTemplate.swift in Sources */,
 				8B7BD0192DA357FB0089F6D3 /* ExerciseSet.swift in Sources */,
 				8B7A5A382DAB0CF000404F43 /* UpcomingTrainingViewModel.swift in Sources */,
 				8B7BCFDF2DA1460F0089F6D3 /* ActiveWorkoutView.swift in Sources */,
