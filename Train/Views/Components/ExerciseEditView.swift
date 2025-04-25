@@ -2,69 +2,195 @@ import SwiftUI
 
 /// A view for editing exercises during a workout
 struct ExerciseEditView: View {
-    // MARK: - Properties
-    
     @ObservedObject var exercise: ExerciseInstanceEntity
     @ObservedObject var viewModel: EnhancedActiveWorkoutViewModel
     
-    // MARK: - Body
+    @State private var exerciseHistory: [ExerciseInstanceEntity] = []
+    @State private var selectedHistoryIndex: Int = 0
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             // Exercise header
-            HStack {
-                Text(exercise.movement.name)
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundColor(AppStyle.Colors.textPrimary)
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(exercise.movement.name)
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .foregroundColor(isViewingHistory ? AppStyle.Colors.textSecondary : AppStyle.Colors.textPrimary)
+                    
+                    // Muscle group pills
+                    if let displayExercise = currentDisplayExercise, !displayExercise.movement.primaryMuscles.isEmpty {
+                        // Only show the first muscle group to keep the display static
+                        if let primaryMuscle = displayExercise.movement.primaryMuscles.first {
+                            MusclePill(muscle: primaryMuscle)
+                                .padding(.bottom, 4)
+                        }
+                    }
+                }
                 
                 Spacer()
                 
-                Text(exercise.exerciseType)
-                    .font(.caption)
-                    .foregroundColor(AppStyle.Colors.textSecondary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule()
-                            .fill(AppStyle.Colors.background)
+                // Exercise history indicator
+                if hasHistory {
+                    ExerciseHistoryIndicator(
+                        currentIndex: selectedHistoryIndex,
+                        totalCount: exerciseHistory.count,
+                        onNavigate: { index in
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                selectedHistoryIndex = index
+                            }
+                        }
                     )
+                }
             }
             
-            // Exercise sets
+            // Sets list
             VStack(spacing: 12) {
-                // Header row
-                HStack(spacing: 12) {
-                    Text("Weight")
-                        .font(.caption)
-                        .foregroundColor(AppStyle.Colors.textSecondary)
-                        .frame(width: 80, alignment: .leading)
-                    
-                    Text("Reps")
-                        .font(.caption)
-                        .foregroundColor(AppStyle.Colors.textSecondary)
-                        .frame(width: 100, alignment: .leading)
-                    
-                    Spacer()
-                    
-                    Text("Completed")
-                        .font(.caption)
-                        .foregroundColor(AppStyle.Colors.textSecondary)
-                }
-                .padding(.horizontal, 8)
-                
-                // Sets
-                ForEach(exercise.sets) { set in
-                    SetEditView(set: set, viewModel: viewModel)
+                if let displayExercise = currentDisplayExercise {
+                    ForEach(displayExercise.sets) { set in
+                        SetEditRow(
+                            set: set,
+                            isEditable: !isViewingHistory,
+                            viewModel: viewModel
+                        )
+                        .id("\(displayExercise.id)-\(set.id)")
+                        .transition(.opacity)
+                    }
                 }
             }
+            .animation(.easeInOut(duration: 0.2), value: selectedHistoryIndex)
+            .opacity(isViewingHistory ? 0.6 : 1.0)
         }
-        .padding(16)
+        .padding()
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(AppStyle.Colors.surface)
-                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
         )
+        .padding(.horizontal, 4)
+        .onAppear {
+            // Load exercise history when view appears
+            exerciseHistory = viewModel.getExerciseHistory(for: exercise)
+            
+            // Default to current week
+            selectedHistoryIndex = exerciseHistory.count - 1
+        }
+    }
+    
+    private var currentDisplayExercise: ExerciseInstanceEntity? {
+        guard !exerciseHistory.isEmpty else { return exercise }
+        return exerciseHistory[selectedHistoryIndex]
+    }
+    
+    private var isViewingHistory: Bool {
+        guard !exerciseHistory.isEmpty else { return false }
+        // If we're not at the last index (current exercise), we're viewing history
+        return selectedHistoryIndex != exerciseHistory.count - 1 && exerciseHistory.count > 1
+    }
+    
+    private var hasHistory: Bool {
+        // Need at least 2 exercises to have history
+        return exerciseHistory.count > 1
+    }
+}
+
+/// A version of SetRow that can be toggled between editable and readonly states
+struct SetEditRow: View {
+    @ObservedObject var set: ExerciseSetEntity
+    let isEditable: Bool
+    let viewModel: EnhancedActiveWorkoutViewModel
+    
+    @State private var showingWeightPad = false
+    @State private var showingRepsPad = false
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Weight Input
+            HStack {
+                if isEditable {
+                    Button(action: {
+                        showingWeightPad = true
+                    }) {
+                        Text(String(format: "%.1f", set.weight))
+                            .font(.body)
+                            .foregroundColor(AppStyle.Colors.textPrimary)
+                            .frame(width: 70, alignment: .trailing)
+                    }
+                    .disabled(set.isComplete)
+                    .sheet(isPresented: $showingWeightPad) {
+                        CustomNumberPadView(
+                            title: "Weight",
+                            initialValue: set.weight,
+                            mode: .weight
+                        ) { newValue in
+                            set.weight = newValue
+                        }
+                        .presentationDetents([.height(350)])
+                    }
+                } else {
+                    Text(String(format: "%.1f", set.weight))
+                        .font(.body)
+                        .foregroundColor(AppStyle.Colors.textPrimary)
+                        .frame(width: 70, alignment: .trailing)
+                }
+                
+                Text("lbs")
+                    .foregroundColor(AppStyle.Colors.textSecondary)
+            }
+            
+            // Reps Input
+            HStack {
+                if isEditable {
+                    Button(action: {
+                        showingRepsPad = true
+                    }) {
+                        Text("\(set.completedReps)")
+                            .font(.body)
+                            .foregroundColor(AppStyle.Colors.textPrimary)
+                            .frame(width: 40, alignment: .trailing)
+                    }
+                    .disabled(set.isComplete)
+                    .sheet(isPresented: $showingRepsPad) {
+                        CustomNumberPadView(
+                            title: "Reps",
+                            initialValue: Double(set.completedReps),
+                            mode: .reps
+                        ) { newValue in
+                            set.completedReps = Int(newValue)
+                        }
+                        .presentationDetents([.height(350)])
+                    }
+                } else {
+                    Text("\(set.completedReps)")
+                        .font(.body)
+                        .foregroundColor(AppStyle.Colors.textPrimary)
+                        .frame(width: 40, alignment: .trailing)
+                }
+                
+                Text("/ \(set.targetReps) reps")
+                    .foregroundColor(AppStyle.Colors.textSecondary)
+            }
+            
+            Spacer()
+            
+            // Complete Checkbox (only for editable mode)
+            if isEditable {
+                Button(action: {
+                    withAnimation {
+                        set.toggleComplete()
+                    }
+                }) {
+                    Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
+                        .font(.title2)
+                        .foregroundColor(set.isComplete ? AppStyle.Colors.success : AppStyle.Colors.textSecondary)
+                }
+            } else {
+                // Show static complete indicator for history
+                Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
+                    .font(.title2)
+                    .foregroundColor(set.isComplete ? AppStyle.Colors.success.opacity(0.6) : AppStyle.Colors.textSecondary.opacity(0.6))
+            }
+        }
+        .opacity(set.isComplete && isEditable ? 0.6 : 1.0)
     }
 }
 

@@ -66,7 +66,7 @@ struct PlanTemplate: Identifiable {
             type: .upperLower,
             workoutDays: [
                 WorkoutDayTemplate(
-                    label: "Upper 1 (Monday)",
+                    label: "Upper 1",
                     exercises: [
                         createExerciseInstance(movement: MovementLibrary.getMovement(type: .barbellBenchPress), sets: 4, reps: 8),
                         createExerciseInstance(movement: MovementLibrary.getMovement(type: .bentOverRow), sets: 3, reps: 10),
@@ -77,7 +77,7 @@ struct PlanTemplate: Identifiable {
                     ]
                 ),
                 WorkoutDayTemplate(
-                    label: "Lower 1 (Tuesday)",
+                    label: "Lower 1",
                     exercises: [
                         createExerciseInstance(movement: MovementLibrary.getMovement(type: .barbellBackSquat), sets: 4, reps: 8),
                         createExerciseInstance(movement: MovementLibrary.getMovement(type: .romanianDeadlift), sets: 3, reps: 10),
@@ -86,7 +86,7 @@ struct PlanTemplate: Identifiable {
                     ]
                 ),
                 WorkoutDayTemplate(
-                    label: "Upper 2 (Thursday)",
+                    label: "Upper 2",
                     exercises: [
                         createExerciseInstance(movement: MovementLibrary.getMovement(type: .overheadPress), sets: 4, reps: 8),
                         createExerciseInstance(movement: MovementLibrary.getMovement(type: .dumbbellInclinePress), sets: 3, reps: 10),
@@ -96,7 +96,7 @@ struct PlanTemplate: Identifiable {
                     ]
                 ),
                 WorkoutDayTemplate(
-                    label: "Lower 2 (Friday)",
+                    label: "Lower 2",
                     exercises: [
                         createExerciseInstance(movement: MovementLibrary.getMovement(type: .barbellBackSquat), sets: 4, reps: 8),
                         createExerciseInstance(movement: MovementLibrary.getMovement(type: .bulgarianSplitSquat), sets: 3, reps: 10),

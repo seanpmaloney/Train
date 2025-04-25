@@ -12,7 +12,7 @@ class EnhancedTrainingViewModel: ObservableObject {
     
     // MARK: - Private Properties
     
-    private let appState: AppState
+    let appState: AppState
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initialization

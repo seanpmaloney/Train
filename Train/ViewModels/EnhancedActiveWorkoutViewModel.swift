@@ -12,7 +12,7 @@ class EnhancedActiveWorkoutViewModel: ObservableObject {
     
     // MARK: - Private Properties
     
-    private var appState: AppState?
+    var appState: AppState?
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initialization

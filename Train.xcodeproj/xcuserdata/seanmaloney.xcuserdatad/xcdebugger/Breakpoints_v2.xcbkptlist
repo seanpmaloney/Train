@@ -272,7 +272,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "162"
             endingLineNumber = "162"
-            landmarkName = "workoutSection(title:workouts:isUpcoming:isHeaderCollapsible:isSectionExpanded:)"
+            landmarkName = "activeWorkoutFloatingButton(workout:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -288,8 +288,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "168"
             endingLineNumber = "168"
-            landmarkName = "workoutSection(title:workouts:isUpcoming:isHeaderCollapsible:isSectionExpanded:)"
-            landmarkType = "7">
+            landmarkName = "EnhancedTrainingView"
+            landmarkType = "14">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -336,7 +336,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "167"
             endingLineNumber = "167"
-            landmarkName = "workoutSection(title:workouts:isUpcoming:isHeaderCollapsible:isSectionExpanded:)"
+            landmarkName = "activeWorkoutFloatingButton(workout:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -10,6 +10,8 @@ struct EnhancedTrainingView: View {
     @State private var activeWorkout: WorkoutEntity? = nil
     @State private var showActiveWorkout = false
     @State private var hasActiveWorkoutDismissedByGesture = false
+    @State private var selectedWeekIndex = 0
+    @State private var weekGroups: [EnhancedTrainingViewModel.WeekGroup] = []
     
     // MARK: - Initialization
     
@@ -28,29 +30,62 @@ struct EnhancedTrainingView: View {
                     activeWorkoutFloatingButton(workout: workout)
                 }
                 
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Upcoming workouts section
-                        workoutSection(
-                            title: "Upcoming Workouts",
-                            workouts: viewModel.upcomingWorkouts,
-                            isUpcoming: true,
-                            isHeaderCollapsible: false,
-                            isSectionExpanded: true
+                VStack(spacing: 0) {
+                    // Week selector
+                    if !weekGroups.isEmpty {
+                        WeekSelectorView(
+                            weekGroups: weekGroups,
+                            currentWeekIndex: selectedWeekIndex,
+                            onWeekSelected: { index in
+                                withAnimation {
+                                    selectedWeekIndex = index
+                                }
+                            }
                         )
-                        
-                        // Past workouts section
-                        workoutSection(
-                            title: "Past Workouts",
-                            workouts: viewModel.pastWorkouts,
-                            isUpcoming: false,
-                            isHeaderCollapsible: true,
-                            isSectionExpanded: isPastWorkoutsExpanded
-                        )
+                        .padding(.top, 8)
                     }
-                    .padding()
+                    
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            // Current week workouts section
+                            if !weekGroups.isEmpty {
+                                workoutSection(
+                                    title: nil,
+                                    workouts: weekGroups[selectedWeekIndex].workouts,
+                                    isUpcoming: true,
+                                    isHeaderCollapsible: false,
+                                    isSectionExpanded: true
+                                )
+                            } else {
+                                // Show upcoming workouts as fallback if no week groups
+                                workoutSection(
+                                    title: nil,
+                                    workouts: viewModel.upcomingWorkouts,
+                                    isUpcoming: true,
+                                    isHeaderCollapsible: false,
+                                    isSectionExpanded: true
+                                )
+                            }
+                            
+                            // Past workouts section
+                            if selectedWeekIndex == 0 {
+                                workoutSection(
+                                    title: "Past Workouts",
+                                    workouts: viewModel.pastWorkouts,
+                                    isUpcoming: false,
+                                    isHeaderCollapsible: true,
+                                    isSectionExpanded: isPastWorkoutsExpanded
+                                )
+                            }
+                        }
+                        .padding()
+                        .padding(.bottom, 60)
+                    }
+                    .background(AppStyle.Colors.background.ignoresSafeArea())
                 }
-                .background(AppStyle.Colors.background.ignoresSafeArea())
+                .onAppear {
+                    refreshWeekGroups()
+                }
                 .onChange(of: appState.activeWorkoutId) { newId in
                     if let id = newId {
                         if let workout = findWorkout(with: id) {
@@ -62,6 +97,9 @@ struct EnhancedTrainingView: View {
                         activeWorkout = nil
                         showActiveWorkout = false
                         hasActiveWorkoutDismissedByGesture = false
+                        
+                        // Refresh week groups when returning from workout
+                        refreshWeekGroups()
                     }
                 }
             }
@@ -131,7 +169,7 @@ struct EnhancedTrainingView: View {
     
     /// Creates a section of workouts (upcoming or past)
     private func workoutSection(
-        title: String,
+        title: String?,
         workouts: [WorkoutEntity],
         isUpcoming: Bool,
         isHeaderCollapsible: Bool,
@@ -146,23 +184,27 @@ struct EnhancedTrainingView: View {
                     }
                 }) {
                     HStack {
-                        Text(title)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(AppStyle.Colors.textPrimary)
-                        
-                        Spacer()
-                        
-                        Image(systemName: isPastWorkoutsExpanded ? "chevron.up" : "chevron.down")
-                            .foregroundColor(AppStyle.Colors.textSecondary)
+                        if (title != nil) {
+                            Text(title!)
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(AppStyle.Colors.textPrimary)
+                            
+                            Spacer()
+                            
+                            Image(systemName: isPastWorkoutsExpanded ? "chevron.up" : "chevron.down")
+                                .foregroundColor(AppStyle.Colors.textSecondary)
+                        }
                     }
                 }
                 .buttonStyle(PlainButtonStyle())
             } else {
-                Text(title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(AppStyle.Colors.textPrimary)
+                if (title != nil) {
+                    Text(title!)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(AppStyle.Colors.textPrimary)
+                }
             }
             
             // Workouts list
@@ -232,5 +274,21 @@ struct EnhancedTrainingView: View {
             return workout
         }
         return viewModel.pastWorkouts.first(where: { $0.id == id })
+    }
+    
+    // Function to refresh week groups and set the correct current week
+    private func refreshWeekGroups() {
+        weekGroups = viewModel.getWeekGroups()
+        
+        // Set the selected week to the current week if we have week groups
+        if !weekGroups.isEmpty {
+            if let currentWeekGroup = viewModel.getCurrentWeekGroup(),
+               let currentWeekIndex = weekGroups.firstIndex(where: { $0.weekNumber == currentWeekGroup.weekNumber }) {
+                selectedWeekIndex = currentWeekIndex
+            } else {
+                // Default to the first week if we can't find the current week
+                selectedWeekIndex = 0
+            }
+        }
     }
 }

@@ -162,7 +162,7 @@ struct EnhancedActiveWorkoutView: View {
             
             VStack(spacing: 16) {
                 ForEach(viewModel.exercises) { exercise in
-                    ExerciseEditView(exercise: exercise, viewModel: viewModel)
+                    SwipeableExerciseCard(exercise: exercise, viewModel: viewModel)
                 }
             }
         }

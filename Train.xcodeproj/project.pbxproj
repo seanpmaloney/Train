@@ -58,6 +58,11 @@
 		8B9877512DBB0C1D00767AE2 /* MovementType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877502DBB0C1D00767AE2 /* MovementType.swift */; };
 		8B9877532DBB15B100767AE2 /* WorkoutDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877522DBB15B100767AE2 /* WorkoutDay.swift */; };
 		8B9877552DBB195A00767AE2 /* DayPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877542DBB195A00767AE2 /* DayPickerView.swift */; };
+		8B9877582DBB25AA00767AE2 /* EnhancedTrainingViewModel+WeekGrouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877562DBB25A900767AE2 /* EnhancedTrainingViewModel+WeekGrouping.swift */; };
+		8B9877592DBB25AA00767AE2 /* EnhancedActiveWorkoutViewModel+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877572DBB25A900767AE2 /* EnhancedActiveWorkoutViewModel+History.swift */; };
+		8B98775C2DBB25C500767AE2 /* ExerciseHistoryIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B98775A2DBB25C500767AE2 /* ExerciseHistoryIndicator.swift */; };
+		8B98775D2DBB25C500767AE2 /* WeekSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B98775B2DBB25C500767AE2 /* WeekSelectorView.swift */; };
+		8B98775F2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B98775E2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -125,6 +130,11 @@
 		8B9877502DBB0C1D00767AE2 /* MovementType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovementType.swift; sourceTree = "<group>"; };
 		8B9877522DBB15B100767AE2 /* WorkoutDay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkoutDay.swift; sourceTree = "<group>"; };
 		8B9877542DBB195A00767AE2 /* DayPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DayPickerView.swift; path = Components/DayPickerView.swift; sourceTree = "<group>"; };
+		8B9877562DBB25A900767AE2 /* EnhancedTrainingViewModel+WeekGrouping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EnhancedTrainingViewModel+WeekGrouping.swift"; sourceTree = "<group>"; };
+		8B9877572DBB25A900767AE2 /* EnhancedActiveWorkoutViewModel+History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EnhancedActiveWorkoutViewModel+History.swift"; sourceTree = "<group>"; };
+		8B98775A2DBB25C500767AE2 /* ExerciseHistoryIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExerciseHistoryIndicator.swift; sourceTree = "<group>"; };
+		8B98775B2DBB25C500767AE2 /* WeekSelectorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeekSelectorView.swift; sourceTree = "<group>"; };
+		8B98775E2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeableExerciseCard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,6 +210,8 @@
 				8B7BD0532DA755F40089F6D3 /* PlanEditorViewModel.swift */,
 				8B7BD0592DA757440089F6D3 /* PlanSummaryViewModel.swift */,
 				8B7BD0572DA756B00089F6D3 /* MovementPickerViewModel.swift */,
+				8B9877572DBB25A900767AE2 /* EnhancedActiveWorkoutViewModel+History.swift */,
+				8B9877562DBB25A900767AE2 /* EnhancedTrainingViewModel+WeekGrouping.swift */,
 				8B9877482DB9B7B700767AE2 /* EnhancedActiveWorkoutViewModel.swift */,
 				8B9877472DB9B7B700767AE2 /* EnhancedTrainingViewModel.swift */,
 				8B7BCFD72DA145F20089F6D3 /* HealthKitManager.swift */,
@@ -280,6 +292,9 @@
 		8B98774D2DB9B88B00767AE2 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				8B98775E2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift */,
+				8B98775A2DBB25C500767AE2 /* ExerciseHistoryIndicator.swift */,
+				8B98775B2DBB25C500767AE2 /* WeekSelectorView.swift */,
 				8B98774B2DB9B88B00767AE2 /* ExerciseEditView.swift */,
 				8B98774C2DB9B88B00767AE2 /* WorkoutCardView.swift */,
 			);
@@ -395,6 +410,7 @@
 			files = (
 				8B7BCFE32DA1460F0089F6D3 /* TrainingView.swift in Sources */,
 				8B7BCFE42DA1460F0089F6D3 /* RestTimer.swift in Sources */,
+				8B98775F2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift in Sources */,
 				8B7BD05C2DA757640089F6D3 /* PlanSummaryView.swift in Sources */,
 				8B7BD05A2DA757440089F6D3 /* PlanSummaryViewModel.swift in Sources */,
 				8B7BCFE12DA1460F0089F6D3 /* WeightInputAccessory.swift in Sources */,
@@ -424,13 +440,16 @@
 				8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */,
 				8B98774E2DB9B88B00767AE2 /* ExerciseEditView.swift in Sources */,
 				8B9877312DB0311600767AE2 /* PlanTemplate.swift in Sources */,
+				8B9877582DBB25AA00767AE2 /* EnhancedTrainingViewModel+WeekGrouping.swift in Sources */,
 				8B7BCFE22DA1460F0089F6D3 /* CustomNumberPadView.swift in Sources */,
 				8B7BCF8F2D9DFD3F0089F6D3 /* TrainApp.swift in Sources */,
 				8B7BD0232DA35A540089F6D3 /* TrainingDataRoot.swift in Sources */,
 				8B9877552DBB195A00767AE2 /* DayPickerView.swift in Sources */,
+				8B98775C2DBB25C500767AE2 /* ExerciseHistoryIndicator.swift in Sources */,
 				8B9877492DB9B7B700767AE2 /* EnhancedTrainingViewModel.swift in Sources */,
 				8B98774A2DB9B7B700767AE2 /* EnhancedActiveWorkoutViewModel.swift in Sources */,
 				8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */,
+				8B98775D2DBB25C500767AE2 /* WeekSelectorView.swift in Sources */,
 				8B7BD0192DA357FB0089F6D3 /* ExerciseSet.swift in Sources */,
 				8B7A5A382DAB0CF000404F43 /* UpcomingTrainingViewModel.swift in Sources */,
 				8B7BCFDF2DA1460F0089F6D3 /* ActiveWorkoutView.swift in Sources */,
@@ -439,6 +458,7 @@
 				8B9877512DBB0C1D00767AE2 /* MovementType.swift in Sources */,
 				8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */,
 				8B7BD0262DA35A630089F6D3 /* ActiveWorkoutViewModel.swift in Sources */,
+				8B9877592DBB25AA00767AE2 /* EnhancedActiveWorkoutViewModel+History.swift in Sources */,
 				8B7BCFBF2DA145110089F6D3 /* TrainingSession.swift in Sources */,
 				8B7BD0282DA5EFD20089F6D3 /* MovementEntity.swift in Sources */,
 				8B7BD0562DA756A90089F6D3 /* MovementPickerView.swift in Sources */,
