@@ -146,7 +146,7 @@ struct ContentView: View {
                                     // Header
                                     HStack {
                                         VStack(alignment: .leading, spacing: 4) {
-                                            Text("Good morning")
+                                            Text(getTimeBasedGreeting())
                                                 .foregroundColor(AppStyle.Colors.textSecondary)
                                             Text("Sean")
                                                 .font(.title)
@@ -205,6 +205,21 @@ struct ContentView: View {
         }
         .preferredColorScheme(.dark)
         .environmentObject(appState)
+    }
+    
+    private func getTimeBasedGreeting() -> String {
+        let date = Date()
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: date)
+        
+        switch hour {
+        case 4..<12:  // 4am to 11:59am
+            return "Good morning"
+        case 12..<17: // 12pm to 4:59pm
+            return "Good afternoon"
+        default:      // 5pm to 3:59am
+            return "Good evening"
+        }
     }
 }
 
