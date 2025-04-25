@@ -52,29 +52,14 @@ struct EnhancedTrainingView: View {
                                 workoutSection(
                                     title: nil,
                                     workouts: weekGroups[selectedWeekIndex].workouts,
-                                    isUpcoming: true,
-                                    isHeaderCollapsible: false,
-                                    isSectionExpanded: true
+                                    isUpcoming: true
                                 )
                             } else {
                                 // Show upcoming workouts as fallback if no week groups
                                 workoutSection(
                                     title: nil,
                                     workouts: viewModel.upcomingWorkouts,
-                                    isUpcoming: true,
-                                    isHeaderCollapsible: false,
-                                    isSectionExpanded: true
-                                )
-                            }
-                            
-                            // Past workouts section
-                            if selectedWeekIndex == 0 {
-                                workoutSection(
-                                    title: "Past Workouts",
-                                    workouts: viewModel.pastWorkouts,
-                                    isUpcoming: false,
-                                    isHeaderCollapsible: true,
-                                    isSectionExpanded: isPastWorkoutsExpanded
+                                    isUpcoming: true
                                 )
                             }
                         }
@@ -171,44 +156,17 @@ struct EnhancedTrainingView: View {
     private func workoutSection(
         title: String?,
         workouts: [WorkoutEntity],
-        isUpcoming: Bool,
-        isHeaderCollapsible: Bool,
-        isSectionExpanded: Bool
+        isUpcoming: Bool
     ) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Section header
-            if isHeaderCollapsible {
-                Button(action: {
-                    withAnimation {
-                        isPastWorkoutsExpanded.toggle()
-                    }
-                }) {
-                    HStack {
-                        if (title != nil) {
-                            Text(title!)
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(AppStyle.Colors.textPrimary)
-                            
-                            Spacer()
-                            
-                            Image(systemName: isPastWorkoutsExpanded ? "chevron.up" : "chevron.down")
-                                .foregroundColor(AppStyle.Colors.textSecondary)
-                        }
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-            } else {
                 if (title != nil) {
                     Text(title!)
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(AppStyle.Colors.textPrimary)
                 }
-            }
             
             // Workouts list
-            if isSectionExpanded {
                 if workouts.isEmpty {
                     emptyStateView(for: isUpcoming)
                 } else {
@@ -239,7 +197,6 @@ struct EnhancedTrainingView: View {
                         }
                     }
                 }
-            }
         }
     }
     

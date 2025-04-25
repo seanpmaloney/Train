@@ -270,8 +270,8 @@
             filePath = "Train/Views/EnhancedTrainingView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "162"
-            endingLineNumber = "162"
+            startingLineNumber = "147"
+            endingLineNumber = "147"
             landmarkName = "activeWorkoutFloatingButton(workout:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -286,10 +286,10 @@
             filePath = "Train/Views/EnhancedTrainingView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "168"
-            endingLineNumber = "168"
-            landmarkName = "EnhancedTrainingView"
-            landmarkType = "14">
+            startingLineNumber = "153"
+            endingLineNumber = "153"
+            landmarkName = "activeWorkoutFloatingButton(workout:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -318,9 +318,9 @@
             filePath = "Train/Views/EnhancedTrainingView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "171"
-            endingLineNumber = "171"
-            landmarkName = "workoutSection(title:workouts:isUpcoming:isHeaderCollapsible:isSectionExpanded:)"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
+            landmarkName = "workoutSection(title:workouts:isUpcoming:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -334,8 +334,8 @@
             filePath = "Train/Views/EnhancedTrainingView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
+            startingLineNumber = "152"
+            endingLineNumber = "152"
             landmarkName = "activeWorkoutFloatingButton(workout:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -350,9 +350,9 @@
             filePath = "Train/Views/EnhancedTrainingView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172"
-            landmarkName = "workoutSection(title:workouts:isUpcoming:isHeaderCollapsible:isSectionExpanded:)"
+            startingLineNumber = "157"
+            endingLineNumber = "157"
+            landmarkName = "workoutSection(title:workouts:isUpcoming:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -368,22 +368,6 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "55"
             endingLineNumber = "55"
-            landmarkName = "body"
-            landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "FA3D003E-BADA-4AC3-A59B-5403FCE7A92F"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Train/Views/EnhancedTrainingView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "66"
-            endingLineNumber = "66"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>

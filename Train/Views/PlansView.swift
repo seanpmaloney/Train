@@ -12,11 +12,11 @@ struct PlansView: View {
                         currentPlanSection(plan: plan)
                     }
                     
+                    createPlanButton
+                    
                     if !appState.pastPlans.isEmpty {
                         pastPlansSection
                     }
-                    
-                    createPlanButton
                 }
                 .padding()
             }

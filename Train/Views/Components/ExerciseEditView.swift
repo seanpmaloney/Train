@@ -124,7 +124,7 @@ struct SetEditRow: View {
                         ) { newValue in
                             set.weight = newValue
                         }
-                        .presentationDetents([.height(350)])
+                        .presentationDetents([.height(405)])
                     }
                 } else {
                     Text(String(format: "%.1f", set.weight))
