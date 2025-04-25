@@ -74,7 +74,7 @@ struct PlanTemplatePickerView: View {
             //add divider
             Divider()
             VStack(alignment: .leading, spacing: 4) {
-                Text(template.schedule)
+                Text(template.scheduleString)
                     .font(AppStyle.Typography.caption())
                     .foregroundColor(AppStyle.Colors.textPrimary)
             }

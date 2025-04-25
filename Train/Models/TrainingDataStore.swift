@@ -9,7 +9,6 @@ class TrainingDataStore: ObservableObject {
     @Published private(set) var data: TrainingDataRoot
     private let fileURL: URL
     private var saveCancellable: AnyCancellable?
-    private let mockProvider = MockDataProvider.shared
     
     // MARK: - Initialization
     private init() {
@@ -50,15 +49,6 @@ class TrainingDataStore: ObservableObject {
         }
     }
     
-    /// Load mock data for development
-    func loadMockData() {
-        Task {
-            await MainActor.run {
-                self.data = mockProvider.createMockData()
-            }
-        }
-    }
-    
     // MARK: - Private Methods
     
     private func setupAutomaticSaving() {
@@ -81,10 +71,6 @@ class TrainingDataStore: ObservableObject {
             }
         } catch {
             print("Error loading data: \(error)")
-            // If loading fails, load mock data for development
-            await MainActor.run {
-                self.data = mockProvider.createMockData()
-            }
         }
     }
     

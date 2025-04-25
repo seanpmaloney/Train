@@ -37,20 +37,107 @@ class PlanEditorViewModel: ObservableObject {
     struct DayPlan: Identifiable {
         let id = UUID()
         let label: String
+        var selectedDay: WorkoutDay?
         var movements: [MovementConfig]
     }
     
     init(template: PlanTemplate?, appState: AppState) {
         self.template = template
         self.appState = appState
+        
+        // Initialize with empty days
         self.days = Calendar.current.weekdaySymbols.map { dayName in
-            DayPlan(label: dayName, movements: [])
+            DayPlan(label: dayName, selectedDay: nil, movements: [])
         }
         
-        // If template provided, set initial name
+        // Set initial plan name if template is provided
         if let template = template {
             self.planName = template.title
+            
+            // Setup template-based days
+            setupDaysFromTemplate(template)
         }
+    }
+    
+    /// Sets up the days array with exercises from the template
+    private func setupDaysFromTemplate(_ template: PlanTemplate) {
+        // Clear existing days array
+        days.removeAll()
+        
+        // Create days from the template's workout days
+        for (index, workoutDay) in template.workoutDays.enumerated() {
+            // Get the corresponding scheduled day if available
+            let scheduledDay = index < template.scheduleDays.count ? template.scheduleDays[index] : nil
+            
+            // Create a new day with the template's label
+            var newDay = DayPlan(
+                label: workoutDay.label,
+                selectedDay: scheduledDay,
+                movements: []
+            )
+            
+            // Add each exercise from the template to this day
+            for exercise in workoutDay.exercises {
+                // Use the template's exercise's movement and extract sets/reps information
+                let movement = exercise.movement
+                let firstSet = exercise.sets.first
+                let targetSets = exercise.sets.count
+                let targetReps = firstSet?.targetReps ?? 10
+                
+                // Create a movement config from this information
+                let config = MovementConfig(
+                    movement: movement,
+                    targetSets: targetSets,
+                    targetReps: targetReps
+                )
+                
+                newDay.movements.append(config)
+            }
+            
+            days.append(newDay)
+        }
+        
+        // Sort days by their weekday values
+        sortDaysByWeekday()
+    }
+    
+    /// Updates the selected day for a given day plan and reorders days
+    func updateSelectedDay(_ day: WorkoutDay?, for dayIndex: Int) {
+        guard days.indices.contains(dayIndex) else { return }
+        
+        // If the day is already selected for another day plan, clear it
+        if let day = day {
+            for index in days.indices where index != dayIndex {
+                if days[index].selectedDay == day {
+                    days[index].selectedDay = nil
+                }
+            }
+        }
+        
+        // Update the selected day
+        days[dayIndex].selectedDay = day
+        
+        // Sort days by their weekday values
+        sortDaysByWeekday()
+        
+        objectWillChange.send()
+    }
+    
+    /// Sorts days by their weekday values (days without a selected day come last)
+    private func sortDaysByWeekday() {
+        days.sort { lhs, rhs in
+            // Days without a selected day come last
+            guard let lhsDay = lhs.selectedDay else { return false }
+            guard let rhsDay = rhs.selectedDay else { return true }
+            
+            // Sort by weekday value
+            return lhsDay.rawValue < rhsDay.rawValue
+        }
+    }
+    
+    /// Returns all days that are currently selected
+    var selectedDays: [WorkoutDay] {
+        days.compactMap { $0.selectedDay }
     }
     
     func addMovement(_ movement: [MovementEntity], to dayIndex: Int) {
@@ -152,12 +239,37 @@ class PlanEditorViewModel: ObservableObject {
                     workout.exercises.append(exercise)
                 }
                 
-                // Calculate the date for this workout
-                var dateComponents = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: startOfWeek)
-                dateComponents.weekday = dayIndex + 1 // weekday is 1-based
-                dateComponents.weekOfYear! += weekIndex // Advance to correct week
+                // Calculate the date for this workout based on user-selected day or template schedule
+                var workoutDate: Date?
                 
-                if let workoutDate = calendar.date(from: dateComponents) {
+                if let selectedDay = day.selectedDay {
+                    // Use the user-selected day for this workout
+                    // Calculate date for this workout by finding the correct weekday
+                    var dateComponents = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: startOfWeek)
+                    dateComponents.weekday = selectedDay.calendarWeekday
+                    dateComponents.weekOfYear! += weekIndex // Advance to correct week
+                    
+                    workoutDate = calendar.date(from: dateComponents)
+                } else if let template = template, dayIndex < template.workoutDays.count, dayIndex < template.scheduleDays.count {
+                    // Fall back to template's scheduled days if no user selection
+                    let workoutDay = template.scheduleDays[dayIndex]
+                    
+                    // Calculate date for this workout
+                    var dateComponents = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: startOfWeek)
+                    dateComponents.weekday = workoutDay.calendarWeekday
+                    dateComponents.weekOfYear! += weekIndex // Advance to correct week
+                    
+                    workoutDate = calendar.date(from: dateComponents)
+                } else {
+                    // Fallback to original behavior if no template or index out of bounds
+                    var dateComponents = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: startOfWeek)
+                    dateComponents.weekday = dayIndex + 1 // weekday is 1-based
+                    dateComponents.weekOfYear! += weekIndex // Advance to correct week
+                    
+                    workoutDate = calendar.date(from: dateComponents)
+                }
+                
+                if let workoutDate = workoutDate {
                     // Only include workouts on or after the plan start date
                     if workoutDate >= planStartDate {
                         workout.scheduledDate = workoutDate

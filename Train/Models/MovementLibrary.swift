@@ -4,152 +4,164 @@ struct MovementLibrary {
     static let allMovements: [MovementEntity] = [
         // Chest
         MovementEntity(
-            name: "Barbell Bench Press",
+            type: .barbellBenchPress,
             primaryMuscles: [.chest],
             secondaryMuscles: [.shoulders, .triceps],
             equipment: .barbell
         ),
         MovementEntity(
-            name: "Dumbbell Incline Press",
+            type: .dumbbellInclinePress,
             primaryMuscles: [.chest],
             secondaryMuscles: [.shoulders, .triceps],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Push-Ups",
+            type: .pushUps,
             primaryMuscles: [.chest],
             secondaryMuscles: [.shoulders, .triceps],
             equipment: .bodyweight
         ),
         MovementEntity(
-            name: "Cable Flyes",
+            type: .cableFlyes,
             primaryMuscles: [.chest],
             secondaryMuscles: [.shoulders],
             equipment: .cable
         ),
         MovementEntity(
-            name: "Machine Pec Deck",
+            type: .machinePecDeck,
             primaryMuscles: [.chest],
             secondaryMuscles: [.shoulders],
             equipment: .machine
         ),
         MovementEntity(
-            name: "Dumbbell Bench Press",
+            type: .dumbbellBenchPress,
             primaryMuscles: [.chest],
             secondaryMuscles: [.shoulders, .triceps],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Cable Chest Fly",
+            type: .cableChestFly,
             primaryMuscles: [.chest],
             secondaryMuscles: [.shoulders],
             equipment: .cable
         ),
+        MovementEntity(
+            type: .dips,
+            primaryMuscles: [.chest],
+            secondaryMuscles: [.shoulders, .triceps],
+            equipment: .bodyweight
+        ),
         
         // Back
         MovementEntity(
-            name: "Barbell Deadlift",
+            type: .barbellDeadlift,
             primaryMuscles: [.back],
             secondaryMuscles: [.glutes, .hamstrings],
             equipment: .barbell
         ),
         MovementEntity(
-            name: "Pull-Ups",
+            type: .pullUps,
             primaryMuscles: [.back],
             secondaryMuscles: [.biceps],
             equipment: .bodyweight
         ),
         MovementEntity(
-            name: "Bent Over Row",
+            type: .bentOverRow,
             primaryMuscles: [.back],
             secondaryMuscles: [.biceps],
             equipment: .barbell
         ),
         MovementEntity(
-            name: "Lat Pulldown",
+            type: .latPulldown,
             primaryMuscles: [.back],
             secondaryMuscles: [.biceps],
             equipment: .machine
         ),
         MovementEntity(
-            name: "Seated Cable Row",
+            type: .seatedCableRow,
             primaryMuscles: [.back],
             secondaryMuscles: [.biceps],
             equipment: .cable
         ),
         MovementEntity(
-            name: "Dumbbell Row",
+            type: .dumbbellRow,
             primaryMuscles: [.back],
             secondaryMuscles: [.biceps],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Cable Pullover",
+            type: .cablePullover,
             primaryMuscles: [.back],
             secondaryMuscles: [.abs],
             equipment: .cable
         ),
         MovementEntity(
-            name: "Chin-Ups",
+            type: .chinUps,
             primaryMuscles: [.back, .biceps],
             secondaryMuscles: [],
             equipment: .bodyweight
         ),
+        MovementEntity(
+            type: .uprightRow,
+            primaryMuscles: [.back, .shoulders],
+            secondaryMuscles: [.biceps],
+            equipment: .barbell
+        ),
         
         // Legs
         MovementEntity(
-            name: "Barbell Back Squat",
+            type: .barbellBackSquat,
             primaryMuscles: [.quads],
             secondaryMuscles: [.glutes, .hamstrings],
             equipment: .barbell
         ),
         MovementEntity(
-            name: "Romanian Deadlift",
+            type: .romanianDeadlift,
             primaryMuscles: [.hamstrings],
             secondaryMuscles: [.glutes, .back],
             equipment: .barbell
         ),
         MovementEntity(
-            name: "Leg Press",
+            type: .legPress,
             primaryMuscles: [.quads],
             secondaryMuscles: [.glutes, .hamstrings],
             equipment: .machine
         ),
         MovementEntity(
-            name: "Bulgarian Split Squat",
+            type: .bulgarianSplitSquat,
             primaryMuscles: [.quads],
             secondaryMuscles: [.glutes, .hamstrings],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Standing Calf Raise",
+            type: .standingCalfRaise,
             primaryMuscles: [.calves],
             equipment: .machine
         ),
         MovementEntity(
-            name: "Leg Extension",
+            type: .legExtension,
             primaryMuscles: [.quads],
             equipment: .machine
         ),
         MovementEntity(
-            name: "Lying Leg Curl",
+            type: .lyingLegCurl,
             primaryMuscles: [.hamstrings],
             equipment: .machine
         ),
         MovementEntity(
-            name: "Goblet Squat",
+            type: .gobletSquat,
             primaryMuscles: [.quads],
             secondaryMuscles: [.glutes, .hamstrings],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Sled Push",
+            type: .sledPush,
             primaryMuscles: [.quads],
             secondaryMuscles: [.glutes, .calves],
             equipment: .machine
         ),
         MovementEntity(
-            name: "Barbell Front Squat",
+            type: .barbellFrontSquat,
             primaryMuscles: [.quads],
             secondaryMuscles: [.glutes, .hamstrings],
             equipment: .barbell
@@ -157,151 +169,122 @@ struct MovementLibrary {
         
         // Shoulders
         MovementEntity(
-            name: "Overhead Press",
+            type: .overheadPress,
             primaryMuscles: [.shoulders],
             secondaryMuscles: [.triceps],
             equipment: .barbell
         ),
         MovementEntity(
-            name: "Lateral Raise",
+            type: .lateralRaise,
             primaryMuscles: [.shoulders],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Face Pull",
+            type: .facePull,
             primaryMuscles: [.shoulders],
             secondaryMuscles: [.back],
             equipment: .cable
         ),
         MovementEntity(
-            name: "Front Raise",
+            type: .frontRaise,
             primaryMuscles: [.shoulders],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Arnold Press",
+            type: .arnoldPress,
             primaryMuscles: [.shoulders],
             secondaryMuscles: [.triceps],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Machine Lateral Raise",
+            type: .machineLateralRaise,
             primaryMuscles: [.shoulders],
             equipment: .machine
         ),
         
         // Arms
         MovementEntity(
-            name: "Barbell Curl",
+            type: .barbellCurl,
             primaryMuscles: [.biceps],
             equipment: .barbell
         ),
         MovementEntity(
-            name: "Tricep Pushdown",
+            type: .tricepPushdown,
             primaryMuscles: [.triceps],
             equipment: .cable
         ),
         MovementEntity(
-            name: "Hammer Curl",
+            type: .hammerCurl,
             primaryMuscles: [.biceps],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Skull Crushers",
+            type: .skullCrushers,
             primaryMuscles: [.triceps],
             equipment: .barbell
         ),
         MovementEntity(
-            name: "Preacher Curl",
+            type: .preacherCurl,
             primaryMuscles: [.biceps],
             equipment: .machine
         ),
         MovementEntity(
-            name: "Concentration Curl",
+            type: .concentrationCurl,
             primaryMuscles: [.biceps],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Overhead Tricep Extension",
+            type: .overheadTricepExtension,
             primaryMuscles: [.triceps],
             secondaryMuscles: [.shoulders],
             equipment: .dumbbell
         ),
         MovementEntity(
-            name: "Cable Curl",
+            type: .cableCurl,
             primaryMuscles: [.biceps],
             equipment: .cable
         ),
         
         // Core
         MovementEntity(
-            name: "Cable Crunch",
+            type: .cableCrunch,
             primaryMuscles: [.abs],
             equipment: .cable
         ),
         MovementEntity(
-            name: "Plank",
+            type: .plank,
             primaryMuscles: [.abs],
             equipment: .bodyweight
         ),
         MovementEntity(
-            name: "Russian Twist",
+            type: .russianTwist,
             primaryMuscles: [.abs],
             equipment: .bodyweight
         ),
         MovementEntity(
-            name: "Hanging Leg Raise",
+            type: .legRaise,
             primaryMuscles: [.abs],
             equipment: .bodyweight
         ),
         MovementEntity(
-            name: "Decline Sit-Up",
+            type: .abRollout,
             primaryMuscles: [.abs],
-            equipment: .bodyweight
-        ),
-        MovementEntity(
-            name: "Ab Wheel Rollout",
-            primaryMuscles: [.abs],
-            secondaryMuscles: [.shoulders],
-            equipment: .bodyweight
-        ),
-        
-        // Compound Movements
-        MovementEntity(
-            name: "Dips",
-            primaryMuscles: [.chest],
-            secondaryMuscles: [.triceps, .shoulders],
-            equipment: .bodyweight
-        ),
-        MovementEntity(
-            name: "Clean and Press",
-            primaryMuscles: [.shoulders],
-            secondaryMuscles: [.back, .quads, .glutes],
-            equipment: .barbell
-        ),
-        MovementEntity(
-            name: "T-Bar Row",
-            primaryMuscles: [.back],
-            secondaryMuscles: [.biceps],
-            equipment: .machine
-        ),
-        MovementEntity(
-            name: "Hip Thrust",
-            primaryMuscles: [.glutes],
-            secondaryMuscles: [.hamstrings],
-            equipment: .barbell
-        ),
-        MovementEntity(
-            name: "Incline Dumbbell Press",
-            primaryMuscles: [.chest],
-            secondaryMuscles: [.shoulders, .triceps],
-            equipment: .dumbbell
-        ),
-        MovementEntity(
-            name: "Machine Chest Press",
-            primaryMuscles: [.chest],
-            secondaryMuscles: [.shoulders, .triceps],
             equipment: .machine
         )
     ]
+    
+    /// Returns a movement entity by type
+    static func getMovement(type: MovementType) -> MovementEntity {
+        if let movement = allMovements.first(where: { $0.movementType == type }) {
+            return movement
+        }
+        
+        // Create a fallback movement if we can't find one
+        return MovementEntity(
+            type: type,
+            primaryMuscles: [.unknown],
+            equipment: .bodyweight
+        )
+    }
+    
 }

@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 enum MuscleGroup: String, CaseIterable, Codable, Identifiable {
-    case chest, back, quads, hamstrings, glutes, calves, biceps, triceps, shoulders, abs, forearms, obliques, lowerBack, traps, neck
+    case chest, back, quads, hamstrings, glutes, calves, biceps, triceps, shoulders, abs, forearms, obliques, lowerBack, traps, neck, unknown
 
     var id: String { rawValue }
 
@@ -23,6 +23,7 @@ enum MuscleGroup: String, CaseIterable, Codable, Identifiable {
         case .lowerBack: return "Lower Back"
         case .traps: return "Traps"
         case .neck: return "Neck"
+        case .unknown: return "Unknown"
         }
     }
     
@@ -43,6 +44,7 @@ enum MuscleGroup: String, CaseIterable, Codable, Identifiable {
         case .lowerBack: return AppStyle.MuscleColors.lowerBack
         case .traps: return AppStyle.MuscleColors.traps
         case .neck: return AppStyle.MuscleColors.neck
+        case .unknown: return AppStyle.Colors.textSecondary
         }
     }
 }

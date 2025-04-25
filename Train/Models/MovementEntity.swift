@@ -16,20 +16,22 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
     @Published var primaryMuscles: [MuscleGroup]
     @Published var secondaryMuscles: [MuscleGroup]
     @Published var equipment: EquipmentType
+    let movementType: MovementType
     
     var muscleGroups: [MuscleGroup] {
         primaryMuscles + secondaryMuscles
     }
 
     init(
-        name: String,
+        type: MovementType,
         primaryMuscles: [MuscleGroup],
         secondaryMuscles: [MuscleGroup] = [],
         equipment: EquipmentType,
         notes: String? = nil,
         videoURL: String? = nil
     ) {
-        self.name = name
+        self.movementType = type
+        self.name = type.displayName
         self.primaryMuscles = primaryMuscles
         self.secondaryMuscles = secondaryMuscles
         self.equipment = equipment
@@ -39,7 +41,7 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
     
     // MARK: - Codable
     enum CodingKeys: String, CodingKey {
-        case id, name, notes, videoURL, primaryMuscles, secondaryMuscles, equipment
+        case id, name, notes, videoURL, primaryMuscles, secondaryMuscles, equipment, movementType
     }
     
     required init(from decoder: Decoder) throws {
@@ -50,6 +52,7 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
         primaryMuscles = try container.decode([MuscleGroup].self, forKey: .primaryMuscles)
         secondaryMuscles = try container.decode([MuscleGroup].self, forKey: .secondaryMuscles)
         equipment = try container.decode(EquipmentType.self, forKey: .equipment)
+        movementType = try container.decode(MovementType.self, forKey: .movementType)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -61,5 +64,6 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
         try container.encode(primaryMuscles, forKey: .primaryMuscles)
         try container.encode(secondaryMuscles, forKey: .secondaryMuscles)
         try container.encode(equipment, forKey: .equipment)
+        try container.encode(movementType, forKey: .movementType)
     }
 }

@@ -168,5 +168,5 @@ struct ExerciseSummaryView: View {
 }
 
 #Preview {
-    ExerciseSummaryView(exercise: ExerciseInstanceEntity(movement: MovementEntity(name: "Pullup", primaryMuscles: [MuscleGroup.back], secondaryMuscles: [MuscleGroup.biceps], equipment: EquipmentType.machine), exerciseType: "Strength", sets: [ExerciseSetEntity(weight: 300, completedReps: 5, targetReps: 5, isComplete: true)]), isEditable: false)
+    ExerciseSummaryView(exercise: ExerciseInstanceEntity(movement: MovementEntity(type: .pullUps, primaryMuscles: [MuscleGroup.back], secondaryMuscles: [MuscleGroup.biceps], equipment: EquipmentType.machine), exerciseType: "Strength", sets: [ExerciseSetEntity(weight: 300, completedReps: 5, targetReps: 5, isComplete: true)]), isEditable: false)
 }

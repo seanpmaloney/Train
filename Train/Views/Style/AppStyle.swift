@@ -38,6 +38,7 @@ enum AppStyle {
         // Other
         static let traps = Color(hex: "#9B5DE5")        // Purple
         static let neck = Color(hex: "#845EC2")         // Deep Purple
+        static let unknown = Colors.textSecondary              // gray for unknown
         
         static func color(for muscleGroup: MuscleGroup) -> Color {
             switch muscleGroup {
@@ -56,6 +57,7 @@ enum AppStyle {
             case .glutes: return glutes
             case .traps: return traps
             case .neck: return neck
+            case .unknown: return unknown
             }
         }
     }

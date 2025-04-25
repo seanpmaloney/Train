@@ -176,9 +176,10 @@ struct PlanEditorView: View {
     
     private var daysSection: some View {
         VStack(spacing: AppStyle.Layout.compactSpacing) {
-            ForEach(viewModel.days.indices, id: \.self) { dayIndex in
+            ForEach(viewModel.days, id: \.id) { day in
+                let dayIndex = viewModel.days.firstIndex(where: { $0.id == day.id }) ?? 0
                 DayView(
-                    day: viewModel.days[dayIndex],
+                    day: day,
                     dayIndex: dayIndex,
                     viewModel: viewModel,
                     scrollTarget: $scrollTarget,
@@ -194,6 +195,7 @@ struct PlanEditorView: View {
                     }
                 )
             }
+            .animation(.snappy, value: viewModel.days.map { $0.id })
         }
     }
 }
@@ -208,24 +210,65 @@ private struct DayView: View {
     let onRemoveMovement: (IndexSet) -> Void
     let onMoveMovement: (IndexSet, Int) -> Void
     
+    @State private var showingDayPicker = false
+    
     var body: some View {
         VStack(alignment: .leading, spacing: AppStyle.Layout.compactSpacing) {
-            Text(day.label)
-                .font(AppStyle.Typography.headline())
-                .foregroundColor(AppStyle.Colors.textPrimary)
+            dayHeader
             
-            if day.movements.isEmpty {
-                emptyState
-            } else {
+            if !day.movements.isEmpty {
                 movementsList
+            } else {
+                emptyStateView
             }
         }
         .padding()
         .background(AppStyle.Colors.surface)
         .cornerRadius(12)
+        .transition(.opacity)
     }
     
-    private var emptyState: some View {
+    private var dayHeader: some View {
+        HStack {
+            Text(day.label)
+                .font(AppStyle.Typography.headline())
+            
+            Spacer()
+            
+            Button(action: {
+                showingDayPicker.toggle()
+            }) {
+                HStack {
+                    Text(day.selectedDay?.displayName ?? "Select day")
+                        .font(AppStyle.Typography.body())
+                        .foregroundColor(day.selectedDay != nil ? AppStyle.Colors.primary : AppStyle.Colors.textSecondary)
+                    
+                    Image(systemName: "chevron.down")
+                        .font(.caption)
+                        .foregroundColor(AppStyle.Colors.textSecondary)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(AppStyle.Colors.surface)
+                        .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
+                )
+            }
+            .popover(isPresented: $showingDayPicker) {
+                DayPickerView(selectedDay: day.selectedDay, 
+                              selectedDays: viewModel.selectedDays,
+                              onSelect: { selectedDay in
+                                  viewModel.updateSelectedDay(selectedDay, for: dayIndex)
+                                  showingDayPicker = false
+                              })
+                .presentationCompactAdaptation(.none)
+            }
+            
+        }
+    }
+    
+    private var emptyStateView: some View {
         Button(action: onAddMovement) {
             HStack {
                 Text("Add Movement")

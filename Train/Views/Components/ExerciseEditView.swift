@@ -254,5 +254,5 @@ struct RepsPickerView: View {
 }
 
 #Preview {
-    ExerciseEditView(exercise: ExerciseInstanceEntity(movement: MovementEntity(name: "Pullup", primaryMuscles: [MuscleGroup.back], secondaryMuscles: [MuscleGroup.biceps], equipment: EquipmentType.machine), exerciseType: "Strength", sets: [ExerciseSetEntity(weight: 300, completedReps: 5, targetReps: 5, isComplete: true)]), viewModel: EnhancedActiveWorkoutViewModel(workout: WorkoutEntity(title: "Workout", description: "Yeet", isComplete: false)))
+    ExerciseEditView(exercise: ExerciseInstanceEntity(movement: MovementEntity(type: .pullUps, primaryMuscles: [MuscleGroup.back], secondaryMuscles: [MuscleGroup.biceps], equipment: EquipmentType.machine), exerciseType: "Strength", sets: [ExerciseSetEntity(weight: 300, completedReps: 5, targetReps: 5, isComplete: true)]), viewModel: EnhancedActiveWorkoutViewModel(workout: WorkoutEntity(title: "Workout", description: "Yeet", isComplete: false)))
 }
