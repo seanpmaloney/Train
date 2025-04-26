@@ -73,6 +73,30 @@ class EnhancedActiveWorkoutViewModel: ObservableObject {
         objectWillChange.send()
     }
     
+    /// Updates the weight for a specific exercise set and all subsequent sets in the same exercise
+    func updateWeightAndSubsequentSets(in exercise: ExerciseInstanceEntity, for set: ExerciseSetEntity, to weight: Double) {
+        guard let setIndex = exercise.sets.firstIndex(where: { $0.id == set.id }) else { return }
+        
+        // Update current set and all subsequent sets
+        for i in setIndex..<exercise.sets.count {
+            exercise.sets[i].weight = weight
+        }
+        
+        objectWillChange.send()
+    }
+    
+    /// Updates the completed reps for a specific exercise set and all subsequent sets in the same exercise
+    func updateRepsAndSubsequentSets(in exercise: ExerciseInstanceEntity, for set: ExerciseSetEntity, to reps: Int) {
+        guard let setIndex = exercise.sets.firstIndex(where: { $0.id == set.id }) else { return }
+        
+        // Update current set and all subsequent sets
+        for i in setIndex..<exercise.sets.count {
+            exercise.sets[i].completedReps = reps
+        }
+        
+        objectWillChange.send()
+    }
+    
     // MARK: - Private Methods
     
     /// Formats weight for display

@@ -50,6 +50,7 @@ struct ExerciseEditView: View {
                     ForEach(displayExercise.sets) { set in
                         SetEditRow(
                             set: set,
+                            exercise: displayExercise,
                             isEditable: !isViewingHistory,
                             viewModel: viewModel
                         )
@@ -96,6 +97,7 @@ struct ExerciseEditView: View {
 /// A version of SetRow that can be toggled between editable and readonly states
 struct SetEditRow: View {
     @ObservedObject var set: ExerciseSetEntity
+    let exercise: ExerciseInstanceEntity
     let isEditable: Bool
     let viewModel: EnhancedActiveWorkoutViewModel
     
@@ -122,7 +124,11 @@ struct SetEditRow: View {
                             initialValue: set.weight,
                             mode: .weight
                         ) { newValue in
-                            set.weight = newValue
+                            viewModel.updateWeightAndSubsequentSets(
+                                in: exercise,
+                                for: set, 
+                                to: newValue
+                            )
                         }
                         .presentationDetents([.height(405)])
                     }
@@ -155,7 +161,11 @@ struct SetEditRow: View {
                             initialValue: Double(set.completedReps),
                             mode: .reps
                         ) { newValue in
-                            set.completedReps = Int(newValue)
+                            viewModel.updateRepsAndSubsequentSets(
+                                in: exercise,
+                                for: set, 
+                                to: Int(newValue)
+                            )
                         }
                         .presentationDetents([.height(350)])
                     }

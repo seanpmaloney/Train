@@ -23,6 +23,25 @@ struct SwipeableExerciseCard: View {
     
     var body: some View {
         ZStack {
+            // History icon that appears when card is moved
+            if hasHistory {
+                HStack {
+                    VStack {
+                        Spacer()
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 20))
+                            .foregroundColor(AppStyle.Colors.textSecondary.opacity(0.7))
+                        Text("History")
+                            .font(.caption)
+                            .foregroundColor(AppStyle.Colors.textSecondary.opacity(0.8))
+                        Spacer()
+                    }
+                    .frame(width: 80)
+                    .padding(.trailing, 16)
+                    Spacer()
+                }
+            }
+            
             // Exercise card content
             VStack(alignment: .leading, spacing: 12) {
                 // Exercise header
@@ -65,7 +84,8 @@ struct SwipeableExerciseCard: View {
                         ForEach(displayExercise.sets) { set in
                             SetEditRow(
                                 set: set,
-                                isEditable: !isViewingHistory,
+                                exercise: displayExercise,
+                                isEditable: !isViewingHistory && !viewModel.isComplete,
                                 viewModel: viewModel
                             )
                             .id("\(displayExercise.id)-\(set.id)")
@@ -99,7 +119,7 @@ struct SwipeableExerciseCard: View {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(AppStyle.Colors.surface)
             )
-            .offset(x: offset + (showingInitialHint ? -20 : 0))
+            .offset(x: offset + (showingInitialHint ? 80 : 0))
             .gesture(
                 DragGesture()
                     .onChanged { gesture in
@@ -141,14 +161,14 @@ struct SwipeableExerciseCard: View {
             // Perform initial animation hint if there's history to see
             if hasHistory {
                 // Give a moment for the view to load before animating
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    withAnimation(.easeInOut(duration: 0.5)) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    withAnimation(.easeInOut(duration: 0.6)) {
                         showingInitialHint = true
                     }
                     
                     // Reset after animation completes
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        withAnimation(.easeInOut(duration: 0.4)) {
                             showingInitialHint = false
                         }
                     }

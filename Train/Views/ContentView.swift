@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Charts
 
 struct VitalStat: View {
     let icon: String
@@ -188,8 +189,8 @@ struct ContentView: View {
                             EnhancedTrainingView(appState: appState)
                                 .environmentObject(appState)
                         case 3:
-                            Text("Profile")
-                                .foregroundColor(AppStyle.Colors.textPrimary)
+                            StatsView(appState: appState)
+                                .environmentObject(appState)
                         default:
                             EmptyView()
                         }
@@ -485,7 +486,7 @@ struct CustomTabBar: View {
         case 0: return "list.bullet.clipboard.fill"
         case 1: return "chart.bar.fill"
         case 2: return "dumbbell.fill"
-        case 3: return "person.fill"
+        case 3: return "chart.xyaxis.line"
         default: return ""
         }
     }
@@ -495,7 +496,7 @@ struct CustomTabBar: View {
         case 0: return "Dashboard"
         case 1: return "Plans"
         case 2: return "Training"
-        case 3: return "Profile"
+        case 3: return "Stats"
         default: return ""
         }
     }

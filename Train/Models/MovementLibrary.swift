@@ -55,8 +55,8 @@ struct MovementLibrary {
         // Back
         MovementEntity(
             type: .barbellDeadlift,
-            primaryMuscles: [.back],
-            secondaryMuscles: [.glutes, .hamstrings],
+            primaryMuscles: [.back, .lowerBack],
+            secondaryMuscles: [.glutes, .hamstrings, .forearms, .traps, .lowerBack],
             equipment: .barbell
         ),
         MovementEntity(
@@ -68,43 +68,43 @@ struct MovementLibrary {
         MovementEntity(
             type: .bentOverRow,
             primaryMuscles: [.back],
-            secondaryMuscles: [.biceps],
+            secondaryMuscles: [.biceps, .traps, .forearms, .lowerBack],
             equipment: .barbell
         ),
         MovementEntity(
             type: .latPulldown,
             primaryMuscles: [.back],
-            secondaryMuscles: [.biceps],
+            secondaryMuscles: [.biceps, .traps, .forearms],
             equipment: .machine
         ),
         MovementEntity(
             type: .seatedCableRow,
             primaryMuscles: [.back],
-            secondaryMuscles: [.biceps],
+            secondaryMuscles: [.biceps, .traps, .forearms, .lowerBack],
             equipment: .cable
         ),
         MovementEntity(
             type: .dumbbellRow,
             primaryMuscles: [.back],
-            secondaryMuscles: [.biceps],
+            secondaryMuscles: [.biceps, .traps, .forearms, .lowerBack],
             equipment: .dumbbell
         ),
         MovementEntity(
             type: .cablePullover,
             primaryMuscles: [.back],
-            secondaryMuscles: [.abs],
+            secondaryMuscles: [.abs, .traps],
             equipment: .cable
         ),
         MovementEntity(
             type: .chinUps,
             primaryMuscles: [.back, .biceps],
-            secondaryMuscles: [],
+            secondaryMuscles: [.traps, .forearms],
             equipment: .bodyweight
         ),
         MovementEntity(
             type: .uprightRow,
-            primaryMuscles: [.back, .shoulders],
-            secondaryMuscles: [.biceps],
+            primaryMuscles: [.traps, .shoulders],
+            secondaryMuscles: [.back, .biceps],
             equipment: .barbell
         ),
         
@@ -118,7 +118,7 @@ struct MovementLibrary {
         MovementEntity(
             type: .romanianDeadlift,
             primaryMuscles: [.hamstrings],
-            secondaryMuscles: [.glutes, .back],
+            secondaryMuscles: [.glutes, .back, .lowerBack],
             equipment: .barbell
         ),
         MovementEntity(
@@ -181,7 +181,7 @@ struct MovementLibrary {
         ),
         MovementEntity(
             type: .facePull,
-            primaryMuscles: [.shoulders],
+            primaryMuscles: [.shoulders, .traps],
             secondaryMuscles: [.back],
             equipment: .cable
         ),
@@ -206,6 +206,7 @@ struct MovementLibrary {
         MovementEntity(
             type: .barbellCurl,
             primaryMuscles: [.biceps],
+            secondaryMuscles: [.forearms],
             equipment: .barbell
         ),
         MovementEntity(
@@ -216,6 +217,7 @@ struct MovementLibrary {
         MovementEntity(
             type: .hammerCurl,
             primaryMuscles: [.biceps],
+            secondaryMuscles: [.forearms],
             equipment: .dumbbell
         ),
         MovementEntity(
@@ -226,11 +228,13 @@ struct MovementLibrary {
         MovementEntity(
             type: .preacherCurl,
             primaryMuscles: [.biceps],
+            secondaryMuscles: [.forearms],
             equipment: .machine
         ),
         MovementEntity(
             type: .concentrationCurl,
             primaryMuscles: [.biceps],
+            secondaryMuscles: [.forearms],
             equipment: .dumbbell
         ),
         MovementEntity(
@@ -242,6 +246,7 @@ struct MovementLibrary {
         MovementEntity(
             type: .cableCurl,
             primaryMuscles: [.biceps],
+            secondaryMuscles: [.forearms],
             equipment: .cable
         ),
         

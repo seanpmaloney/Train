@@ -15,9 +15,6 @@ extension EnhancedActiveWorkoutViewModel {
             return [currentExercise]
         }
         
-        // Get current date
-        let today = Date()
-        
         // Get the current workout (needed to exclude it from history)
         let currentWorkoutId = workout.id
         
@@ -31,9 +28,8 @@ extension EnhancedActiveWorkoutViewModel {
         for historicalWorkout in currentPlan.workouts {
             // Skip if not complete, future date, or current workout
             guard historicalWorkout.isComplete,
-                  historicalWorkout.id != currentWorkoutId,
-                  let workoutDate = historicalWorkout.scheduledDate,
-                  workoutDate < today else {
+                  historicalWorkout.id != currentWorkoutId
+            else {
                 continue
             }
             
@@ -59,7 +55,7 @@ extension EnhancedActiveWorkoutViewModel {
             let aDate = aWorkout?.scheduledDate ?? Date.distantPast
             let bDate = bWorkout?.scheduledDate ?? Date.distantPast
             
-            return aDate > bDate
+            return aDate < bDate
         }
         
         return historyExercises

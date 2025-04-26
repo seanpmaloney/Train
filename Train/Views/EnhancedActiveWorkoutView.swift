@@ -16,7 +16,7 @@ struct EnhancedActiveWorkoutView: View {
         // Create view model with the workout but don't connect to appState yet
         _viewModel = StateObject(wrappedValue: EnhancedActiveWorkoutViewModel(workout: workout))
         
-        print("EnhancedActiveWorkoutView initialized with workout: \(workout.title)")
+        print("EnhancedActiveWorkoutView initialized with workout: \(workout.title), isComplete: \(workout.isComplete)")
     }
     
     // MARK: - Body
@@ -171,21 +171,24 @@ struct EnhancedActiveWorkoutView: View {
     /// Action buttons view
     private var actionButtonsView: some View {
         VStack(spacing: 16) {
-            Button(action: {
-                showingEndWorkoutConfirmation = true
-            }) {
-                HStack {
-                    Spacer()
-                    Text("End Workout")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    Spacer()
+            // Only show the End Workout button if the workout is not already complete
+            if !viewModel.isComplete {
+                Button(action: {
+                    showingEndWorkoutConfirmation = true
+                }) {
+                    HStack {
+                        Spacer()
+                        Text("End Workout")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(AppStyle.Colors.danger)
+                    )
                 }
-                .padding(.vertical, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(AppStyle.Colors.danger)
-                )
             }
         }
     }

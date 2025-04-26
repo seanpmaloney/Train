@@ -77,11 +77,18 @@ struct WorkoutCardView: View {
                 }
                 
                 // Action button for upcoming workouts
-                if isUpcoming && !workout.isComplete {
+                if isUpcoming {
                     Button(action: onStartPressed) {
                         HStack {
-                            // Adjust the button text based on whether this workout is active
-                            if viewModel.isWorkoutActive(workout) {
+                            // Adjust button text based on completion status and activity
+                            if workout.isComplete {
+                                Text("View Workout")
+                                    .font(.headline)
+                                    .foregroundColor(Color(AppStyle.Colors.textSecondary))
+                                Image(systemName: "arrow.right.circle.fill")
+                                    .font(.headline)
+                                    .foregroundColor(Color(AppStyle.Colors.textSecondary))
+                            } else if viewModel.isWorkoutActive(workout) {
                                 Text("Continue Workout")
                                     .font(.headline)
                                     .foregroundColor(Color(AppStyle.Colors.primary))
@@ -155,14 +162,14 @@ struct ExerciseSummaryView: View {
                     .foregroundColor(AppStyle.Colors.textSecondary)
                     .background(
                         RoundedRectangle(cornerRadius: 6)
-                            .fill(AppStyle.Colors.surfaceVariant)
+                            .fill(AppStyle.Colors.surfaceTop)
                     )
             }
         }
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(AppStyle.Colors.surfaceVariant)
+                .fill(AppStyle.Colors.surfaceTop)
         )
     }
 }
