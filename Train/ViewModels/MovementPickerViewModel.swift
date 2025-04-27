@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 class MovementPickerViewModel: ObservableObject {
     @Published var selectedMuscleGroup: MuscleGroup?
     @Published var searchText = ""

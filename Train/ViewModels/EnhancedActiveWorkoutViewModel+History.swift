@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 // Extension to add exercise history functionality to EnhancedActiveWorkoutViewModel
 extension EnhancedActiveWorkoutViewModel {
     

@@ -8,14 +8,14 @@ enum EquipmentType: String, Codable, CaseIterable {
     case cable = "Cable"
 }
 
-class MovementEntity: ObservableObject, Identifiable, Codable {
-    let id: UUID = UUID()
-    @Published var name: String
-    @Published var notes: String?
-    @Published var videoURL: String?
-    @Published var primaryMuscles: [MuscleGroup]
-    @Published var secondaryMuscles: [MuscleGroup]
-    @Published var equipment: EquipmentType
+struct MovementEntity: Identifiable, Codable, Hashable {
+    let id: UUID
+    let name: String
+    let notes: String?
+    let videoURL: String?
+    let primaryMuscles: [MuscleGroup]
+    let secondaryMuscles: [MuscleGroup]
+    let equipment: EquipmentType
     let movementType: MovementType
     
     var muscleGroups: [MuscleGroup] {
@@ -30,6 +30,7 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
         notes: String? = nil,
         videoURL: String? = nil
     ) {
+        self.id = UUID()
         self.movementType = type
         self.name = type.displayName
         self.primaryMuscles = primaryMuscles
@@ -44,8 +45,9 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
         case id, name, notes, videoURL, primaryMuscles, secondaryMuscles, equipment, movementType
     }
     
-    required init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         notes = try container.decodeIfPresent(String.self, forKey: .notes)
         videoURL = try container.decodeIfPresent(String.self, forKey: .videoURL)
@@ -65,5 +67,15 @@ class MovementEntity: ObservableObject, Identifiable, Codable {
         try container.encode(secondaryMuscles, forKey: .secondaryMuscles)
         try container.encode(equipment, forKey: .equipment)
         try container.encode(movementType, forKey: .movementType)
+    }
+    
+    // MARK: - Hashable
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: MovementEntity, rhs: MovementEntity) -> Bool {
+        return lhs.id == rhs.id
     }
 }

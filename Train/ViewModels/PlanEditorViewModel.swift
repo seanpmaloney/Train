@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 class PlanEditorViewModel: ObservableObject {
     @Published var days: [DayPlan]
     @Published var planLength: Int = 4

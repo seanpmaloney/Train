@@ -3,6 +3,7 @@ import SwiftUI
 import Combine
 
 /// ViewModel for managing an active workout session
+@MainActor
 class EnhancedActiveWorkoutViewModel: ObservableObject {
     // MARK: - Published Properties
     

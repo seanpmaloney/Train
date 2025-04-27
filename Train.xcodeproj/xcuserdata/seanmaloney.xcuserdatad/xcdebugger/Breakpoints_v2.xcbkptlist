@@ -176,8 +176,52 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "245"
             endingLineNumber = "245"
-            landmarkName = "savePlans()"
+            landmarkName = "setCurrentPlan(_:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "F7EABB95-13FE-4191-82B7-4D0DA714786A - 904e35246bd963d0"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Train.AppState.setActiveWorkout(Train.WorkoutEntity) -&gt; ()"
+                  moduleName = "Train.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/seanmaloney/Projects/Train/Train/State/AppState.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "246"
+                  endingLineNumber = "246">
+               </Location>
+               <Location
+                  uuid = "F7EABB95-13FE-4191-82B7-4D0DA714786A - 3a8ef6a71f81224d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Train.AppState.setCurrentPlan(Train.TrainingPlanEntity) -&gt; ()"
+                  moduleName = "Train.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/seanmaloney/Projects/Train/Train/State/AppState.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "245"
+                  endingLineNumber = "245">
+               </Location>
+               <Location
+                  uuid = "F7EABB95-13FE-4191-82B7-4D0DA714786A - 3a8ef6a71f81224d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Train.AppState.setCurrentPlan(Train.TrainingPlanEntity) -&gt; ()"
+                  moduleName = "Train.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/seanmaloney/Projects/Train/Train/State/AppState.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "245"
+                  endingLineNumber = "245">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -256,7 +300,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "177"
             endingLineNumber = "177"
-            landmarkName = "setCurrentPlan(_:)"
+            landmarkName = "scheduleWorkouts(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -302,8 +346,8 @@
             filePath = "Train/ViewModels/EnhancedTrainingViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "35"
-            endingLineNumber = "35"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
             landmarkName = "startWorkout(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -398,8 +442,8 @@
             filePath = "Train/ViewModels/EnhancedActiveWorkoutViewModel+History.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "15"
-            endingLineNumber = "15"
+            startingLineNumber = "16"
+            endingLineNumber = "16"
             landmarkName = "getExerciseHistory(for:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -414,8 +458,8 @@
             filePath = "Train/ViewModels/EnhancedActiveWorkoutViewModel+History.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "11"
-            endingLineNumber = "11"
+            startingLineNumber = "12"
+            endingLineNumber = "12"
             landmarkName = "getExerciseHistory(for:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -430,8 +474,8 @@
             filePath = "Train/ViewModels/EnhancedActiveWorkoutViewModel+History.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "39"
-            endingLineNumber = "39"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
             landmarkName = "getExerciseHistory(for:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -446,8 +490,8 @@
             filePath = "Train/ViewModels/EnhancedActiveWorkoutViewModel+History.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "9"
-            endingLineNumber = "9"
+            startingLineNumber = "10"
+            endingLineNumber = "10"
             landmarkName = "getExerciseHistory(for:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -462,8 +506,8 @@
             filePath = "Train/ViewModels/EnhancedActiveWorkoutViewModel+History.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "37"
-            endingLineNumber = "37"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
             landmarkName = "getExerciseHistory(for:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -478,8 +522,8 @@
             filePath = "Train/ViewModels/EnhancedActiveWorkoutViewModel+History.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "30"
-            endingLineNumber = "30"
+            startingLineNumber = "31"
+            endingLineNumber = "31"
             landmarkName = "getExerciseHistory(for:)"
             landmarkType = "7">
          </BreakpointContent>

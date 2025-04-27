@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 class PlanSummaryViewModel: ObservableObject {
     @Published var planName: String
     @Published var notes: String = ""

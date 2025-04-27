@@ -1,0 +1,53 @@
+{
+  "configurations" : [
+    {
+      "id" : "6A1E72AF-FB55-4CB9-8B0F-3B99B6F12B7E",
+      "name" : "Standard Configuration",
+      "options" : {
+        "targetForVariableExpansion" : {
+          "containerPath" : "container:Train.xcodeproj",
+          "identifier" : "TrainTests",
+          "name" : "TrainTests"
+        }
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:Train.xcodeproj",
+          "identifier" : "Train",
+          "name" : "Train"
+        }
+      ]
+    },
+    "environmentVariableEntries" : [
+      {
+        "key" : "TEST_ENVIRONMENT",
+        "value" : "1"
+      }
+    ],
+    "testExecutionOrdering" : "random",
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Train.xcodeproj",
+        "identifier" : "TrainTests",
+        "name" : "TrainTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Train.xcodeproj",
+        "identifier" : "TrainUITests",
+        "name" : "TrainUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+@MainActor
 /// View model for the Stats page, handling data processing and calculations
 class StatsViewModel: ObservableObject {
     // MARK: - Published Properties

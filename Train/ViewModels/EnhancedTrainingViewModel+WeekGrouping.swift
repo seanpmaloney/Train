@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 // Extension to add week grouping functionality to EnhancedTrainingViewModel
 extension EnhancedTrainingViewModel {
     

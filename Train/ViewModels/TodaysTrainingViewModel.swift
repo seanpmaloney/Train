@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 class TodaysTrainingViewModel: ObservableObject {
     @Published private(set) var todaysWorkout: WorkoutEntity?
     @Published private(set) var completionPercentage: Double = 0.0

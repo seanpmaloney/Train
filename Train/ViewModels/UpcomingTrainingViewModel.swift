@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 class UpcomingTrainingViewModel: ObservableObject {
     @Published var nextWorkout: WorkoutEntity?
     private let appState: AppState

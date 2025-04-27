@@ -16,7 +16,7 @@ struct PlanTemplate: Identifiable {
         WorkoutDay.formatSchedule(scheduleDays)
     }
     
-    static let templates: [PlanTemplate] = [
+    @MainActor static let templates: [PlanTemplate] = [
         PlanTemplate(
             title: "Full Body",
             goal: .strength,

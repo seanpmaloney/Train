@@ -1,9 +1,9 @@
 import Foundation
 import Combine
 
-class TrainingDataStore: ObservableObject {
+class TrainingDataStore: ObservableObject, @unchecked Sendable {
     // MARK: - Singleton
-    static let shared = TrainingDataStore()
+    @MainActor static let shared = TrainingDataStore()
     
     // MARK: - Properties
     @Published private(set) var data: TrainingDataRoot

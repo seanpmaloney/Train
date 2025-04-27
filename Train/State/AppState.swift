@@ -1,22 +1,152 @@
 import Foundation
 
+// Add MainActor to the entire class since this is primarily UI state
+@MainActor
 class AppState: ObservableObject {
     @Published var currentPlan: TrainingPlanEntity?
     @Published var pastPlans: [TrainingPlanEntity] = []
     @Published var scheduledWorkouts: [WorkoutEntity] = []
     @Published var activeWorkout: WorkoutEntity?
     @Published var activeWorkoutId: UUID?
-    @Published var isLoaded: Bool = false
+    @Published private(set) var isLoaded: Bool = false
     
     private let saveQueue = DispatchQueue(label: "com.train.saveQueue", qos: .background)
     private let fileName = "plans.json"
     
     // Wrapper struct for Codable serialization
-    struct SavedPlans: Codable {
+    fileprivate struct SavedPlans: Codable {
         let currentPlan: TrainingPlanEntity?
         let pastPlans: [TrainingPlanEntity]
         let scheduledWorkouts: [WorkoutEntity]
         let activeWorkout: WorkoutEntity?
+    }
+    
+    // MARK: File I/O operations marked as nonisolated
+    
+    // Mark file operations as nonisolated so they can be called from background contexts
+    nonisolated func savePlans() {
+        // Capture the state on the main thread first
+        Task { @MainActor in
+            // Create saved plans wrapper
+            let savedPlans = SavedPlans(
+                currentPlan: self.currentPlan,
+                pastPlans: self.pastPlans,
+                scheduledWorkouts: self.scheduledWorkouts,
+                activeWorkout: self.activeWorkout
+            )
+            
+            // Now perform the file operations in the background
+            self._savePlansInBackground(savedPlans: savedPlans)
+        }
+    }
+    
+    // Background file operation - no UI access
+    private nonisolated func _savePlansInBackground(savedPlans: SavedPlans) {
+        // Use dispatch queue for background work
+        DispatchQueue.global(qos: .background).async {
+            do {
+                // Encode to JSON
+                let encoder = JSONEncoder()
+                encoder.dateEncodingStrategy = .iso8601
+                let data = try encoder.encode(savedPlans)
+                
+                // Get documents directory URL
+                guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                    print("Error: Could not access documents directory")
+                    return
+                }
+                
+                let fileName = "plans.json"
+                let fileURL = url.appendingPathComponent(fileName)
+                
+                // Write atomically to temporary file first
+                let tempURL = url.appendingPathComponent("\(fileName).temp")
+                try data.write(to: tempURL, options: .atomic)
+                
+                // Remove existing file if it exists
+                if FileManager.default.fileExists(atPath: fileURL.path) {
+                    try FileManager.default.removeItem(at: fileURL)
+                }
+                
+                // Rename temp file to final file
+                try FileManager.default.moveItem(at: tempURL, to: fileURL)
+                
+                print("Successfully saved plans to \(fileURL.path)")
+            } catch {
+                print("Error saving plans: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    // Mark loading operation as nonisolated 
+    nonisolated func loadPlans() {
+        Task {
+            await self._loadPlansAndUpdateUI()
+        }
+    }
+    
+    // Private method that loads plans and updates UI
+    private nonisolated func _loadPlansAndUpdateUI() async {
+        // Check if file exists
+        guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("plans.json") else {
+            await MainActor.run {
+                print("Could not find document directory")
+                self.isLoaded = true // Still mark as loaded even if no plans exist
+            }
+            return
+        }
+        
+        if !FileManager.default.fileExists(atPath: url.path) {
+            await MainActor.run {
+                print("No saved plans file exists at \(url.path)")
+                self.isLoaded = true // Still mark as loaded for first launch
+            }
+            return
+        }
+        
+        do {
+            // Read and decode data in background
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            
+            let savedPlans = try decoder.decode(SavedPlans.self, from: data)
+            
+            // Update UI state on main actor
+            await MainActor.run {
+                self.currentPlan = savedPlans.currentPlan
+                self.pastPlans = savedPlans.pastPlans
+                self.scheduledWorkouts = savedPlans.scheduledWorkouts
+                self.activeWorkout = savedPlans.activeWorkout
+                self.isLoaded = true
+                print("Successfully loaded plans from \(url.path)")
+            }
+        } catch let DecodingError.keyNotFound(key, context) {
+            await MainActor.run {
+                print("Decoding error: Missing key '\(key.stringValue)' – \(context.debugDescription)")
+                self.isLoaded = true // Mark as loaded even on error
+            }
+        } catch let DecodingError.typeMismatch(type, context) {
+            await MainActor.run {
+                print("Decoding error: Type mismatch for type \(type) – \(context.debugDescription)")
+                self.isLoaded = true
+            }
+        } catch let DecodingError.valueNotFound(value, context) {
+            await MainActor.run {
+                print("Decoding error: Missing value of type \(value) – \(context.debugDescription)")
+                self.isLoaded = true
+            }
+        } catch let DecodingError.dataCorrupted(context) {
+            await MainActor.run {
+                print("Decoding error: Data corrupted – \(context.debugDescription)")
+                self.isLoaded = true
+            }
+        } catch {
+            await MainActor.run {
+                print("Unknown error loading plans: \(error.localizedDescription)")
+                self.isLoaded = true
+            }
+        }
     }
     
     init() {
@@ -85,7 +215,8 @@ class AppState: ObservableObject {
         }
     }
     
-    func markWorkoutComplete(_ workout: WorkoutEntity, isComplete: Bool) {
+    @MainActor
+    public func markWorkoutComplete(_ workout: WorkoutEntity, isComplete: Bool) {
         if let index = scheduledWorkouts.firstIndex(where: { $0.id == workout.id }) {
             scheduledWorkouts[index].isComplete = isComplete
             savePlans()
@@ -147,110 +278,32 @@ class AppState: ObservableObject {
         return currentPlan?.id == plan.id
     }
     
-    public func savePlans() {
-        saveQueue.async { [weak self] in
-            guard let self = self else { return }
-            
-            do {
-                // Create saved plans wrapper
-                let savedPlans = SavedPlans(
-                    currentPlan: self.currentPlan,
-                    pastPlans: self.pastPlans,
-                    scheduledWorkouts: self.scheduledWorkouts,
-                    activeWorkout: self.activeWorkout
-                )
-                
-                // Encode to JSON
-                let encoder = JSONEncoder()
-                encoder.dateEncodingStrategy = .iso8601
-                let data = try encoder.encode(savedPlans)
-                
-                // Get documents directory URL
-                guard let url = self.getDocumentsURL() else {
-                    print("Error: Could not access documents directory")
-                    return
-                }
-                
-                let fileURL = url.appendingPathComponent(self.fileName)
-                
-                // Write atomically to temporary file first
-                let tempURL = url.appendingPathComponent("\(self.fileName).temp")
-                try data.write(to: tempURL, options: .atomic)
-                
-                // Remove existing file if it exists
-                if self.getFileManager().fileExists(atPath: fileURL.path) {
-                    try self.getFileManager().removeItem(at: fileURL)
-                }
-                
-                // Rename temp file to final file
-                try self.getFileManager().moveItem(at: tempURL, to: fileURL)
-                
-                print("Successfully saved plans to \(fileURL.path)")
-            } catch {
-                print("Error saving plans: \(error.localizedDescription)")
-            }
-        }
+    // Creates a SavedPlans struct capturing the current state for serialization
+    @MainActor
+    private func createSavedPlansSnapshot() -> SavedPlans {
+        return SavedPlans(
+            currentPlan: self.currentPlan,
+            pastPlans: self.pastPlans,
+            scheduledWorkouts: self.scheduledWorkouts,
+            activeWorkout: self.activeWorkout
+        )
     }
     
-    public func loadPlans() {
-        guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) else {
-            print("Could not find document directory")
-            self.isLoaded = true // Still mark as loaded even if no plans exist
-            return
-        }
-        
-        if !FileManager.default.fileExists(atPath: url.path) {
-            print("No saved plans file exists at \(url.path)")
-            self.isLoaded = true // Still mark as loaded for first launch
-            return
-        }
-        
-        do {
-            let data = try Data(contentsOf: url)
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            
-            DispatchQueue.main.async {
-                do {
-                    let savedPlans = try decoder.decode(SavedPlans.self, from: data)
-                    self.currentPlan = savedPlans.currentPlan
-                    self.pastPlans = savedPlans.pastPlans
-                    self.scheduledWorkouts = savedPlans.scheduledWorkouts
-                    self.isLoaded = true
-                    print("Successfully loaded plans from \(url.path)")
-                } catch let DecodingError.keyNotFound(key, context) {
-                    print("Decoding error: Missing key '\(key.stringValue)' – \(context.debugDescription)")
-                    self.isLoaded = true // Mark as loaded even on error
-                } catch let DecodingError.typeMismatch(type, context) {
-                    print("Decoding error: Type mismatch for type \(type) – \(context.debugDescription)")
-                    self.isLoaded = true
-                } catch let DecodingError.valueNotFound(value, context) {
-                    print("Decoding error: Missing value of type \(value) – \(context.debugDescription)")
-                    self.isLoaded = true
-                } catch let DecodingError.dataCorrupted(context) {
-                    print("Decoding error: Data corrupted – \(context.debugDescription)")
-                    self.isLoaded = true
-                } catch {
-                    print("Unknown error loading plans: \(error.localizedDescription)")
-                    self.isLoaded = true
-                }
-            }
-        } catch {
-            print("Error reading plans file: \(error.localizedDescription)")
-            DispatchQueue.main.async {
-                self.isLoaded = true
-            }
-        }
-    }
-    
+    @MainActor
     public func setActiveWorkout(_ workout: WorkoutEntity) {
-        activeWorkout = workout
+        self.activeWorkout = workout
+        self.activeWorkoutId = workout.id
     }
     
+    @MainActor
     public func getActiveWorkout() -> WorkoutEntity {
-        return activeWorkout!
+        guard let activeWorkout = self.activeWorkout else {
+            fatalError("Active workout is not set")
+        }
+        return activeWorkout
     }
     
+    @MainActor
     public func getNextWorkout() -> WorkoutEntity {
         // Return the first incomplete workout, or the first workout if all are complete
         guard !scheduledWorkouts.isEmpty else {
@@ -260,12 +313,13 @@ class AppState: ObservableObject {
         return scheduledWorkouts[index]
     }
     
-    // Methods that can be overridden for testing
-    public func getDocumentsURL() -> URL? {
+    // MARK: - Helper Methods
+    
+    nonisolated func getDocumentsURL() -> URL? {
         return self.getFileManager().urls(for: .documentDirectory, in: .userDomainMask).first
     }
     
-    public func getFileManager() -> FileManager {
+    nonisolated func getFileManager() -> FileManager {
         return FileManager.default
     }
 }

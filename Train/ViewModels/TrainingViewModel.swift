@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+@MainActor
 class TrainingViewModel: ObservableObject {
     @Published private(set) var upcomingWorkouts: [WorkoutEntity] = []
     private var cancellables = Set<AnyCancellable>()

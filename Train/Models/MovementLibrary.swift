@@ -1,7 +1,7 @@
 import Foundation
 
 struct MovementLibrary {
-    static let allMovements: [MovementEntity] = [
+    @MainActor static let allMovements: [MovementEntity] = [
         // Chest
         MovementEntity(
             type: .barbellBenchPress,
@@ -279,7 +279,7 @@ struct MovementLibrary {
     ]
     
     /// Returns a movement entity by type
-    static func getMovement(type: MovementType) -> MovementEntity {
+    @MainActor static func getMovement(type: MovementType) -> MovementEntity {
         if let movement = allMovements.first(where: { $0.movementType == type }) {
             return movement
         }
@@ -291,5 +291,4 @@ struct MovementLibrary {
             equipment: .bodyweight
         )
     }
-    
 }

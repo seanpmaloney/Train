@@ -59,8 +59,11 @@ struct ExerciseHistoryIndicator: View {
         
         // Create new timer to hide controls after delay
         controlsTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
-            withAnimation(.easeInOut(duration: 0.3)) {
-                showControls = false
+            // Dispatch UI updates to the main actor
+            Task { @MainActor in
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    self.showControls = false
+                }
             }
         }
     }

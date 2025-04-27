@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+@MainActor
 /// ViewModel for managing training workouts, providing both upcoming and past workouts
 class EnhancedTrainingViewModel: ObservableObject {
     // MARK: - Published Properties
