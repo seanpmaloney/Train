@@ -120,7 +120,7 @@ struct SwipeableExerciseCard: View {
                     .fill(AppStyle.Colors.surface)
             )
             .offset(x: offset + (showingInitialHint ? 80 : 0))
-            .gesture(
+            .simultaneousGesture(
                 DragGesture()
                     .onChanged { gesture in
                         // Only allow drag if there's history
