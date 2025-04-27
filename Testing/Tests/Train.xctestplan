@@ -36,7 +36,7 @@
       "parallelizable" : true,
       "target" : {
         "containerPath" : "container:Train.xcodeproj",
-        "identifier" : "TrainTests",
+        "identifier" : "8B7A5A292DAA783D00404F43",
         "name" : "TrainTests"
       }
     },

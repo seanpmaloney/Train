@@ -1,0 +1,2 @@
+1. When adding tests, use Swift Testing instead of XCTest
+2. Use Issue.record instead of #fail

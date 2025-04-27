@@ -168,60 +168,16 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "F7EABB95-13FE-4191-82B7-4D0DA714786A"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Train/State/AppState.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "245"
-            endingLineNumber = "245"
-            landmarkName = "setCurrentPlan(_:)"
+            startingLineNumber = "250"
+            endingLineNumber = "250"
+            landmarkName = "markWorkoutComplete(_:isComplete:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "F7EABB95-13FE-4191-82B7-4D0DA714786A - 904e35246bd963d0"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Train.AppState.setActiveWorkout(Train.WorkoutEntity) -&gt; ()"
-                  moduleName = "Train.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/seanmaloney/Projects/Train/Train/State/AppState.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "246"
-                  endingLineNumber = "246">
-               </Location>
-               <Location
-                  uuid = "F7EABB95-13FE-4191-82B7-4D0DA714786A - 3a8ef6a71f81224d"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Train.AppState.setCurrentPlan(Train.TrainingPlanEntity) -&gt; ()"
-                  moduleName = "Train.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/seanmaloney/Projects/Train/Train/State/AppState.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "245"
-                  endingLineNumber = "245">
-               </Location>
-               <Location
-                  uuid = "F7EABB95-13FE-4191-82B7-4D0DA714786A - 3a8ef6a71f81224d"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Train.AppState.setCurrentPlan(Train.TrainingPlanEntity) -&gt; ()"
-                  moduleName = "Train.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/seanmaloney/Projects/Train/Train/State/AppState.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "245"
-                  endingLineNumber = "245">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -298,9 +254,9 @@
             filePath = "Train/State/AppState.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "177"
-            endingLineNumber = "177"
-            landmarkName = "scheduleWorkouts(_:)"
+            startingLineNumber = "182"
+            endingLineNumber = "182"
+            landmarkName = "_loadPlansAndUpdateUI(fileName:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

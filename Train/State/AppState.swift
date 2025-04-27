@@ -11,7 +11,33 @@ class AppState: ObservableObject {
     @Published private(set) var isLoaded: Bool = false
     
     private let saveQueue = DispatchQueue(label: "com.train.saveQueue", qos: .background)
-    private let fileName = "plans.json"
+    
+    // Use a property for the filename to allow customization in tests
+    private var fileName = "plans.json"
+    
+    // MARK: - Test Support (Debug Only)
+    
+    #if DEBUG
+    // These properties and methods will only be compiled in debug builds
+    // They provide hooks for testing to avoid touching real data
+    
+    /// Set a custom filename for testing
+    @MainActor
+    func setCustomFileName(_ name: String) {
+        fileName = name
+    }
+    
+    /// Enable test mode with a custom file name
+    @MainActor
+    func enableTestMode(withFileName name: String) {
+        setCustomFileName(name)
+    }
+    
+    @MainActor
+    func setLoaded(val: Bool) {
+        isLoaded = val
+    }
+    #endif
     
     // Wrapper struct for Codable serialization
     fileprivate struct SavedPlans: Codable {
@@ -41,7 +67,10 @@ class AppState: ObservableObject {
     }
     
     // Background file operation - no UI access
-    private nonisolated func _savePlansInBackground(savedPlans: SavedPlans) {
+    private func _savePlansInBackground(savedPlans: SavedPlans) {
+        // Capture fileName before using it in the background context
+        let fileNameCopy = self.fileName
+        
         // Use dispatch queue for background work
         DispatchQueue.global(qos: .background).async {
             do {
@@ -56,11 +85,11 @@ class AppState: ObservableObject {
                     return
                 }
                 
-                let fileName = "plans.json"
-                let fileURL = url.appendingPathComponent(fileName)
+                // Use the captured fileName copy instead of accessing self.fileName
+                let fileURL = url.appendingPathComponent(fileNameCopy)
                 
                 // Write atomically to temporary file first
-                let tempURL = url.appendingPathComponent("\(fileName).temp")
+                let tempURL = url.appendingPathComponent("\(fileNameCopy).temp")
                 try data.write(to: tempURL, options: .atomic)
                 
                 // Remove existing file if it exists
@@ -79,16 +108,19 @@ class AppState: ObservableObject {
     }
     
     // Mark loading operation as nonisolated 
-    nonisolated func loadPlans() {
+    func loadPlans() {
+        // Capture fileName before using it in a non-isolated context
+        let fileNameCopy = self.fileName
+        
         Task {
-            await self._loadPlansAndUpdateUI()
+            await self._loadPlansAndUpdateUI(fileName: fileNameCopy)
         }
     }
     
     // Private method that loads plans and updates UI
-    private nonisolated func _loadPlansAndUpdateUI() async {
+    private nonisolated func _loadPlansAndUpdateUI(fileName: String) async {
         // Check if file exists
-        guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("plans.json") else {
+        guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) else {
             await MainActor.run {
                 print("Could not find document directory")
                 self.isLoaded = true // Still mark as loaded even if no plans exist
