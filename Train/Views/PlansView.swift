@@ -22,16 +22,15 @@ struct PlansView: View {
             }
             .background(AppStyle.Colors.background)
             .navigationTitle("Plans")
-            .sheet(isPresented: $showingNewPlanSheet) {
-                PlanTemplatePickerView()
-            }
+//            .sheet(isPresented: $showingNewPlanSheet) {
+//                PlanTemplatePickerView()
+//            }
         }
     }
     
+    
     private var createPlanButton: some View {
-        Button(action: {
-            showingNewPlanSheet = true
-        }) {
+        NavigationLink(destination: PlanTemplatePickerView()) {
             HStack {
                 Text("Create New Plan")
                     .font(AppStyle.Typography.body())
@@ -44,6 +43,7 @@ struct PlansView: View {
             .background(AppStyle.Colors.surface)
             .cornerRadius(12)
         }
+            
     }
     
     private func currentPlanSection(plan: TrainingPlanEntity) -> some View {

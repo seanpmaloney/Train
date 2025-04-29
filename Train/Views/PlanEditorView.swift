@@ -5,6 +5,7 @@ struct PlanEditorView: View {
     @State private var scrollTarget: ScrollTarget?
     @State private var requiredPadding: CGFloat = 0
     @Environment(\.dismiss) private var dismiss
+    @Binding var planCreated: Bool
     
     private let numberPadHeight: CGFloat = 390
     private let desiredSpaceAboveKeyboard: CGFloat = 40
@@ -33,8 +34,16 @@ struct PlanEditorView: View {
         }
     }
     
+    // Default initializer for previews and backward compatibility
     init(template: PlanTemplate?, appState: AppState) {
         _viewModel = StateObject(wrappedValue: PlanEditorViewModel(template: template, appState: appState))
+        _planCreated = .constant(false) // Provide a default constant binding
+    }
+    
+    // Main initializer with plan creation binding
+    init(template: PlanTemplate?, appState: AppState, planCreated: Binding<Bool>) {
+        _viewModel = StateObject(wrappedValue: PlanEditorViewModel(template: template, appState: appState))
+        _planCreated = planCreated
     }
     
     var body: some View {
@@ -90,6 +99,7 @@ struct PlanEditorView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("Create") {
                             viewModel.finalizePlan()
+                            planCreated = true
                             dismiss()
                         }
                         .disabled(viewModel.planName.isEmpty || viewModel.totalMovementCount == 0)

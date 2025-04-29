@@ -4,6 +4,7 @@ struct PlanTemplatePickerView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var appState: AppState
     @State private var selectedTemplate: PlanTemplate?
+    @State private var planCreated = false // State to track if a plan was created
     
     var body: some View {
         NavigationStack {
@@ -11,8 +12,7 @@ struct PlanTemplatePickerView: View {
                 VStack(spacing: AppStyle.Layout.compactSpacing) {
                     // Custom Plan Option
                     NavigationLink {
-                        PlanEditorView(template: nil, appState: appState)
-                            .navigationBarBackButtonHidden()
+                        PlanEditorView(template: nil, appState: appState, planCreated: $planCreated)
                     } label: {
                         customPlanCard
                     }
@@ -20,8 +20,7 @@ struct PlanTemplatePickerView: View {
                     // Template Options
                     ForEach(PlanTemplate.templates) { template in
                         NavigationLink {
-                            PlanEditorView(template: template, appState: appState)
-                                .navigationBarBackButtonHidden()
+                            PlanEditorView(template: template, appState: appState, planCreated: $planCreated)
                         } label: {
                             templateCard(template)
                         }
@@ -32,11 +31,10 @@ struct PlanTemplatePickerView: View {
             .background(AppStyle.Colors.background)
             .navigationTitle("Choose Template")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+            // When planCreated changes to true, dismiss this view
+            .onChange(of: planCreated) { created in
+                if created {
+                    dismiss()
                 }
             }
         }
