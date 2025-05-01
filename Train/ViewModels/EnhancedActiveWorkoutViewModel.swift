@@ -22,6 +22,14 @@ class EnhancedActiveWorkoutViewModel: ObservableObject {
         self.workout = workout
         self.exercises = workout.exercises
         self.isComplete = workout.isComplete
+        
+        // Subscribe to workout changes from WorkoutManager
+        WorkoutManager.shared.workoutChanges
+            .sink { [weak self] _ in
+                // Notify SwiftUI that our view model has changed
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Public Methods
@@ -69,6 +77,9 @@ class EnhancedActiveWorkoutViewModel: ObservableObject {
         appState.activeWorkoutId = nil
         appState.savePlans()
         
+        // Analyze performance and adjust future workouts if needed
+        WorkoutManager.shared.analyzeAndAdjustFutureWorkouts(completedWorkout: workout, appState: appState)
+        
         // Trigger UI updates
         appState.objectWillChange.send()
         objectWillChange.send()
@@ -96,6 +107,40 @@ class EnhancedActiveWorkoutViewModel: ObservableObject {
         }
         
         objectWillChange.send()
+    }
+    
+    // MARK: - Set Management Proxy Methods
+    
+    /// Proxy method to skip a set using WorkoutManager (marks as skipped without deleting)
+    func skipSet(in exercise: ExerciseInstanceEntity, set: ExerciseSetEntity) {
+        WorkoutManager.shared.skipSet(in: exercise, set: set)
+    }
+    
+    /// Proxy method to delete a set using WorkoutManager (completely removes it)
+    func deleteSet(in exercise: ExerciseInstanceEntity, set: ExerciseSetEntity) {
+        WorkoutManager.shared.deleteSet(in: exercise, set: set)
+    }
+    
+    /// Proxy method to unskip a set using WorkoutManager
+    func unskipSet(in exercise: ExerciseInstanceEntity, set: ExerciseSetEntity) {
+        // Find a previous set to get default weight if needed
+        var defaultWeight: Double? = nil
+        if let setIndex = exercise.sets.firstIndex(where: { $0.id == set.id }), setIndex > 0 {
+            // Use previous set's weight as default
+            defaultWeight = exercise.sets[setIndex - 1].weight
+        }
+        
+        WorkoutManager.shared.unskipSet(in: exercise, set: set, defaultWeight: defaultWeight)
+    }
+    
+    /// Check if a set is skipped
+    func isSetSkipped(_ set: ExerciseSetEntity) -> Bool {
+        return WorkoutManager.shared.isSetSkipped(set)
+    }
+    
+    /// Proxy method to add a set using WorkoutManager
+    func addSet(to exercise: ExerciseInstanceEntity) {
+        WorkoutManager.shared.addSet(to: exercise)
     }
     
     // MARK: - Private Methods

@@ -112,14 +112,19 @@ struct SetEditRow: View {
                 HStack(spacing: 4) {
                     if isEditable {
                         Button(action: {
-                            showingWeightPad = true
+                            // If set is skipped, unskip it first
+                            if viewModel.isSetSkipped(set) {
+                                viewModel.unskipSet(in: exercise, set: set)
+                            } else {
+                                showingWeightPad = true
+                            }
                         }) {
                             Text(String(format: "%.1f", set.weight))
                                 .font(.body)
-                                .foregroundColor(AppStyle.Colors.textPrimary)
+                                .foregroundColor(viewModel.isSetSkipped(set) ? AppStyle.Colors.textSecondary.opacity(0.6) : AppStyle.Colors.textPrimary)
                                 .frame(width: 55, alignment: .trailing)
                         }
-                        .disabled(set.isComplete)
+                        .disabled(set.isComplete && !viewModel.isSetSkipped(set))
                         .sheet(isPresented: $showingWeightPad) {
                             CustomNumberPadView(
                                 title: "Weight",
@@ -137,12 +142,12 @@ struct SetEditRow: View {
                     } else {
                         Text(String(format: "%.1f", set.weight))
                             .font(.body)
-                            .foregroundColor(AppStyle.Colors.textPrimary)
+                            .foregroundColor(viewModel.isSetSkipped(set) ? AppStyle.Colors.textSecondary.opacity(0.6) : AppStyle.Colors.textPrimary)
                             .frame(width: 55, alignment: .trailing)
                     }
                     
                     Text("lbs")
-                        .foregroundColor(AppStyle.Colors.textSecondary)
+                        .foregroundColor(viewModel.isSetSkipped(set) ? AppStyle.Colors.textSecondary.opacity(0.6) : AppStyle.Colors.textSecondary)
                 }
                 .frame(width: 100)
                 .padding(.trailing, 12)
@@ -151,22 +156,35 @@ struct SetEditRow: View {
                 HStack(spacing: 4) {
                     if isEditable {
                         Button(action: {
-                            showingRepsPad = true
-                        }) {
-                            // Single value that shows target when not entered, actual when entered
-                            if set.completedReps > 0 {
-                                Text("\(set.completedReps)")
-                                    .font(.body)
-                                    .foregroundColor(AppStyle.Colors.textPrimary)
-                                    .frame(width: 30, alignment: .trailing)
+                            // If set is skipped, unskip it first
+                            if viewModel.isSetSkipped(set) {
+                                viewModel.unskipSet(in: exercise, set: set)
                             } else {
-                                Text("\(set.targetReps)")
+                                showingRepsPad = true
+                            }
+                        }) {
+                            // Display based on skip status
+                            if viewModel.isSetSkipped(set) {
+                                Text("Skipped")
                                     .font(.body)
-                                    .foregroundColor(AppStyle.Colors.textSecondary)
-                                    .frame(width: 30, alignment: .trailing)
+                                    .foregroundColor(AppStyle.Colors.textSecondary.opacity(0.6))
+                                    .frame(width: 90, alignment: .trailing)
+                            } else {
+                                // Single value that shows target when not entered, actual when entered
+                                if set.completedReps > 0 {
+                                    Text("\(set.completedReps)")
+                                        .font(.body)
+                                        .foregroundColor(AppStyle.Colors.textPrimary)
+                                        .frame(width: 30, alignment: .trailing)
+                                } else {
+                                    Text("\(set.targetReps)")
+                                        .font(.body)
+                                        .foregroundColor(AppStyle.Colors.textSecondary)
+                                        .frame(width: 30, alignment: .trailing)
+                                }
                             }
                         }
-                        .disabled(set.isComplete)
+                        .disabled(set.isComplete && !viewModel.isSetSkipped(set))
                         .sheet(isPresented: $showingRepsPad) {
                             CustomNumberPadView(
                                 title: "Reps",
@@ -182,22 +200,38 @@ struct SetEditRow: View {
                             .presentationDetents([.height(350)])
                         }
                     } else {
-                        // Show either completed or target reps based on what was recorded
-                        if set.completedReps > 0 {
-                            Text("\(set.completedReps)")
+                        // Display based on skip status
+                        if viewModel.isSetSkipped(set) {
+                            Text("Skipped")
                                 .font(.body)
-                                .foregroundColor(AppStyle.Colors.textPrimary)
-                                .frame(width: 30, alignment: .trailing)
+                                .foregroundColor(AppStyle.Colors.textSecondary.opacity(0.6))
+                                .frame(width: 90, alignment: .trailing)
                         } else {
-                            Text("\(set.targetReps)")
-                                .font(.body)
+                            // Show either completed or target reps based on what was recorded
+                            if set.completedReps > 0 {
+                                Text("\(set.completedReps)")
+                                    .font(.body)
+                                    .foregroundColor(AppStyle.Colors.textPrimary)
+                                    .frame(width: 30, alignment: .trailing)
+                            } else {
+                                Text("\(set.targetReps)")
+                                    .font(.body)
+                                    .foregroundColor(AppStyle.Colors.textSecondary)
+                                    .frame(width: 30, alignment: .trailing)
+                            }
+                            
+                            Text("reps")
                                 .foregroundColor(AppStyle.Colors.textSecondary)
-                                .frame(width: 30, alignment: .trailing)
+                                .padding(.leading, 4)
                         }
                     }
                     
-                    Text("reps")
-                        .foregroundColor(AppStyle.Colors.textSecondary)
+                    // Only show "reps" text if not skipped
+                    if !viewModel.isSetSkipped(set) && isEditable {
+                        Text("reps")
+                            .foregroundColor(AppStyle.Colors.textSecondary)
+                            .padding(.leading, 4)
+                    }
                 }
                 .frame(width: 90)
                 
@@ -205,31 +239,79 @@ struct SetEditRow: View {
                 
                 // Complete Checkbox (only for editable mode)
                 if isEditable {
-                    Button(action: {
-                        withAnimation {
-                            set.toggleComplete()
+                    // Show different button based on whether set is skipped
+                    if viewModel.isSetSkipped(set) {
+                        Button(action: {
+                            viewModel.unskipSet(in: exercise, set: set)
+                        }) {
+                            Image(systemName: "arrow.uturn.backward.circle")
+                                .font(.title2)
+                                .foregroundColor(AppStyle.Colors.textSecondary)
                         }
-                    }) {
-                        Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
-                            .font(.title2)
-                            .foregroundColor(set.isComplete ? AppStyle.Colors.success : AppStyle.Colors.textSecondary)
+                        .padding(.horizontal, 4)
+                    } else {
+                        Button(action: {
+                            withAnimation {
+                                set.toggleComplete()
+                            }
+                        }) {
+                            Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
+                                .font(.title2)
+                                .foregroundColor(set.isComplete ? AppStyle.Colors.success : AppStyle.Colors.textSecondary)
+                        }
+                        .padding(.horizontal, 4)
                     }
-                    .padding(.horizontal, 8)
+                    
+                    // 3-dot menu for set actions
+                    Menu {
+                        Button(action: {
+                            viewModel.skipSet(in: exercise, set: set)
+                        }) {
+                            Label("Skip Set", systemImage: "minus.circle")
+                        }
+                        
+//                        Button(action: {
+//                            viewModel.deleteSet(in: exercise, set: set)
+//                        }) {
+//                            Label("Delete Set", systemImage: "trash")
+//                        }
+                        
+                        Button(action: {
+                            viewModel.addSet(to: exercise)
+                        }) {
+                            Label("Add Set", systemImage: "plus.circle")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(AppStyle.Colors.textSecondary)
+                            .frame(width: 32, height: 32)
+                    }
+                    .disabled(viewModel.isComplete)
+                    .padding(.horizontal, 4)
+                    
                 } else {
                     // Show static complete indicator for history
-                    Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
-                        .font(.title2)
-                        .foregroundColor(set.isComplete ? AppStyle.Colors.success.opacity(0.6) : AppStyle.Colors.textSecondary.opacity(0.6))
-                    .padding(.horizontal, 8)
+                    if viewModel.isSetSkipped(set) {
+                        Image(systemName: "minus.circle")
+                            .font(.title2)
+                            .foregroundColor(AppStyle.Colors.textSecondary.opacity(0.6))
+                            .padding(.horizontal, 8)
+                    } else {
+                        Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
+                            .font(.title2)
+                            .foregroundColor(set.isComplete ? AppStyle.Colors.success.opacity(0.6) : AppStyle.Colors.textSecondary.opacity(0.6))
+                            .padding(.horizontal, 8)
+                    }
                 }
             }
         }
         .padding(10)
         .background(
             RoundedRectangle(cornerRadius: AppStyle.Layout.innerCardCornerRadius)
-                .fill(AppStyle.Colors.surfaceTop)
+                .fill(viewModel.isSetSkipped(set) ? AppStyle.Colors.surfaceTop.opacity(0.5) : AppStyle.Colors.surfaceTop)
         )
-        .opacity(set.isComplete && isEditable ? 0.6 : 1.0)
+        .opacity(set.isComplete && isEditable && !viewModel.isSetSkipped(set) ? 0.6 : 1.0)
     }
 }
 

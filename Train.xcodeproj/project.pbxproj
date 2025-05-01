@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B568C742DC37E21004A39C6 /* WorkoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C722DC37E21004A39C6 /* WorkoutManager.swift */; };
 		8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */; };
 		8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */; };
 		8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A352DAAA08300404F43 /* TrainingType.swift */; };
@@ -84,6 +85,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8B568C722DC37E21004A39C6 /* WorkoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutManager.swift; sourceTree = "<group>"; };
 		8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
 		8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardViewModel.swift; sourceTree = "<group>"; };
@@ -171,6 +173,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8B568C732DC37E21004A39C6 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				8B568C722DC37E21004A39C6 /* WorkoutManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		8B7A5A192DA9FC4500404F43 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -200,6 +210,7 @@
 		8B7BCF8D2D9DFD3F0089F6D3 /* Train */ = {
 			isa = PBXGroup;
 			children = (
+				8B568C732DC37E21004A39C6 /* Services */,
 				8B7BCF9E2D9E0AF90089F6D3 /* Train.entitlements */,
 				8B7BCF8E2D9DFD3F0089F6D3 /* TrainApp.swift */,
 				8B7BD05E2DA757900089F6D3 /* State */,
@@ -565,6 +576,7 @@
 				8B7A5A382DAB0CF000404F43 /* UpcomingTrainingViewModel.swift in Sources */,
 				8B7BCFDF2DA1460F0089F6D3 /* ActiveWorkoutView.swift in Sources */,
 				8B7BD01E2DA357FB0089F6D3 /* ExerciseInstance.swift in Sources */,
+				8B568C742DC37E21004A39C6 /* WorkoutManager.swift in Sources */,
 				8B7BD0442DA6BA630089F6D3 /* TrainingPlanBuilder.swift in Sources */,
 				8B9877512DBB0C1D00767AE2 /* MovementType.swift in Sources */,
 				8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */,
