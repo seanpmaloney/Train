@@ -30,10 +30,6 @@ struct EnhancedActiveWorkoutView: View {
             // Main scrolling content
             ScrollView {
                 VStack(spacing: 24) {
-                    // Workout header with progress
-                    workoutHeaderView
-                        .padding(.bottom, 8)
-                    
                     // Exercise list
                     exerciseListView
                     

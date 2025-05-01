@@ -12,7 +12,7 @@ struct ExerciseEditView: View {
         VStack(alignment: .leading, spacing: 12) {
             // Exercise header
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .top, spacing: 8) {
                     Text(exercise.movement.name)
                         .font(.title3)
                         .fontWeight(.bold)
@@ -23,7 +23,6 @@ struct ExerciseEditView: View {
                         // Only show the first muscle group to keep the display static
                         if let primaryMuscle = displayExercise.movement.primaryMuscles.first {
                             MusclePill(muscle: primaryMuscle)
-                                .padding(.bottom, 4)
                         }
                     }
                 }
@@ -105,101 +104,131 @@ struct SetEditRow: View {
     @State private var showingRepsPad = false
     
     var body: some View {
-        HStack(spacing: 16) {
-            // Weight Input
+        VStack(alignment: .leading, spacing: 8) {
+            // Main row content
+        
             HStack {
-                if isEditable {
-                    Button(action: {
-                        showingWeightPad = true
-                    }) {
+                // Weight section - fixed width to ensure alignment
+                HStack(spacing: 4) {
+                    if isEditable {
+                        Button(action: {
+                            showingWeightPad = true
+                        }) {
+                            Text(String(format: "%.1f", set.weight))
+                                .font(.body)
+                                .foregroundColor(AppStyle.Colors.textPrimary)
+                                .frame(width: 55, alignment: .trailing)
+                        }
+                        .disabled(set.isComplete)
+                        .sheet(isPresented: $showingWeightPad) {
+                            CustomNumberPadView(
+                                title: "Weight",
+                                initialValue: set.weight,
+                                mode: .weight
+                            ) { newValue in
+                                viewModel.updateWeightAndSubsequentSets(
+                                    in: exercise,
+                                    for: set, 
+                                    to: newValue
+                                )
+                            }
+                            .presentationDetents([.height(405)])
+                        }
+                    } else {
                         Text(String(format: "%.1f", set.weight))
                             .font(.body)
                             .foregroundColor(AppStyle.Colors.textPrimary)
-                            .frame(width: 70, alignment: .trailing)
+                            .frame(width: 55, alignment: .trailing)
                     }
-                    .disabled(set.isComplete)
-                    .sheet(isPresented: $showingWeightPad) {
-                        CustomNumberPadView(
-                            title: "Weight",
-                            initialValue: set.weight,
-                            mode: .weight
-                        ) { newValue in
-                            viewModel.updateWeightAndSubsequentSets(
-                                in: exercise,
-                                for: set, 
-                                to: newValue
-                            )
-                        }
-                        .presentationDetents([.height(405)])
-                    }
-                } else {
-                    Text(String(format: "%.1f", set.weight))
-                        .font(.body)
-                        .foregroundColor(AppStyle.Colors.textPrimary)
-                        .frame(width: 70, alignment: .trailing)
+                    
+                    Text("lbs")
+                        .foregroundColor(AppStyle.Colors.textSecondary)
                 }
+                .frame(width: 100)
+                .padding(.trailing, 12)
                 
-                Text("lbs")
-                    .foregroundColor(AppStyle.Colors.textSecondary)
-            }
-            
-            // Reps Input
-            HStack {
+                // Reps section - fixed width to ensure alignment
+                HStack(spacing: 4) {
+                    if isEditable {
+                        Button(action: {
+                            showingRepsPad = true
+                        }) {
+                            // Single value that shows target when not entered, actual when entered
+                            if set.completedReps > 0 {
+                                Text("\(set.completedReps)")
+                                    .font(.body)
+                                    .foregroundColor(AppStyle.Colors.textPrimary)
+                                    .frame(width: 30, alignment: .trailing)
+                            } else {
+                                Text("\(set.targetReps)")
+                                    .font(.body)
+                                    .foregroundColor(AppStyle.Colors.textSecondary)
+                                    .frame(width: 30, alignment: .trailing)
+                            }
+                        }
+                        .disabled(set.isComplete)
+                        .sheet(isPresented: $showingRepsPad) {
+                            CustomNumberPadView(
+                                title: "Reps",
+                                initialValue: Double(set.completedReps > 0 ? set.completedReps : set.targetReps),
+                                mode: .reps
+                            ) { newValue in
+                                viewModel.updateRepsAndSubsequentSets(
+                                    in: exercise,
+                                    for: set,
+                                    to: Int(newValue)
+                                )
+                            }
+                            .presentationDetents([.height(350)])
+                        }
+                    } else {
+                        // Show either completed or target reps based on what was recorded
+                        if set.completedReps > 0 {
+                            Text("\(set.completedReps)")
+                                .font(.body)
+                                .foregroundColor(AppStyle.Colors.textPrimary)
+                                .frame(width: 30, alignment: .trailing)
+                        } else {
+                            Text("\(set.targetReps)")
+                                .font(.body)
+                                .foregroundColor(AppStyle.Colors.textSecondary)
+                                .frame(width: 30, alignment: .trailing)
+                        }
+                    }
+                    
+                    Text("reps")
+                        .foregroundColor(AppStyle.Colors.textSecondary)
+                }
+                .frame(width: 90)
+                
+                Spacer()
+                
+                // Complete Checkbox (only for editable mode)
                 if isEditable {
                     Button(action: {
-                        showingRepsPad = true
-                    }) {
-                        Text("\(set.completedReps)")
-                            .font(.body)
-                            .foregroundColor(AppStyle.Colors.textPrimary)
-                            .frame(width: 40, alignment: .trailing)
-                    }
-                    .disabled(set.isComplete)
-                    .sheet(isPresented: $showingRepsPad) {
-                        CustomNumberPadView(
-                            title: "Reps",
-                            initialValue: Double(set.completedReps),
-                            mode: .reps
-                        ) { newValue in
-                            viewModel.updateRepsAndSubsequentSets(
-                                in: exercise,
-                                for: set, 
-                                to: Int(newValue)
-                            )
+                        withAnimation {
+                            set.toggleComplete()
                         }
-                        .presentationDetents([.height(350)])
+                    }) {
+                        Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
+                            .font(.title2)
+                            .foregroundColor(set.isComplete ? AppStyle.Colors.success : AppStyle.Colors.textSecondary)
                     }
+                    .padding(.horizontal, 8)
                 } else {
-                    Text("\(set.completedReps)")
-                        .font(.body)
-                        .foregroundColor(AppStyle.Colors.textPrimary)
-                        .frame(width: 40, alignment: .trailing)
-                }
-                
-                Text("/ \(set.targetReps) reps")
-                    .foregroundColor(AppStyle.Colors.textSecondary)
-            }
-            
-            Spacer()
-            
-            // Complete Checkbox (only for editable mode)
-            if isEditable {
-                Button(action: {
-                    withAnimation {
-                        set.toggleComplete()
-                    }
-                }) {
+                    // Show static complete indicator for history
                     Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
                         .font(.title2)
-                        .foregroundColor(set.isComplete ? AppStyle.Colors.success : AppStyle.Colors.textSecondary)
+                        .foregroundColor(set.isComplete ? AppStyle.Colors.success.opacity(0.6) : AppStyle.Colors.textSecondary.opacity(0.6))
+                    .padding(.horizontal, 8)
                 }
-            } else {
-                // Show static complete indicator for history
-                Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")
-                    .font(.title2)
-                    .foregroundColor(set.isComplete ? AppStyle.Colors.success.opacity(0.6) : AppStyle.Colors.textSecondary.opacity(0.6))
             }
         }
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: AppStyle.Layout.innerCardCornerRadius)
+                .fill(AppStyle.Colors.surfaceTop)
+        )
         .opacity(set.isComplete && isEditable ? 0.6 : 1.0)
     }
 }
@@ -390,5 +419,5 @@ struct RepsPickerView: View {
 }
 
 #Preview {
-    ExerciseEditView(exercise: ExerciseInstanceEntity(movement: MovementEntity(type: .pullUps, primaryMuscles: [MuscleGroup.back], secondaryMuscles: [MuscleGroup.biceps], equipment: EquipmentType.machine), exerciseType: "Strength", sets: [ExerciseSetEntity(weight: 300, completedReps: 5, targetReps: 5, isComplete: true)]), viewModel: EnhancedActiveWorkoutViewModel(workout: WorkoutEntity(title: "Workout", description: "Yeet", isComplete: false)))
+    ExerciseEditView(exercise: ExerciseInstanceEntity(movement: MovementEntity(type: .pullUps, primaryMuscles: [MuscleGroup.back], secondaryMuscles: [MuscleGroup.biceps], equipment: EquipmentType.machine), exerciseType: "Strength", sets: [ExerciseSetEntity(weight: 300, completedReps: 5, targetReps: 5, isComplete: true), ExerciseSetEntity(weight: 300, completedReps: 5, targetReps: 5, isComplete: true)]), viewModel: EnhancedActiveWorkoutViewModel(workout: WorkoutEntity(title: "Workout", description: "Yeet", isComplete: false)))
 }
