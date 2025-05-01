@@ -4,9 +4,15 @@ import SwiftUI
 struct EnhancedActiveWorkoutView: View {
     // MARK: - Properties
     
-    @StateObject private var viewModel: EnhancedActiveWorkoutViewModel
+    // Environment objects
     @EnvironmentObject private var appState: AppState
     @Environment(\.dismiss) private var dismiss
+    
+    // Track last started workout for UI state
+    @AppStorage("lastStartedWorkout") private var lastStartedWorkoutId: String = ""
+    
+    // View model
+    @StateObject private var viewModel: EnhancedActiveWorkoutViewModel
     @State private var showingEndWorkoutConfirmation = false
     @State private var isTimerExpanded = false
     
@@ -15,8 +21,6 @@ struct EnhancedActiveWorkoutView: View {
     init(workout: WorkoutEntity) {
         // Create view model with the workout but don't connect to appState yet
         _viewModel = StateObject(wrappedValue: EnhancedActiveWorkoutViewModel(workout: workout))
-        
-        print("EnhancedActiveWorkoutView initialized with workout: \(workout.title), isComplete: \(workout.isComplete)")
     }
     
     // MARK: - Body
@@ -60,10 +64,15 @@ struct EnhancedActiveWorkoutView: View {
             }
         }
         .background(AppStyle.Colors.background.ignoresSafeArea())
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
+                    // Clear the active workout ID on dismiss (like original ActiveWorkoutView)
+                    appState.activeWorkoutId = nil
+                    
+                    // Keep lastStartedWorkoutId so button shows "Continue Workout" when returning
                     dismiss()
                 }) {
                     HStack(spacing: 4) {
@@ -71,6 +80,12 @@ struct EnhancedActiveWorkoutView: View {
                         Text("Back")
                     }
                 }
+            }
+            
+            ToolbarItem(placement: .principal) {
+                Text(viewModel.workout.title)
+                    .font(.headline)
+                    .foregroundColor(AppStyle.Colors.textPrimary)
             }
             
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -102,7 +117,13 @@ struct EnhancedActiveWorkoutView: View {
             Text("Are you sure you want to end this workout? This will mark it as complete.")
         }
         .onAppear {
-            // Connect view model to appState when the view appears
+            // Set the active workout ID when the view appears
+            appState.activeWorkoutId = viewModel.workout.id
+            
+            // Mark this workout as started for the UI state to show "Continue Workout" button
+            lastStartedWorkoutId = viewModel.workout.id.uuidString
+            
+            // Connect view model to appState
             viewModel.connectAppState(appState)
         }
     }

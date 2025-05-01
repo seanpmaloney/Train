@@ -94,6 +94,8 @@ struct EnhancedTrainingView: View {
                 isActive: $showActiveWorkout,
                 destination: {
                     if let workout = activeWorkout {
+                        // The original TrainingView directly passed the workout to ActiveWorkoutView
+                        // so we'll do the same and let the view handle setting activeWorkoutId in onAppear
                         EnhancedActiveWorkoutView(workout: workout)
                     } else {
                         // Fallback if workout is nil (should never happen)
@@ -178,15 +180,12 @@ struct EnhancedTrainingView: View {
                                 isUpcoming: isUpcoming,
                                 isExpanded: isUpcoming || viewModel.isWorkoutExpanded(workout),
                                 onStartPressed: {
-                                    // If this workout is already active, just navigate to it
-                                    if viewModel.isWorkoutActive(workout) {
-                                        activeWorkout = workout
-                                        showActiveWorkout = true
-                                        hasActiveWorkoutDismissedByGesture = false
-                                    } else {
-                                        // Otherwise start a new workout
-                                        viewModel.startWorkout(workout)
-                                    }
+                                    // Set the activeWorkout to prepare for navigation
+                                    activeWorkout = workout
+                                    showActiveWorkout = true
+                                    hasActiveWorkoutDismissedByGesture = false
+                                    
+                                    // Don't set activeWorkoutId here, let the view do it in onAppear
                                 },
                                 onExpandToggle: {
                                     if !isUpcoming {

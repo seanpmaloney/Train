@@ -11,6 +11,10 @@ struct WorkoutCardView: View {
     let onStartPressed: () -> Void
     let onExpandToggle: () -> Void
     
+    // Track if this workout has been started and returned to
+    // This is separate from activeWorkoutId to prevent UI changes during navigation
+    @AppStorage("lastStartedWorkout") private var lastStartedWorkoutId: String = ""
+    
     // MARK: - Body
     
     var body: some View {
@@ -46,13 +50,6 @@ struct WorkoutCardView: View {
             
             // Expanded content
             if isExpanded {
-//                if !workout.description.isEmpty {
-//                    Text(workout.description)
-//                        .font(.body)
-//                        .foregroundColor(AppStyle.Colors.textSecondary)
-//                        .padding(.vertical, 4)
-//                }
-                
                 // Muscle group tags
                 let muscleGroups = viewModel.getMuscleGroups(from: workout)
                 if !muscleGroups.isEmpty {
@@ -88,7 +85,7 @@ struct WorkoutCardView: View {
                                 Image(systemName: "arrow.right.circle.fill")
                                     .font(.headline)
                                     .foregroundColor(Color(AppStyle.Colors.textSecondary))
-                            } else if viewModel.isWorkoutActive(workout) {
+                            } else if lastStartedWorkoutId == workout.id.uuidString {
                                 Text("Continue Workout")
                                     .font(.headline)
                                     .foregroundColor(Color(AppStyle.Colors.primary))

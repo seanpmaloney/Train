@@ -32,10 +32,8 @@ class EnhancedTrainingViewModel: ObservableObject {
     
     /// Starts a workout and navigates to the workout view
     func startWorkout(_ workout: WorkoutEntity) {
-        // Update app state
-        appState.activeWorkoutId = workout.id
-        
-        // Force update
+        // We don't need to set activeWorkoutId here - the view will handle this when it appears
+        // Just notify any observers that something happened
         objectWillChange.send()
     }
     
