@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8B568C742DC37E21004A39C6 /* WorkoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C722DC37E21004A39C6 /* WorkoutManager.swift */; };
+		8B568C762DC454C7004A39C6 /* MovementInfoSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C752DC454C7004A39C6 /* MovementInfoSheet.swift */; };
 		8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */; };
 		8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */; };
 		8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A352DAAA08300404F43 /* TrainingType.swift */; };
@@ -86,6 +87,7 @@
 
 /* Begin PBXFileReference section */
 		8B568C722DC37E21004A39C6 /* WorkoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutManager.swift; sourceTree = "<group>"; };
+		8B568C752DC454C7004A39C6 /* MovementInfoSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementInfoSheet.swift; sourceTree = "<group>"; };
 		8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
 		8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardViewModel.swift; sourceTree = "<group>"; };
@@ -323,6 +325,7 @@
 			isa = PBXGroup;
 			children = (
 				8B98775E2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift */,
+				8B568C752DC454C7004A39C6 /* MovementInfoSheet.swift */,
 				8B98775A2DBB25C500767AE2 /* ExerciseHistoryIndicator.swift */,
 				8B98775B2DBB25C500767AE2 /* WeekSelectorView.swift */,
 				8B98774B2DB9B88B00767AE2 /* ExerciseEditView.swift */,
@@ -533,6 +536,7 @@
 				8B7BCFE42DA1460F0089F6D3 /* RestTimer.swift in Sources */,
 				8B98775F2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift in Sources */,
 				8B7BD05C2DA757640089F6D3 /* PlanSummaryView.swift in Sources */,
+				8B568C762DC454C7004A39C6 /* MovementInfoSheet.swift in Sources */,
 				8B7BD05A2DA757440089F6D3 /* PlanSummaryViewModel.swift in Sources */,
 				8B7BCFE12DA1460F0089F6D3 /* WeightInputAccessory.swift in Sources */,
 				8B7BCFEC2DA155280089F6D3 /* AppStyle.swift in Sources */,

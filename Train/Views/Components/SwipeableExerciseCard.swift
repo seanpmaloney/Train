@@ -12,6 +12,7 @@ struct SwipeableExerciseCard: View {
     @State private var offset: CGFloat = 0
     @State private var showingInitialHint = false
     @State private var hintTimer: Timer?
+    @State private var showingMovementInfo: Bool = false
     
     // Computed property to determine if we have any history to display
     private var hasHistory: Bool {
@@ -51,15 +52,21 @@ struct SwipeableExerciseCard: View {
                             .font(.title3)
                             .fontWeight(.bold)
                             .foregroundColor(isViewingHistory ? AppStyle.Colors.textSecondary : AppStyle.Colors.textPrimary)
+                            .lineLimit(1)
                         
                         // Muscle group pills
-                        if let displayExercise = currentDisplayExercise, !displayExercise.movement.primaryMuscles.isEmpty {
-                            // Only show the first muscle group (as mentioned by the user)
-                            // This ensures it's static and doesn't affect swiping
-                            if let primaryMuscle = displayExercise.movement.primaryMuscles.first {
-                                MusclePill(muscle: primaryMuscle)
-                                    .padding(.bottom, 4)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                if let displayExercise = currentDisplayExercise, !displayExercise.movement.primaryMuscles.isEmpty {
+                                    if let primaryMuscle = displayExercise.movement.primaryMuscles.first {
+                                        MusclePill(muscle: primaryMuscle)
+                                    }
+                                    ForEach(displayExercise.movement.secondaryMuscles, id: \.self) { muscle in
+                                        MusclePill(muscle: muscle)
+                                    }
+                                }
                             }
+                            .padding(.bottom, 4)
                         }
                     }
                     
@@ -75,6 +82,19 @@ struct SwipeableExerciseCard: View {
                                     .fill(AppStyle.Colors.surface.opacity(0.7))
                             )
                             .padding(2)
+                    } else if !isViewingHistory, let displayExercise = currentDisplayExercise {
+                        // Info button - only show when not viewing history
+                        Button(action: {
+                            showingMovementInfo = true
+                        }) {
+                            Image(systemName: "info.circle")
+                                .foregroundColor(AppStyle.Colors.textSecondary)
+                                .font(.system(size: 20))
+                        }
+                        .sheet(isPresented: $showingMovementInfo) {
+                            MovementInfoSheet(movement: displayExercise.movement)
+                        }
+                        .padding(.trailing, 4)
                     }
                 }
                 
