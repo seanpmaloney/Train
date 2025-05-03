@@ -45,4 +45,13 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
     func toggleComplete() {
         isComplete.toggle()
     }
+    
+    func copy() -> ExerciseSetEntity {
+        return ExerciseSetEntity(
+            weight: self.weight,
+            completedReps: self.completedReps,
+            targetReps: self.targetReps,
+            isComplete: self.isComplete
+        )
+    }
 }

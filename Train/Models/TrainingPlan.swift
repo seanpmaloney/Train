@@ -9,9 +9,21 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
     @Published var daysPerWeek: Int
     @Published var isCompleted: Bool
     @Published var workouts: [WorkoutEntity] = []
+    @Published var musclePreferences: [MuscleTrainingPreference]?
+    @Published var trainingGoal: TrainingGoal?
     
     var calculatedEndDate: Date {
         workouts.map { $0.scheduledDate ?? startDate }.max() ?? startDate
+    }
+    
+    /// Returns muscle groups that are prioritized for growth, or empty array if no preferences
+    var prioritizedMuscles: [MuscleGroup] {
+        musclePreferences?.filter { $0.goal == .grow }.map { $0.muscleGroup } ?? []
+    }
+    
+    /// Returns true if this is an adaptive plan with muscle preferences
+    var isAdaptivePlan: Bool {
+        return musclePreferences != nil && trainingGoal != nil
     }
 
     init(name: String, notes: String? = nil, startDate: Date, daysPerWeek: Int = 3, isCompleted: Bool = false) {
@@ -25,7 +37,7 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
     
     // MARK: - Codable
     enum CodingKeys: String, CodingKey {
-        case id, name, notes, startDate, endDate, daysPerWeek, isCompleted, workouts
+        case id, name, notes, startDate, endDate, daysPerWeek, isCompleted, workouts, musclePreferences, trainingGoal
     }
     
     required init(from decoder: Decoder) throws {
@@ -38,6 +50,10 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
         daysPerWeek = try container.decode(Int.self, forKey: .daysPerWeek)
         isCompleted = try container.decode(Bool.self, forKey: .isCompleted)
         workouts = try container.decode([WorkoutEntity].self, forKey: .workouts)
+        
+        // Handle optional new properties for backward compatibility
+        musclePreferences = try container.decodeIfPresent([MuscleTrainingPreference].self, forKey: .musclePreferences)
+        trainingGoal = try container.decodeIfPresent(TrainingGoal.self, forKey: .trainingGoal)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -50,6 +66,10 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
         try container.encode(daysPerWeek, forKey: .daysPerWeek)
         try container.encode(isCompleted, forKey: .isCompleted)
         try container.encode(workouts, forKey: .workouts)
+        
+        // Encode new properties only if they exist
+        try container.encodeIfPresent(musclePreferences, forKey: .musclePreferences)
+        try container.encodeIfPresent(trainingGoal, forKey: .trainingGoal)
     }
     
     func percentageCompleted() -> Double {

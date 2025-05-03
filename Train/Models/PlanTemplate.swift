@@ -227,10 +227,3 @@ struct WorkoutDayTemplate {
     let label: String
     let exercises: [ExerciseInstanceEntity]
 }
-
-enum TrainingGoal: String, Codable {
-    case strength = "Strength"
-    case hypertrophy = "Hypertrophy"
-    case endurance = "Endurance"
-    case powerbuilding = "Powerbuilding"
-}

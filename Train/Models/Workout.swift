@@ -7,6 +7,7 @@ class WorkoutEntity: ObservableObject, Identifiable, Codable {
     @Published var isComplete: Bool
     @Published var scheduledDate: Date?
     @Published var exercises: [ExerciseInstanceEntity]
+    weak var trainingPlan: TrainingPlanEntity?
     
     init(title: String, description: String, isComplete: Bool, scheduledDate: Date? = nil, exercises: [ExerciseInstanceEntity] = []) {
         self.id = UUID()
@@ -46,5 +47,24 @@ class WorkoutEntity: ObservableObject, Identifiable, Codable {
         try container.encode(isComplete, forKey: .isComplete)
         try container.encodeIfPresent(scheduledDate, forKey: .scheduledDate)
         try container.encode(exercises, forKey: .exercises)
+    }
+    
+    func copy() -> WorkoutEntity {
+        let copiedExercises = exercises.map { exercise -> ExerciseInstanceEntity in
+            let copiedSets = exercise.sets.map { $0.copy() as! ExerciseSetEntity }
+            return ExerciseInstanceEntity(
+                movement: exercise.movement,
+                exerciseType: exercise.exerciseType,
+                sets: copiedSets
+            )
+        }
+        
+        return WorkoutEntity(
+            title: self.title,
+            description: self.description,
+            isComplete: self.isComplete,
+            scheduledDate: self.scheduledDate,
+            exercises: copiedExercises
+        )
     }
 } 

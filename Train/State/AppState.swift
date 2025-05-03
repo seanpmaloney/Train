@@ -354,4 +354,18 @@ class AppState: ObservableObject {
     nonisolated func getFileManager() -> FileManager {
         return FileManager.default
     }
+    
+    @MainActor
+    func addPlan(_ plan: TrainingPlanEntity) {
+        // Set as current plan if there is no current plan
+        if currentPlan == nil {
+            currentPlan = plan
+        } else {
+            // Otherwise add to past plans
+            pastPlans.append(plan)
+        }
+        
+        // Save changes
+        savePlans()
+    }
 }

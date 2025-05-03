@@ -3,27 +3,25 @@ import SwiftUI
 struct PlanTemplatePickerView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var appState: AppState
-    @State private var selectedTemplate: PlanTemplate?
     @State private var planCreated = false // State to track if a plan was created
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: AppStyle.Layout.compactSpacing) {
+                    // Adaptive Plan Option (Special)
+                    NavigationLink {
+                        // Navigate to the new questionnaire flow
+                        AdaptivePlanSetupView()
+                    } label: {
+                        adaptivePlanCard
+                    }
+                    
                     // Custom Plan Option
                     NavigationLink {
                         PlanEditorView(template: nil, appState: appState, planCreated: $planCreated)
                     } label: {
                         customPlanCard
-                    }
-                    
-                    // Template Options
-                    ForEach(PlanTemplate.templates) { template in
-                        NavigationLink {
-                            PlanEditorView(template: template, appState: appState, planCreated: $planCreated)
-                        } label: {
-                            templateCard(template)
-                        }
                     }
                 }
                 .padding()
@@ -62,40 +60,45 @@ struct PlanTemplatePickerView: View {
         .cornerRadius(12)
     }
     
-    private func templateCard(_ template: PlanTemplate) -> some View {
-        VStack(alignment: .leading, spacing: AppStyle.Layout.compactSpacing) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(template.title)
-                    .font(AppStyle.Typography.headline())
-                    .foregroundColor(AppStyle.Colors.textPrimary)
-            }
-            //add divider
-            Divider()
-            VStack(alignment: .leading, spacing: 4) {
-                Text(template.scheduleString)
+    private var adaptivePlanCard: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .bottom, spacing: 8) {
+                    Text("Adaptive Plan")
+                        .font(AppStyle.Typography.headline())
+                        .foregroundColor(AppStyle.Colors.textPrimary)
+                    
+                    // Add a special symbol/badge to make it look enticing
+                    Image(systemName: "sparkles")
+                        .foregroundColor(AppStyle.Colors.textSecondary)
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                
+                Text("A personalized program built from your goals, with built-in progression and performance monitoring.")
                     .font(AppStyle.Typography.caption())
-                    .foregroundColor(AppStyle.Colors.textPrimary)
+                    .foregroundColor(AppStyle.Colors.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.leading)
             }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .foregroundColor(AppStyle.Colors.textSecondary.opacity(0.5))
         }
-        
         .padding()
-        .background(AppStyle.Colors.surface)
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    AppStyle.Colors.surface,
+                    AppStyle.Colors.surface.opacity(0.95),
+                    AppStyle.Colors.textSecondary.opacity(0.1)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .cornerRadius(12)
-    }
-    
-    private func metricPill(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(AppStyle.Typography.caption())
-                .foregroundColor(AppStyle.Colors.textSecondary)
-            Text(value)
-                .font(AppStyle.Typography.caption())
-                .foregroundColor(AppStyle.Colors.textPrimary)
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(AppStyle.Colors.background.opacity(0.5))
-        .cornerRadius(8)
     }
 }
 
