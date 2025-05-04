@@ -3,7 +3,7 @@ import Foundation
 @testable import Train
 
 struct PlanGeneratorTests {
-    @Test("Plan has correct properties")
+    @MainActor @Test("Plan has correct properties")
     func planHasCorrectProperties() {
         // Setup test dependencies
         let testContext = TestContext()
@@ -23,7 +23,7 @@ struct PlanGeneratorTests {
         #expect(priorityPreferences?.count == testContext.planInput.prioritizedMuscles.count)
     }
     
-    @Test("Plan creates correct number of workouts")
+    @MainActor @Test("Plan creates correct number of workouts")
     func planCreatesCorrectNumberOfWorkouts() {
         // Setup test dependencies
         let testContext = TestContext()
@@ -39,7 +39,7 @@ struct PlanGeneratorTests {
         #expect(plan.workouts.count == expectedWorkoutCount)
     }
     
-    @Test("Plan schedules workouts on correct days")
+    @MainActor @Test("Plan schedules workouts on correct days")
     func planSchedulesWorkoutsCorrectly() {
         // Setup test dependencies
         let testContext = TestContext()
@@ -92,7 +92,7 @@ struct PlanGeneratorTests {
         }
     }
     
-    @Test("Volume distributed correctly based on split style")
+    @MainActor @Test("Volume distributed correctly based on split style")
     func volumeDistributionBasedOnSplitStyle() {
         // Setup test dependencies
         let testContext = TestContext()
@@ -171,7 +171,7 @@ struct PlanGeneratorTests {
         }
     }
     
-    @Test("Volume progresses appropriately across weeks")
+    @MainActor @Test("Volume progresses appropriately across weeks")
     func volumeProgressionAcrossWeeks() {
         // Setup test dependencies
         let testContext = TestContext()
@@ -226,7 +226,7 @@ struct PlanGeneratorTests {
         }
     }
     
-    @Test("Experience level affects set and rep ranges")
+    @MainActor @Test("Experience level affects set and rep ranges")
     func experienceLevelAffectsSetAndRepRanges() {
         // Setup test dependencies
         let testContext = TestContext()
@@ -274,7 +274,7 @@ struct PlanGeneratorTests {
     // MARK: - Test Context Class
     
     // Using a class to hold mutable state for our tests
-    class TestContext {
+    @MainActor class TestContext {
         var mockVolumeStrategy: MockVolumeRampStrategy
         var mockExerciseSelector: MockExerciseSelector
         var mockWorkoutBuilder: MockWorkoutBuilder

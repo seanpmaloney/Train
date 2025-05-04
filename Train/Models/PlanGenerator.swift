@@ -58,6 +58,7 @@ struct PlanInput {
 }
 
 /// Generates a personalized training plan based on user input
+@MainActor
 struct PlanGenerator {
     
     // MARK: - Dependencies
@@ -103,15 +104,12 @@ struct PlanGenerator {
         plan.musclePreferences = musclePreferences
         plan.trainingGoal = input.goal
         
-        // If we have necessary components, build workouts
-        if let builder = workoutBuilder {
-            generateWorkouts(
-                for: plan,
-                using: builder,
-                input: input,
-                weeks: weeks
-            )
-        }
+
+        generateWorkouts(
+            for: plan,
+            input: input,
+            weeks: weeks
+        )
         
         return plan
     }
@@ -151,7 +149,6 @@ struct PlanGenerator {
     ///   - weeks: Number of weeks to generate
     private func generateWorkouts(
         for plan: TrainingPlanEntity,
-        using builder: WorkoutBuilder,
         input: PlanInput,
         weeks: Int
     ) {
@@ -212,15 +209,14 @@ struct PlanGenerator {
             // Select exercises for this workout
             var selectedExercises: [MovementEntity] = []
             
-            // If we have an exercise selector, use it to get appropriate exercises
-            if let selector = exerciseSelector {
+
                 // Get candidate exercises that match our criteria
-                let candidateExercises = selector.selectExercises(
+                let candidateExercises = exerciseSelector?.selectExercises(
                     targeting: targetMuscles,
                     withPriority: input.prioritizedMuscles,
                     availableEquipment: input.equipment,
                     exerciseCount: maxExerciseCount * 2 // Get extra to choose from
-                )
+                ) ?? []
                 
                 // Sort exercises - compounds first, then by number of muscles targeted
                 let sortedExercises = candidateExercises.sorted { first, second in
@@ -327,7 +323,6 @@ struct PlanGenerator {
                         }
                     }
                 }
-            }
             
             // Add this workout to our base week
             baseWeekWorkouts.append(workout)

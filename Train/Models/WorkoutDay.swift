@@ -64,6 +64,20 @@ enum WorkoutDay: Int, Codable, CaseIterable, Identifiable {
         }
     }
     
+    /// Converts calendar weekday (1-7) to WorkoutDay enum
+    static func fromWeekday(_ weekday: Int) -> WorkoutDay? {
+        switch weekday {
+        case 1: return .sunday
+        case 2: return .monday
+        case 3: return .tuesday
+        case 4: return .wednesday
+        case 5: return .thursday
+        case 6: return .friday
+        case 7: return .saturday
+        default: return nil
+        }
+    }
+    
     /// Get a formatted string representation of workout days (e.g., "Mon/Wed/Fri")
     static func formatSchedule(_ days: [WorkoutDay]) -> String {
         days.map { $0.shortName }.joined(separator: "/")

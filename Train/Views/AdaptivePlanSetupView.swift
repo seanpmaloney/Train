@@ -2,15 +2,22 @@ import SwiftUI
 
 /// View for setting up an adaptive plan through a series of questions
 struct AdaptivePlanSetupView: View {
+    // MARK: - Properties
+    
+    // Dependencies
+    @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var appState: AppState
+    
+    // Preferences data model
+    @State private var preferences = PlanPreferences()
+    
+    // Plan generation state
+    @State private var generatedPlan: TrainingPlanEntity?
+    @State private var showPlanEditor = false
     
     // State for question navigation
     @State private var currentQuestion = 0
     @State private var animateIn = false
-    
-    // Preferences data model
-    @State private var preferences = PlanPreferences()
     
     // Total number of questions
     private let totalQuestions = 7
@@ -96,6 +103,12 @@ struct AdaptivePlanSetupView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             animateIn = true
+        }
+        .navigationDestination(isPresented: $showPlanEditor) {
+            if let plan = generatedPlan {
+                // Pass the generated plan to our specialized editor view
+                GeneratedPlanEditorView(generatedPlan: plan, appState: appState, planCreated: .constant(true))
+            }
         }
     }
     
@@ -366,15 +379,21 @@ struct AdaptivePlanSetupView: View {
             return
         }
         
-        // Create the plan using our new unified PlanGenerator
-        let generator = PlanGenerator()
-        let plan = generator.generatePlan(from: input)
-        
-        // Add the plan to the app state
-        appState.addPlan(plan)
-        
-        // Dismiss this view and return to previous screen
-        dismiss()
+        // Create the plan using PlanGenerator within MainActor context
+        Task { @MainActor in
+            // Create exercise selector using the factory method
+            let exerciseSelector = DefaultExerciseSelector.create()
+            
+            // Initialize plan generator with our dependencies
+            let generator = PlanGenerator(exerciseSelector: exerciseSelector)
+            
+            // Generate the plan
+            let plan = generator.generatePlan(from: input)
+            
+            // Store the generated plan and show the editor
+            generatedPlan = plan
+            showPlanEditor = true
+        }
     }
 }
 

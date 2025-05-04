@@ -20,6 +20,9 @@
 		8B568C8A2DC65B5C004A39C6 /* VolumeRampStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C892DC65B5C004A39C6 /* VolumeRampStrategy.swift */; };
 		8B568C8C2DC66853004A39C6 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 8B568C8B2DC66853004A39C6 /* README.md */; };
 		8B568C8E2DC67478004A39C6 /* PlanGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C8D2DC67478004A39C6 /* PlanGeneratorTests.swift */; };
+		8B568C902DC68BC3004A39C6 /* GeneratedPlanEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C8F2DC68BC3004A39C6 /* GeneratedPlanEditorViewModel.swift */; };
+		8B568C922DC68BDA004A39C6 /* GeneratedPlanEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C912DC68BDA004A39C6 /* GeneratedPlanEditorView.swift */; };
+		8B568C942DC6A4F1004A39C6 /* DefaultExerciseSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C932DC6A4F1004A39C6 /* DefaultExerciseSelector.swift */; };
 		8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */; };
 		8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */; };
 		8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A352DAAA08300404F43 /* TrainingType.swift */; };
@@ -110,6 +113,9 @@
 		8B568C892DC65B5C004A39C6 /* VolumeRampStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeRampStrategy.swift; sourceTree = "<group>"; };
 		8B568C8B2DC66853004A39C6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		8B568C8D2DC67478004A39C6 /* PlanGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanGeneratorTests.swift; sourceTree = "<group>"; };
+		8B568C8F2DC68BC3004A39C6 /* GeneratedPlanEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedPlanEditorViewModel.swift; sourceTree = "<group>"; };
+		8B568C912DC68BDA004A39C6 /* GeneratedPlanEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedPlanEditorView.swift; sourceTree = "<group>"; };
+		8B568C932DC6A4F1004A39C6 /* DefaultExerciseSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultExerciseSelector.swift; sourceTree = "<group>"; };
 		8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
 		8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardViewModel.swift; sourceTree = "<group>"; };
@@ -263,6 +269,7 @@
 				8B9877692DBC2BC400767AE2 /* StatsViewModel.swift */,
 				8B7BD0592DA757440089F6D3 /* PlanSummaryViewModel.swift */,
 				8B7BD0572DA756B00089F6D3 /* MovementPickerViewModel.swift */,
+				8B568C8F2DC68BC3004A39C6 /* GeneratedPlanEditorViewModel.swift */,
 				8B9877572DBB25A900767AE2 /* EnhancedActiveWorkoutViewModel+History.swift */,
 				8B9877562DBB25A900767AE2 /* EnhancedTrainingViewModel+WeekGrouping.swift */,
 				8B9877482DB9B7B700767AE2 /* EnhancedActiveWorkoutViewModel.swift */,
@@ -282,6 +289,7 @@
 				8B7BCFD92DA1460F0089F6D3 /* ActiveWorkoutView.swift */,
 				8B568C772DC4CF18004A39C6 /* SorenessCheckView.swift */,
 				8B568C7B2DC62739004A39C6 /* MuscleGoalSelectionView.swift */,
+				8B568C912DC68BDA004A39C6 /* GeneratedPlanEditorView.swift */,
 				8B9877442DB9B7B100767AE2 /* EnhancedActiveWorkoutView.swift */,
 				8B98774D2DB9B88B00767AE2 /* Components */,
 				8B9877432DB9B7B100767AE2 /* EnhancedTrainingView.swift */,
@@ -315,6 +323,7 @@
 				8B7BD0272DA5EFD20089F6D3 /* MovementEntity.swift */,
 				8B7BD0472DA74FCA0089F6D3 /* MovementLibrary.swift */,
 				8B9877522DBB15B100767AE2 /* WorkoutDay.swift */,
+				8B568C932DC6A4F1004A39C6 /* DefaultExerciseSelector.swift */,
 				8B9877502DBB0C1D00767AE2 /* MovementType.swift */,
 				8B568C872DC659F0004A39C6 /* PlanGenerator.swift */,
 				8B568C8B2DC66853004A39C6 /* README.md */,
@@ -591,6 +600,7 @@
 				8B98772D2DAF32D400767AE2 /* LoadingScreenView.swift in Sources */,
 				8B7BD0482DA74FCB0089F6D3 /* MovementLibrary.swift in Sources */,
 				8B7A5A3E2DABE3E200404F43 /* TodaysTrainingCard.swift in Sources */,
+				8B568C942DC6A4F1004A39C6 /* DefaultExerciseSelector.swift in Sources */,
 				8B568C7E2DC627BB004A39C6 /* WorkoutDayPicker.swift in Sources */,
 				8B7BCFD82DA145F20089F6D3 /* HealthKitManager.swift in Sources */,
 				8B568C802DC64990004A39C6 /* AdaptivePlanSetupView.swift in Sources */,
@@ -611,6 +621,7 @@
 				8B98774E2DB9B88B00767AE2 /* ExerciseEditView.swift in Sources */,
 				8B9877312DB0311600767AE2 /* PlanTemplate.swift in Sources */,
 				8B9877582DBB25AA00767AE2 /* EnhancedTrainingViewModel+WeekGrouping.swift in Sources */,
+				8B568C922DC68BDA004A39C6 /* GeneratedPlanEditorView.swift in Sources */,
 				8B7BCFE22DA1460F0089F6D3 /* CustomNumberPadView.swift in Sources */,
 				8B7BCF8F2D9DFD3F0089F6D3 /* TrainApp.swift in Sources */,
 				8B7BD0232DA35A540089F6D3 /* TrainingDataRoot.swift in Sources */,
@@ -621,6 +632,7 @@
 				8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */,
 				8B98775D2DBB25C500767AE2 /* WeekSelectorView.swift in Sources */,
 				8B7BD0192DA357FB0089F6D3 /* ExerciseSet.swift in Sources */,
+				8B568C902DC68BC3004A39C6 /* GeneratedPlanEditorViewModel.swift in Sources */,
 				8B7A5A382DAB0CF000404F43 /* UpcomingTrainingViewModel.swift in Sources */,
 				8B7BCFDF2DA1460F0089F6D3 /* ActiveWorkoutView.swift in Sources */,
 				8B7BD01E2DA357FB0089F6D3 /* ExerciseInstance.swift in Sources */,
