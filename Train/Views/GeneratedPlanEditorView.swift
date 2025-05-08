@@ -511,10 +511,10 @@ struct ExerciseRow: View {
             preferredSplit: .upperLower,
             trainingExperience: .intermediate
         )
-        let generator = PlanGenerator()
-        let plan = generator.generatePlan(from: planInput)
+        var generator = PlanGenerator()
+        var plan = generator.generatePlan(input: planInput, forWeeks: 4)
         
-        return GeneratedPlanEditorView(
+        GeneratedPlanEditorView(
             generatedPlan: plan,
             appState: appState,
             planCreated: .constant(false)

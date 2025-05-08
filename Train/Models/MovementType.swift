@@ -52,6 +52,7 @@ enum MovementType: String, CaseIterable, Codable, Identifiable {
     case concentrationCurl
     case overheadTricepExtension
     case cableCurl
+    case dumbbellCurl
     
     // Core
     case cableCrunch
@@ -71,6 +72,7 @@ enum MovementType: String, CaseIterable, Codable, Identifiable {
         switch self {
         case .barbellBenchPress: return "Barbell Bench Press"
         case .dumbbellInclinePress: return "Dumbbell Incline Press"
+        case .dumbbellCurl: return "Dumbbell Curl"
         case .pushUps: return "Push-Ups"
         case .cableFlyes: return "Cable Flyes"
         case .machinePecDeck: return "Machine Pec Deck"

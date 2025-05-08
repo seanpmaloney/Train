@@ -1,0 +1,418 @@
+# Plan Generator Design Document
+
+## Purpose
+
+To create a clean, maintainable, testable, and flexible training plan generation algorithm that:
+
+1. Builds a plan based on user input.
+2. Ramps volume and intensity weekly.
+3. Adjusts future workouts based on user performance after each session.
+4. Integrates with existing entities (`TrainingPlanEntity`, `WorkoutEntity`, etc.).
+
+---
+
+## User Inputs
+
+Collected from questionnaire:
+1. Main training goal (strength/hypertrophy)
+2. Prioritized muscle groups
+3. Days per week to train
+4. Workout duration (short/medium/long)
+5. Available equipment
+6. Preferred training split (full body, push/pull/legs, etc.)
+7. Training experience level
+
+---
+
+## Plan Generation Flow
+
+### Entry Point
+
+- `generatePlan(input: PlanInput, weeks: Int) -> TrainingPlanEntity`
+
+### Step-by-Step
+
+1. **Initialize Plan**
+    - Create `TrainingPlanEntity`
+    - Attach metadata (goal, muscle priorities)
+
+2. **Base Week Creation**
+    - For each day in week:
+        - Determine `WorkoutDayType` (split logic)
+        - Get target muscles for that day
+        - Allocate weekly sets for target muscles
+        - Divide weekly targets evenly across training days
+        - Select exercises (consider compound, technical, variety)
+        - Ensure variety (e.g., horizontal & vertical pulls for back)
+        - Create `ExerciseInstanceEntity` with appropriate sets/reps
+        - Avoid duplicate primary muscles on back-to-back days
+    	- Do not reuse same lift more than 2x/week
+    	- Avoid placing the same lift on back-to-back days
+
+2a. **Workout Construction Logic**
+- Implemented by `generateWorkouts(for:input:weeks:)`
+- Handles:
+    - Weekly generation loop
+    - Determining `WorkoutDayType`
+    - Selecting muscles per day
+    - Allocating volume across days
+    - Selecting valid movements for each muscle
+    - Applying compound and technical movement priority
+    - Injecting variety via `variationGroup` and direction (e.g., horizontal vs vertical)
+    - Avoiding repeated movements more than 2x/week
+    - Preventing back-to-back primary muscle usage
+
+3. **Volume Allocation**
+    - Use `StandardVolumeRampStrategy` to:
+        - Ramp set volume weekly for prioritized muscles
+        - Keep others at maintenance
+        - Beginners start at lower total sets, higher reps
+
+4. **Copy Workouts**
+    - For subsequent weeks, copy base week
+    - Adjust target sets, reps, weight
+    - Keep movements all the same as week 1
+
+5. **Progressive Overload**
+    - Not applied immediately
+    - Applied after a workout is marked complete
+    - Adjust the matching workout next week:
+        - Increase sets (evenly distribute)
+        - Increase reps if under max
+        - Increase weight if near top of rep range
+        - For bodyweight, increase only sets/reps
+
+### 5a. **Progressive Overload Allocation**
+
+**Overview:**
+Progressive overload is applied only after a workout is marked complete. We look at the next week’s matching workout (same split/day type) and add volume for prioritized muscles that are below their weekly target. This is done by increasing sets, and optionally reps or weight.
+
+**Steps for Even Set Distribution:**
+
+1. **Determine Set Deficit:**
+   - For each prioritized muscle, calculate:
+     ```
+     setsToAdd = weeklyTargetSetsNextWeek - setsCompletedThisWeek
+     ```
+
+2. **Find Relevant Exercises:**
+   - Identify all `ExerciseInstanceEntity` objects in next week’s workouts that have this muscle as a primary target.
+
+3. **Sort by Set Count:**
+   - Sort those exercises by `exercise.sets.count` in ascending order.
+
+4. **Distribute Sets:**
+   - Distribute `setsToAdd` one at a time across the sorted exercises in round-robin order.
+   - Only add a set if the exercise has fewer than 5 sets.
+   - If all candidate exercises hit the 5-set cap before setsToAdd is 0, stop — we do not add more or introduce new movements.
+
+5. **Rationale:**
+   - Ensures workouts remain similar in length.
+   - Avoids stacking volume on a single day.
+   - Simple, bug-resistant approach by avoiding new movement injection or per-day redistribution.
+
+
+---
+
+## Considerations
+
+- Beginners:
+    - Start with lower set count
+    - Hypertrophy rep range = 8–30
+    - Strength rep range minimum = 5
+- MovementEntity:
+    - Add properties for horizontal/vertical direction
+    - Add field for "variationGroup" to enforce variety
+- Set Allocation:
+    - Track sets per muscle across the week
+    - Evenly distribute additions when increasing volume
+- Back-to-back Days:
+    - No repeat of same primary muscle group on consecutive days
+- Fallback Rules:
+    - If no valid movement can be found (e.g. due to equipment limitations or conflict rules), skip with warning
+    - If all candidate exercises hit per-exercise set cap, do not inject new movements
+    - If variety can’t be satisfied, log a soft warning (future fix)
+
+---
+
+## Future Work
+
+- Recovery scoring
+- AI recommendations based on performance trends
+- Save/load plan state to JSON
+
+---
+
+## Reusable Logic from First Implementation
+
+Several helper functions and logic blocks from the current implementation in `PlanGenerator.swift` should be reused or adapted in the new design. These include:
+
+- `getDayType(day:split:totalDays:) -> WorkoutDayType`  
+  Converts a calendar day and user-selected split into a logical day type (e.g., Push, Pull, Legs).
+
+- `getMusclesForDayType(_:) -> [MuscleGroup]`  
+  Maps each day type to the corresponding set of target muscle groups.
+
+- `convertToMusclePreferences(from:) -> [MuscleTrainingPreference]`  
+  Converts prioritized muscles into grow/maintain goals used for plan generation.
+
+- `countTrainingDaysForMuscle(_:split:daysPerWeek:) -> Int`  
+  Used for dividing weekly set targets into daily allocations.
+
+- `isCompoundMovement(_:) -> Bool`  
+  Useful when prioritizing compound movements during exercise selection.
+
+- `isTechnicalMovement(_:) -> Bool`  
+  Helps avoid assigning overly complex movements to beginners.
+
+- `getPrimaryMuscle(_:) -> MuscleGroup`  
+  Retrieves the main muscle targeted by a given movement.
+
+- `getExerciseCountForDuration(_:) -> Int`  
+  Maps user-selected workout duration to number of exercises per session.
+
+- `getWeightIncrementForEquipment(_:) -> Double`  
+  Defines sensible progression steps based on equipment type.
+
+- `generateWorkouts(for:input:weeks:)`
+  - Generates workouts for each week using muscle split and constraints.
+  - Core logic for assigning days, selecting exercises, and enforcing training rules.
+
+These utility functions should be retained as-is or slightly adapted and moved to appropriate utility/helper modules if needed.
+
+---
+
+## Function Specifications
+
+### 1. `generatePlan(input: PlanInput, forWeeks: Int) -> TrainingPlanEntity`
+- **Purpose**: Entry point for generating a complete training plan.
+- **Inputs**:
+  - `PlanInput`: User-selected preferences.
+  - `forWeeks`: Duration of the training plan in weeks.
+- **Output**:
+  - A `TrainingPlanEntity` with populated workouts and volume targets.
+- **Tests**:
+  - Verify the number of workouts equals `forWeeks * trainingDaysPerWeek`.
+  - Ensure each workout contains exercises matching prioritized muscles.
+
+---
+
+### 2. `distributeSetsEvenly(plan: TrainingPlanEntity) -> Void`
+- **Purpose**: Evenly distribute sets for prioritized muscles across available training days.
+- **Inputs**:
+  - `TrainingPlanEntity` with draft workouts.
+- **Output**:
+  - Mutates plan’s workouts to spread volume evenly.
+- **Tests**:
+  - Check no single workout has disproportionate sets.
+  - Validate cumulative weekly sets per muscle meet the target.
+
+---
+
+### 3. `avoidBackToBackMuscleUse(plan: TrainingPlanEntity) -> Void`
+- **Purpose**: Adjust exercises to avoid training the same primary muscle on consecutive days.
+- **Inputs**:
+  - `TrainingPlanEntity`
+- **Output**:
+  - Mutated workouts with adjusted exercises.
+- **Tests**:
+  - Ensure no muscle is a primary in two back-to-back workouts.
+
+---
+
+### 4. `enforceMovementVariety(workout: WorkoutEntity) -> Void`
+- **Purpose**: Enforces variety like vertical vs. horizontal pull/push movements.
+- **Inputs**:
+  - A `WorkoutEntity`
+- **Output**:
+  - Updates exercise list to include balanced movement types.
+- **Tests**:
+  - Ensure at least one vertical and one horizontal movement per back/push day.
+
+---
+
+### 5. `calculateInitialSets(muscle: MuscleGroup, week: Int, experience: TrainingExperience) -> Int`
+- **Purpose**: Determine number of sets to assign in week 1 for a muscle.
+- **Inputs**:
+  - Muscle group
+  - Week number
+  - Training experience
+- **Output**:
+  - Int: Target number of sets.
+- **Tests**:
+  - Check values fall within research-backed hypertrophy/strength ranges.
+  - Ensure lower volume for beginners.
+
+---
+
+### 6. `adjustProgressionAfterWorkout(plan: TrainingPlanEntity, completedWorkout: WorkoutEntity) -> Void`
+- **Purpose**: Adjust the same workout next week based on completed performance.
+- **Inputs**:
+  - Full plan
+  - The just-completed workout
+- **Output**:
+  - Modifies future workout for progression.
+- **Tests**:
+  - Ensure sets/reps/weights adjust according to progression rules.
+  - Bodyweight only adjusts sets/reps.
+
+---
+
+### 7. `generateWorkouts(for plan: TrainingPlanEntity, input: PlanInput, weeks: Int) -> Void`
+- **Purpose**: Core routine that populates workouts for the plan.
+- **Inputs**:
+  - `TrainingPlanEntity`: the plan to populate
+  - `PlanInput`: user constraints
+  - `weeks`: number of weeks
+- **Output**:
+  - Modifies the `plan` in-place
+- **Tests**:
+  - Verify correct number of workouts created
+  - Validate workout structure and constraints (no back-to-back, no overuse)
+  - Confirm exercise variety present where applicable
+
+
+--- ---
+## Entities to understand:
+
+enum EquipmentType: String, Codable, CaseIterable {
+    case barbell = "Barbell"
+    case dumbbell = "Dumbbell"
+    case machine = "Machine"
+    case bodyweight = "Bodyweight"
+    case cable = "Cable"
+}
+
+enum MovementPattern: String, Codable {
+    // Big compound patterns
+    case horizontalPush
+    case verticalPush
+    case horizontalPull
+    case verticalPull
+    case squat
+    case hinge
+    case lunge
+    case carry
+    
+    // Core/control
+    case core
+    case rotation
+    case antiRotation
+    case antiExtension
+    
+    // Isolation/supportive
+    case abduction       // e.g. lateral raise
+    case adduction       // e.g. chest fly
+    case elbowFlexion    // e.g. curls
+    case elbowExtension  // e.g. triceps
+    case kneeExtension   // e.g. leg extension
+    case kneeFlexion     // e.g. leg curl
+    
+    case unknown
+}
+
+struct MovementEntity: Identifiable, Codable, Hashable
+    let id: UUID
+    let name: String
+    let notes: String?
+    let videoURL: String?
+    let primaryMuscles: [MuscleGroup]
+    let secondaryMuscles: [MuscleGroup]
+    let equipment: EquipmentType
+    let movementType: MovementType
+    let movementPattern: MovementPattern
+    let isCompound: Bool
+--
+class ExerciseInstanceEntity: ObservableObject, Identifiable, Codable 
+    let id: UUID
+    let movement: MovementEntity
+    var exerciseType: String
+    var sets: [ExerciseSetEntity]
+    var note: String?
+--
+class ExerciseSetEntity: ObservableObject, Identifiable, Codable 
+    let id: UUID
+    @Published var weight: Double
+    @Published var targetReps: Int
+    @Published var completedReps: Int
+    @Published var isComplete: Bool
+--
+
+enum MuscleSize: String, CaseIterable, Codable {
+    case small, large
+}
+
+enum MuscleGroup: String, CaseIterable, Codable, Identifiable {
+    case chest, back, quads, hamstrings, glutes, calves, biceps, triceps, shoulders, abs, forearms, obliques, lowerBack, traps, neck, unknown
+
+    var displayName: String
+    var trainingGuidelines: TrainingVolumeGuidelines {
+    /// Range of weekly sets recommended for maintenance
+    let maintenanceSetsRange: ClosedRange<Int>
+    
+    /// Range of weekly sets recommended for hypertrophy (muscle growth)
+    let hypertrophySetsRange: ClosedRange<Int>
+    
+    /// Description explaining the recommendation
+    let description: String
+    
+    /// Source URL for evidence backing the recommendation
+    let source: URL
+    
+    // Convenience computed properties
+    var minMaintenanceSets: Int { maintenanceSetsRange.lowerBound }
+    var maxMaintenanceSets: Int { maintenanceSetsRange.upperBound }
+    var minHypertrophySets: Int { hypertrophySetsRange.lowerBound }
+    var maxHypertrophySets: Int { hypertrophySetsRange.upperBound }
+}
+    var muscleSize: MuscleSize 
+}
+--
+
+class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
+    var id: UUID = UUID()
+    @Published var name: String
+    @Published var notes: String?
+    @Published var startDate: Date
+    @Published var endDate: Date
+    @Published var daysPerWeek: Int
+    @Published var isCompleted: Bool
+    @Published var workouts: [WorkoutEntity] = []
+    @Published var musclePreferences: [MuscleTrainingPreference]?
+    @Published var trainingGoal: TrainingGoal?
+struct MuscleTrainingPreference: Identifiable, Codable, Equatable {
+    var id: UUID = UUID()
+    let muscleGroup: MuscleGroup
+    var goal: MuscleGoal
+}
+enum MuscleGoal: String, Codable, CaseIterable, Identifiable {
+    case grow = "Grow"
+    case maintain = "Maintain"
+    Var description
+    Var id
+}
+}
+--
+class WorkoutEntity: ObservableObject, Identifiable, Codable {
+    let id: UUID
+    @Published var title: String
+    @Published var description: String
+    @Published var isComplete: Bool
+    @Published var scheduledDate: Date?
+    @Published var exercises: [ExerciseInstanceEntity]
+    weak var trainingPlan: TrainingPlanEntity?
+}
+--
+class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
+    var id: UUID = UUID()
+    @Published var name: String
+    @Published var notes: String?
+    @Published var startDate: Date
+    @Published var endDate: Date
+    @Published var daysPerWeek: Int
+    @Published var isCompleted: Bool
+    @Published var workouts: [WorkoutEntity] = []
+    @Published var musclePreferences: [MuscleTrainingPreference]?
+    @Published var trainingGoal: TrainingGoal?
+}
+--

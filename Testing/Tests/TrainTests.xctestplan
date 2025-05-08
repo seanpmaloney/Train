@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "C0C90355-CCA7-4405-AE83-223AA7EBA29F",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Train.xcodeproj",
+        "identifier" : "8B7A5A292DAA783D00404F43",
+        "name" : "TrainTests"
+      }
+    }
+  ],
+  "version" : 1
+}

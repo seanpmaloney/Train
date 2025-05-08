@@ -382,13 +382,13 @@ struct AdaptivePlanSetupView: View {
         // Create the plan using PlanGenerator within MainActor context
         Task { @MainActor in
             // Create exercise selector using the factory method
-            let exerciseSelector = DefaultExerciseSelector.create()
+//            let exerciseSelector = DefaultExerciseSelector.create()
             
             // Initialize plan generator with our dependencies
-            let generator = PlanGenerator(exerciseSelector: exerciseSelector)
+            var generator = PlanGenerator()
             
             // Generate the plan
-            let plan = generator.generatePlan(from: input)
+            let plan = generator.generatePlan(input: input, forWeeks: 4)
             
             // Store the generated plan and show the editor
             generatedPlan = plan

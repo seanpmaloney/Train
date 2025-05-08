@@ -519,144 +519,240 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "13A8B384-BB6F-42B5-B17C-0C2284415B99"
+            uuid = "AB748177-F65F-4594-8F47-E85AF5391AC3"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Train/Models/PlanGenerator.swift"
+            filePath = "Testing/Tests/UnitTests/PlanGeneratorTests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "158"
-            endingLineNumber = "158"
-            landmarkName = "generateWorkouts(for:input:weeks:)"
+            startingLineNumber = "308"
+            endingLineNumber = "308"
+            landmarkName = "volumeIncreasesDistributedAcrossWorkouts()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "2F75CF4A-D865-4F98-8018-81CF4D9FF02A"
+            uuid = "949AF833-F9F5-4FAA-A967-F8070B6C3FAA"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Train/Models/PlanGenerator.swift"
+            filePath = "Testing/Tests/UnitTests/PlanGeneratorTests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "155"
-            endingLineNumber = "155"
-            landmarkName = "generateWorkouts(for:input:weeks:)"
+            startingLineNumber = "212"
+            endingLineNumber = "212"
+            landmarkName = "volumeProgressionAcrossWeeks()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "FD8DA3D5-FAB5-42BD-8C22-6E09022BE28D"
+            uuid = "DC86BBA9-AC3E-4EC0-BDAC-E6325EA3F3B1"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Train/Models/PlanGenerator.swift"
+            filePath = "Testing/Tests/UnitTests/PlanGeneratorTests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "108"
-            endingLineNumber = "108"
-            landmarkName = "generatePlan(from:forWeeks:)"
+            startingLineNumber = "174"
+            endingLineNumber = "174"
+            landmarkName = "volumeProgressionAcrossWeeks()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "3040638F-07DA-4E37-9A0D-10FEACEF0787"
+            uuid = "33498B9B-B93B-44C8-B084-87EF23A28DC5"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Train/Models/PlanGenerator.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "107"
-            endingLineNumber = "107"
-            landmarkName = "generatePlan(from:forWeeks:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "B6DD1F2C-264D-40CB-8697-6A6C454ADCAA"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Train/Models/PlanGenerator.swift"
+            filePath = "Testing/Tests/UnitTests/PlanGeneratorTests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "282"
             endingLineNumber = "282"
-            landmarkName = "generateWorkouts(for:input:weeks:)"
+            landmarkName = "volumeIncreasesDistributedAcrossWorkouts()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "4648441C-5FB8-4BA1-9A6E-F02E0E5667DB"
+            uuid = "451AF295-9884-4CF3-BD8C-3FD103FE8E42"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Train/Models/PlanGenerator.swift"
+            filePath = "Testing/Tests/UnitTests/PlanGeneratorTests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "199"
-            endingLineNumber = "199"
-            landmarkName = "generateWorkouts(for:input:weeks:)"
+            startingLineNumber = "323"
+            endingLineNumber = "323"
+            landmarkName = "volumeIncreasesDistributedAcrossWorkouts()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "B00EDCD2-3832-4EC1-90E7-DA9263CB66C6"
+            uuid = "A8170A91-0712-4219-A7A4-224BC30844CF"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Train/Models/PlanGenerator.swift"
+            filePath = "Train/Models/PlanGenerator2.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "209"
-            endingLineNumber = "209"
-            landmarkName = "generateWorkouts(for:input:weeks:)"
+            startingLineNumber = "194"
+            endingLineNumber = "194"
+            landmarkName = "createWorkout(for:in:input:weekNumber:dayNumber:muscleFrequencyMap:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "4049AB2E-2951-486E-8640-F48B33C503C1"
+            uuid = "DBEDF1C6-2716-4B6B-8C41-615C2604C9ED"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Train/Models/PlanGenerator.swift"
+            filePath = "Train/Models/PlanGenerator2.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "106"
-            endingLineNumber = "106"
-            landmarkName = "generatePlan(from:forWeeks:)"
+            startingLineNumber = "1179"
+            endingLineNumber = "1179"
+            landmarkName = "calculateWeeklyVolumeForMuscle(muscle:goal:isPrioritized:experienceLevel:weekNumber:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "42C88AAE-CC9D-430C-945D-93DF842211CD"
+            uuid = "EEC3BCB7-4DAD-490E-BF0F-0CF404C3F525"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Train/Models/PlanGenerator.swift"
+            filePath = "Train/Models/PlanGenerator2.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "198"
-            endingLineNumber = "198"
-            landmarkName = "generateWorkouts(for:input:weeks:)"
+            startingLineNumber = "226"
+            endingLineNumber = "226"
+            landmarkName = "populateWorkoutWithExercises(workout:muscleTargets:input:weekNumber:muscleFrequencyMap:excludedMovements:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "DC8BD738-1840-445B-9E2B-30E6AEF3C28B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/Models/PlanGenerator2.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "253"
+            endingLineNumber = "253"
+            landmarkName = "populateWorkoutWithExercises(workout:muscleTargets:input:weekNumber:muscleFrequencyMap:excludedMovements:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "CA1EA402-7639-47BF-AC3C-D318E36A4413"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/Models/PlanGenerator2.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "264"
+            endingLineNumber = "264"
+            landmarkName = "populateWorkoutWithExercises(workout:muscleTargets:input:weekNumber:muscleFrequencyMap:excludedMovements:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8228972A-6539-4B10-BA6E-C5FE00CD2D4B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/Models/PlanGenerator2.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1223"
+            endingLineNumber = "1223"
+            landmarkName = "calculateSetsForMovement(movement:in:muscleTargets:weekNumber:daysPerMuscle:goal:experienceLevel:input:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6960861B-7E97-4C5B-8235-B8B594163084"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/Models/PlanGenerator2.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "918"
+            endingLineNumber = "918"
+            landmarkName = "enforceMovementVariety(for:input:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "ECA35235-C83B-4184-A54B-D7536DD3E547"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/Models/PlanGenerator2.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "928"
+            endingLineNumber = "928"
+            landmarkName = "enforceMovementVariety(for:input:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "DCA08496-BFB4-4224-BB5C-832BB7290A96"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Testing/Tests/UnitTests/PlanGeneratorTests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "136"
+            endingLineNumber = "136"
+            landmarkName = "volumeDistributionBasedOnSplitStyle()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "69250E71-D172-4903-97C0-7EAF385101CB"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Testing/Tests/UnitTests/PlanGeneratorTests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "125"
+            endingLineNumber = "125"
+            landmarkName = "volumeDistributionBasedOnSplitStyle()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

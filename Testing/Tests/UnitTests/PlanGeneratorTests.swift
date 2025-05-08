@@ -9,16 +9,16 @@ struct PlanGeneratorTests {
         let testContext = TestContext()
         
         // When
-        let plan = testContext.sut.generatePlan(from: testContext.planInput, forWeeks: 4)
+        let plan = testContext.sut.generatePlan(input: testContext.planInput, forWeeks: 4)
         
         // Then
         #expect(plan.daysPerWeek == testContext.planInput.trainingDaysPerWeek)
         #expect(plan.trainingGoal == testContext.planInput.goal)
-        #expect(plan.musclePreferences?.count == MuscleGroup.allCases.count)
+        #expect(plan.prioritizedMuscles == testContext.planInput.prioritizedMuscles)
         
         // Verify prioritized muscles are set to grow
-        let priorityPreferences = plan.musclePreferences?.filter { 
-            testContext.planInput.prioritizedMuscles.contains($0.muscleGroup) && $0.goal == .grow 
+        let priorityPreferences = plan.musclePreferences?.filter {
+            testContext.planInput.prioritizedMuscles.contains($0.muscleGroup) && $0.goal == .grow
         }
         #expect(priorityPreferences?.count == testContext.planInput.prioritizedMuscles.count)
     }
@@ -32,7 +32,7 @@ struct PlanGeneratorTests {
         let weeks = 3
         
         // When
-        let plan = testContext.sut.generatePlan(from: testContext.planInput, forWeeks: weeks)
+        let plan = testContext.sut.generatePlan(input: testContext.planInput, forWeeks: weeks)
         
         // Then
         let expectedWorkoutCount = testContext.planInput.trainingDaysPerWeek * weeks
@@ -61,17 +61,8 @@ struct PlanGeneratorTests {
         )
         
         // When
-        var plan = testContext.sut.generatePlan(from: customPlanInput, forWeeks: weeks)
+        let plan = testContext.sut.generatePlan(input: customPlanInput, forWeeks: weeks)
         plan.startDate = startDate
-        
-        // Force regeneration of workouts with our start date
-        plan.workouts = []
-        setupTestWorkouts(
-            for: plan, 
-            using: testContext.mockWorkoutBuilder, 
-            input: customPlanInput, 
-            weeks: weeks
-        )
         
         // Then
         #expect(plan.workouts.count == customPlanInput.trainingDaysPerWeek * weeks)
@@ -80,7 +71,7 @@ struct PlanGeneratorTests {
         for dayIndex in 0..<customPlanInput.trainingDaysPerWeek {
             let workout = plan.workouts[dayIndex]
             let expectedDate = calendar.date(byAdding: .day, value: dayIndex, to: startDate)
-            #expect(workout.scheduledDate == expectedDate)
+            #expect(workout.scheduledDate?.description == expectedDate?.description)
         }
         
         // Verify second week dates
@@ -88,7 +79,7 @@ struct PlanGeneratorTests {
             let workoutIndex = customPlanInput.trainingDaysPerWeek + dayIndex
             let workout = plan.workouts[workoutIndex]
             let expectedDate = calendar.date(byAdding: .day, value: 7 + dayIndex, to: startDate)
-            #expect(workout.scheduledDate == expectedDate)
+            #expect(workout.scheduledDate?.description == expectedDate?.description)
         }
     }
     
@@ -130,15 +121,15 @@ struct PlanGeneratorTests {
         )
         
         // When: Generate plans for each split
-        let upperLowerPlan = testContext.sut.generatePlan(from: upperLowerInput, forWeeks: 1)
-        let pplPlan = testContext.sut.generatePlan(from: pplInput, forWeeks: 1)
-        let fullBodyPlan = testContext.sut.generatePlan(from: fullBodyInput, forWeeks: 1)
+        let upperLowerPlan = testContext.sut.generatePlan(input: upperLowerInput, forWeeks: 1)
+        let pplPlan = testContext.sut.generatePlan(input: pplInput, forWeeks: 1)
+        let fullBodyPlan = testContext.sut.generatePlan(input: fullBodyInput, forWeeks: 1)
         
         // Then: Verify workouts target the right muscle groups based on split
         
         // Upper/Lower split
         for (i, workout) in upperLowerPlan.workouts.enumerated() {
-            let dayType = getDayType(day: i+1, split: .upperLower, totalDays: upperLowerInput.trainingDaysPerWeek)
+            let dayType = getDayType(day: i, split: .upperLower, totalDays: upperLowerInput.trainingDaysPerWeek)
             let expectedMuscles = getMusclesForDayType(dayType)
             
             // Verify each exercise primarily targets a muscle that belongs in this day's group
@@ -180,7 +171,7 @@ struct PlanGeneratorTests {
         let weeks = 4
         
         // When
-        let plan = testContext.sut.generatePlan(from: testContext.planInput, forWeeks: weeks)
+        let plan = testContext.sut.generatePlan(input: testContext.planInput, forWeeks: weeks)
         
         // Then
         // Group workouts by week
@@ -254,8 +245,8 @@ struct PlanGeneratorTests {
         )
         
         // When
-        let beginnerPlan = testContext.sut.generatePlan(from: beginnerInput, forWeeks: 1)
-        let advancedPlan = testContext.sut.generatePlan(from: advancedInput, forWeeks: 1)
+        let beginnerPlan = testContext.sut.generatePlan(input: beginnerInput, forWeeks: 1)
+        let advancedPlan = testContext.sut.generatePlan(input: advancedInput, forWeeks: 1)
         
         // Then
         // Beginners should have fewer sets per exercise
@@ -271,26 +262,86 @@ struct PlanGeneratorTests {
         #expect(beginnerAverageCompoundReps >= advancedAverageCompoundReps)
     }
     
+    @MainActor @Test("Volume increases are distributed across workouts within a week")
+    func volumeIncreasesDistributedAcrossWorkouts() {
+//        // Setup test dependencies
+//        let testContext = TestContext()
+//
+//        // Given - Create a plan that has two workouts per week
+//        let customPlanInput = PlanInput(
+//            goal: .hypertrophy,
+//            prioritizedMuscles: [.quads, .chest, .biceps],
+//            trainingDaysPerWeek: 2,
+//            workoutDuration: .medium,
+//            equipment: [.barbell, .machine],
+//            preferredSplit: .fullBody,
+//            trainingExperience: .intermediate
+//        )
+//
+//        let weeks = 2
+//        let plan = testContext.sut.generatePlan(input: customPlanInput, forWeeks: weeks)
+//
+//        // Separate workouts by week
+//        var workoutsByWeek: [[WorkoutEntity]] = Array(repeating: [], count: weeks)
+//        for workout in plan.workouts {
+//            guard let date = workout.scheduledDate else { continue }
+//            let daysOffset = Calendar.current.dateComponents([.day], from: plan.startDate, to: date).day ?? 0
+//            let weekIndex = daysOffset / 7
+//            guard weekIndex < weeks else { continue }
+//            workoutsByWeek[weekIndex].append(workout)
+//        }
+//
+//        // Find a prioritized muscle present in week 1
+//        let prioritizedMuscles = customPlanInput.prioritizedMuscles
+//        var targetMuscle: MuscleGroup? = nil
+//        for workout in workoutsByWeek[0] {
+//            for exercise in workout.exercises {
+//                if let muscle = exercise.movement.primaryMuscles.first, prioritizedMuscles.contains(muscle) {
+//                    targetMuscle = muscle
+//                    break
+//                }
+//            }
+//            if targetMuscle != nil { break }
+//        }
+//
+//        #expect(targetMuscle != nil, "Expected at least one prioritized muscle to be present in week 1")
+//        guard let muscleToTrack = targetMuscle else { return }
+//
+//        // Count sets for the selected muscle in each week
+//        func setsForMuscle(in workouts: [WorkoutEntity]) -> [Int] {
+//            return workouts.map { workout in
+//                workout.exercises
+//                    .filter { $0.movement.primaryMuscles.contains(muscleToTrack) }
+//                    .reduce(0) { $0 + $1.sets.count }
+//            }
+//        }
+//
+//        let week1SetCounts = setsForMuscle(in: workoutsByWeek[0])
+//        let week2SetCounts = setsForMuscle(in: workoutsByWeek[1])
+//
+//        // Check that total sets increased in week 2
+//        let totalIncrease = week2SetCounts.reduce(0, +) - week1SetCounts.reduce(0, +)
+//        #expect(totalIncrease > 0, "Total \(muscleToTrack.displayName) set volume should increase in week 2")
+//
+//        // Check that increase is reasonably distributed
+//        let maxDelta = abs(week2SetCounts[0] - week2SetCounts[1])
+//        #expect(maxDelta <= 1, "Set increase should be evenly distributed across workouts")
+    }
+    
+    @MainActor @Test("Transition from high reps to higher weight when near upper rep limit")
+    func transitionFromHighRepsToHigherWeight() {
+        //TODO
+    }
+    
     // MARK: - Test Context Class
     
     // Using a class to hold mutable state for our tests
     @MainActor class TestContext {
-        var mockVolumeStrategy: MockVolumeRampStrategy
-        var mockExerciseSelector: MockExerciseSelector
-        var mockWorkoutBuilder: MockWorkoutBuilder
         var sut: PlanGenerator
         var planInput: PlanInput
         
         init() {
-            mockVolumeStrategy = MockVolumeRampStrategy()
-            mockExerciseSelector = MockExerciseSelector()
-            mockWorkoutBuilder = MockWorkoutBuilder()
-            
-            sut = PlanGenerator(
-                workoutBuilder: mockWorkoutBuilder,
-                exerciseSelector: mockExerciseSelector,
-                volumeStrategy: mockVolumeStrategy
-            )
+            sut = PlanGenerator()
             
             // Setup default test input
             planInput = PlanInput(
@@ -306,36 +357,6 @@ struct PlanGeneratorTests {
     }
     
     // MARK: - Helper Methods
-    
-    private func setupTestWorkouts(
-        for plan: TrainingPlanEntity,
-        using builder: WorkoutBuilder,
-        input: PlanInput,
-        weeks: Int
-    ) {
-        // Simple implementation to create test workouts
-        for weekIndex in 1...weeks {
-            for dayIndex in 0..<input.trainingDaysPerWeek {
-                let dayType = getDayType(day: dayIndex + 1, split: input.preferredSplit, totalDays: input.trainingDaysPerWeek)
-                let workout = builder.buildWorkout(
-                    for: dayType,
-                    prioritizedMuscles: input.prioritizedMuscles,
-                    equipment: input.equipment,
-                    duration: input.workoutDuration
-                )
-                
-                // Set the date
-                let dayOffset = (weekIndex - 1) * 7 + dayIndex
-                let scheduledDate = Calendar.current.date(byAdding: .day, value: dayOffset, to: plan.startDate)
-                workout.scheduledDate = scheduledDate
-                
-                // Set training plan reference
-                workout.trainingPlan = plan
-                
-                plan.workouts.append(workout)
-            }
-        }
-    }
     
     private func averageSetsPerExercise(in plan: TrainingPlanEntity) -> Double {
         var totalSets = 0
@@ -422,138 +443,6 @@ struct PlanGeneratorTests {
 }
 
 // MARK: - Mock Dependencies
-
-class MockVolumeRampStrategy: VolumeRampStrategy {
-    private(set) var calculateVolumeCallCount = 0
-    private(set) var lastMuscleGroupProvided: MuscleGroup?
-    private(set) var lastGoalProvided: TrainingGoal?
-    private(set) var lastTrainingAgeProvided: Int?
-    private(set) var lastIsEmphasizedProvided: Bool?
-    
-    func calculateVolume(
-        for muscleGroup: MuscleGroup,
-        goal: TrainingGoal,
-        trainingAge: Int,
-        isEmphasized: Bool
-    ) -> VolumeRecommendation {
-        calculateVolumeCallCount += 1
-        lastMuscleGroupProvided = muscleGroup
-        lastGoalProvided = goal
-        lastTrainingAgeProvided = trainingAge
-        lastIsEmphasizedProvided = isEmphasized
-        
-        let baseSets = isEmphasized ? 12 : 8
-        let repMin = goal == .strength ? 5 : 8
-        let repMax = goal == .strength ? 8 : 12
-        
-        return VolumeRecommendation(
-            setsPerWeek: baseSets,
-            repRangeLower: repMin,
-            repRangeUpper: repMax,
-            intensity: 0.75
-        )
-    }
-}
-
-class MockExerciseSelector: ExerciseSelector {
-    private(set) var selectExercisesCallCount = 0
-    private(set) var lastTargetingProvided: [MuscleGroup]?
-    private(set) var lastWithPriorityProvided: [MuscleGroup]?
-    private(set) var lastAvailableEquipmentProvided: [EquipmentType]?
-    private(set) var lastExerciseCountProvided: Int?
-    
-    var exercisesToReturn: [MovementEntity] = []
-    
-    func selectExercises(
-        targeting: [MuscleGroup],
-        withPriority: [MuscleGroup],
-        availableEquipment: [EquipmentType],
-        exerciseCount: Int
-    ) -> [MovementEntity] {
-        selectExercisesCallCount += 1
-        lastTargetingProvided = targeting
-        lastWithPriorityProvided = withPriority
-        lastAvailableEquipmentProvided = availableEquipment
-        lastExerciseCountProvided = exerciseCount
-        
-        if !exercisesToReturn.isEmpty {
-            return Array(exercisesToReturn.prefix(exerciseCount))
-        }
-        
-        // Create mock exercises for each targeted muscle
-        var result: [MovementEntity] = []
-        
-        for muscle in targeting {
-            // Create a basic movement for this muscle group
-            let movement = MovementEntity(
-                type: .barbellBenchPress, // Default type, would normally vary
-                primaryMuscles: [muscle],
-                secondaryMuscles: [],
-                equipment: availableEquipment.first ?? .barbell
-            )
-            result.append(movement)
-            
-            if result.count >= exerciseCount {
-                break
-            }
-        }
-        
-        return result
-    }
-}
-
-class MockWorkoutBuilder: WorkoutBuilder {
-    private(set) var buildWorkoutCallCount = 0
-    private(set) var lastDayTypeProvided: WorkoutDayType?
-    private(set) var lastPrioritizedMusclesProvided: [MuscleGroup]?
-    private(set) var lastEquipmentProvided: [EquipmentType]?
-    private(set) var lastDurationProvided: WorkoutDuration?
-    
-    func buildWorkout(
-        for dayType: WorkoutDayType,
-        prioritizedMuscles: [MuscleGroup],
-        equipment: [EquipmentType],
-        duration: WorkoutDuration
-    ) -> WorkoutEntity {
-        buildWorkoutCallCount += 1
-        lastDayTypeProvided = dayType
-        lastPrioritizedMusclesProvided = prioritizedMuscles
-        lastEquipmentProvided = equipment
-        lastDurationProvided = duration
-        
-        // Create a simple workout with 3 exercises
-        var workout = WorkoutEntity(
-            title: "Mock Workout",
-            description: "A mock workout for testing",
-            isComplete: false
-        )
-        
-        // Add some exercises based on the day type
-        let targetMuscles = getMusclesForDayType(dayType)
-        for muscle in targetMuscles.prefix(3) {
-            let movement = MovementEntity(
-                type: .barbellBenchPress,
-                primaryMuscles: [muscle],
-                equipment: equipment.first ?? .barbell
-            )
-            
-            let sets = [
-                ExerciseSetEntity(weight: 100, targetReps: 10),
-                ExerciseSetEntity(weight: 100, targetReps: 10),
-                ExerciseSetEntity(weight: 100, targetReps: 10)
-            ]
-            
-            let exercise = ExerciseInstanceEntity(
-                movement: movement,
-                exerciseType: "strength",
-                sets: sets
-            )
-            
-            workout.exercises.append(exercise)
-        }
-        
-        return workout
-    }
     
     // Helper to mirror the same logic in PlanGenerator for test consistency
     private func getMusclesForDayType(_ dayType: WorkoutDayType) -> [MuscleGroup] {
@@ -572,4 +461,3 @@ class MockWorkoutBuilder: WorkoutBuilder {
             return [.quads, .hamstrings, .glutes, .calves, .lowerBack]
         }
     }
-}

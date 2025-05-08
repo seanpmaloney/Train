@@ -22,10 +22,35 @@ struct TrainingVolumeGuidelines {
     var maxHypertrophySets: Int { hypertrophySetsRange.upperBound }
 }
 
+enum MuscleSize: String, CaseIterable, Codable {
+    case small, large
+}
+
 enum MuscleGroup: String, CaseIterable, Codable, Identifiable {
     case chest, back, quads, hamstrings, glutes, calves, biceps, triceps, shoulders, abs, forearms, obliques, lowerBack, traps, neck, unknown
 
     var id: String { rawValue }
+    
+    var muscleSize: MuscleSize {
+        switch self {
+        case .chest: return .large
+        case .back: return .large
+        case .quads: return .large
+        case .hamstrings: return .large
+        case .glutes: return .large
+        case .calves: return .small
+        case .biceps: return .small
+        case .triceps: return .small
+        case .shoulders: return .small
+        case .abs: return .large
+        case .forearms: return .small
+        case .obliques: return .small
+        case .lowerBack: return .small
+        case .traps: return .small
+        case .neck: return .small
+        case .unknown: return .small
+        }
+    }
 
     var displayName: String {
         switch self {
