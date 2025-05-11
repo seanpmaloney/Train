@@ -18,6 +18,7 @@ struct AdaptivePlanSetupView: View {
     // State for question navigation
     @State private var currentQuestion = 0
     @State private var animateIn = false
+    @State private var isMovingForward = true // Track navigation direction
     
     // Total number of questions
     private let totalQuestions = 7
@@ -34,56 +35,43 @@ struct AdaptivePlanSetupView: View {
             // Question container
             ScrollView {
                 // Question content - aligned to top with .frame and .alignmentGuide
-                ZStack {
-                    // Show the appropriate question based on currentQuestion
+                // Using a simple ZStack approach for the pages
+                // We'll only show the current question
+                VStack {
                     switch currentQuestion {
                     case 0:
                         trainingGoalQuestion
-                            .transition(.asymmetric(
-                                insertion: .opacity.combined(with: .move(edge: .trailing)),
-                                removal: .opacity.combined(with: .move(edge: .leading))
-                            ))
+                            .transition(transitionAnimation)
+                            .id("question0") // Ensure view is recreated when id changes
                     case 1:
                         musclePriorityQuestion
-                            .transition(.asymmetric(
-                                insertion: .opacity.combined(with: .move(edge: .trailing)),
-                                removal: .opacity.combined(with: .move(edge: .leading))
-                            ))
+                            .transition(transitionAnimation)
+                            .id("question1")
                     case 2:
                         daysPerWeekQuestion
-                            .transition(.asymmetric(
-                                insertion: .opacity.combined(with: .move(edge: .trailing)),
-                                removal: .opacity.combined(with: .move(edge: .leading))
-                            ))
+                            .transition(transitionAnimation)
+                            .id("question2")
                     case 3:
                         workoutDurationQuestion
-                            .transition(.asymmetric(
-                                insertion: .opacity.combined(with: .move(edge: .trailing)),
-                                removal: .opacity.combined(with: .move(edge: .leading))
-                            ))
+                            .transition(transitionAnimation)
+                            .id("question3")
                     case 4:
                         equipmentQuestion
-                            .transition(.asymmetric(
-                                insertion: .opacity.combined(with: .move(edge: .trailing)),
-                                removal: .opacity.combined(with: .move(edge: .leading))
-                            ))
+                            .transition(transitionAnimation)
+                            .id("question4")
                     case 5:
                         splitStyleQuestion
-                            .transition(.asymmetric(
-                                insertion: .opacity.combined(with: .move(edge: .trailing)),
-                                removal: .opacity.combined(with: .move(edge: .leading))
-                            ))
+                            .transition(transitionAnimation)
+                            .id("question5")
                     case 6:
                         trainingExperienceQuestion
-                            .transition(.asymmetric(
-                                insertion: .opacity.combined(with: .move(edge: .trailing)),
-                                removal: .opacity.combined(with: .move(edge: .leading))
-                            ))
+                            .transition(transitionAnimation)
+                            .id("question6")
                     default:
                         EmptyView()
                     }
                 }
-                .animation(.spring(response: 0.4, dampingFraction: 0.75), value: currentQuestion)
+                .animation(.snappy(duration: 0.3), value: currentQuestion)
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top) // Align to top
                 .padding(.bottom, 80) // Add bottom padding for the buttons
@@ -239,8 +227,7 @@ struct AdaptivePlanSetupView: View {
                             } else {
                                 preferences.availableEquipment.insert(equipmentType)
                             }
-                        },
-                        icon: getEquipmentIcon(for: equipmentType)
+                        }
                     )
                 }
             }
@@ -291,6 +278,25 @@ struct AdaptivePlanSetupView: View {
         .id("question7")
     }
     
+    // MARK: - Animation
+    
+    /// Dynamic transition animation based on navigation direction
+    private var transitionAnimation: AnyTransition {
+        if isMovingForward {
+            // Moving forward: slide left with fade for clean transition
+            return AnyTransition.asymmetric(
+                insertion: .opacity.combined(with: .move(edge: .trailing)),
+                removal: .opacity.animation(.easeOut(duration: 0.2))
+            )
+        } else {
+            // Moving backward: slide right with fade for clean transition
+            return AnyTransition.asymmetric(
+                insertion: .opacity.combined(with: .move(edge: .leading)),
+                removal: .opacity.animation(.easeOut(duration: 0.2))
+            )
+        }
+    }
+    
     // MARK: - Helper Methods
     
     /// Section of muscle groups with title
@@ -317,7 +323,7 @@ struct AdaptivePlanSetupView: View {
     /// Get icon for equipment type
     private func getEquipmentIcon(for equipmentType: EquipmentType) -> String {
         switch equipmentType {
-        case .barbell: return "figure.strengthtraining.functional"
+        case .barbell: return "figure.strengthtraining.traditional"
         case .dumbbell: return "dumbbell"
         case .machine: return "figure.strengthtraining.traditional"
         case .bodyweight: return "figure.highintensity.intervaltraining"
@@ -353,6 +359,7 @@ struct AdaptivePlanSetupView: View {
     private func goToPreviousQuestion() {
         withAnimation {
             if currentQuestion > 0 {
+                isMovingForward = false // Set direction to backward
                 currentQuestion -= 1
             }
         }
@@ -363,6 +370,7 @@ struct AdaptivePlanSetupView: View {
         withAnimation {
             if currentQuestion < totalQuestions - 1 {
                 if canProceedToNextQuestion {
+                    isMovingForward = true // Set direction to forward
                     currentQuestion += 1
                 }
             } else {

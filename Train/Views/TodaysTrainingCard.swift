@@ -23,7 +23,7 @@ struct TodaysTrainingCard: View {
         VStack(alignment: .leading, spacing: 12) {
             // Header
             HStack {
-                Text("Today's Training")
+                Text("Today")
                     .font(.title3)
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)

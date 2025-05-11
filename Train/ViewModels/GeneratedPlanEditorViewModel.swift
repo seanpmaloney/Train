@@ -197,6 +197,26 @@ class GeneratedPlanEditorViewModel: ObservableObject {
         objectWillChange.send()
     }
     
+    /// Removes a movement from a workout
+    func replaceMovement(at exerciseIndex: Int, from workoutIndex: Int, newMovement: MovementEntity) {
+        guard workouts.indices.contains(workoutIndex),
+              workouts[workoutIndex].exercises.indices.contains(exerciseIndex) else {
+            return
+        }
+        
+        // Create a new exercise model, preserving the original sets/reps if possible
+        let originalExercise = workouts[workoutIndex].exercises[exerciseIndex]
+        let replacement = ExerciseModel(
+            movement: newMovement,
+            targetSets: originalExercise.targetSets,
+            targetReps: originalExercise.targetReps
+        )
+        
+        // Replace at the same index to maintain order
+        workouts[workoutIndex].exercises[exerciseIndex] = replacement
+        objectWillChange.send()
+    }
+    
     /// Updates the number of sets for an exercise
     func updateSets(_ sets: Int, for exerciseId: UUID, in workoutIndex: Int) {
         guard workouts.indices.contains(workoutIndex) else { return }
@@ -307,5 +327,3 @@ class GeneratedPlanEditorViewModel: ObservableObject {
         appState.savePlans()
     }
 }
-
-

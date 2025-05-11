@@ -18,11 +18,14 @@ struct GeneratedPlanEditorView: View {
     enum ActiveSheet: Identifiable {
         case movementPicker(workoutIndex: Int)
         case datePicker
+        case replaceMovementPicker(exerciseIndex: Int, workoutIndex: Int)
 
         var id: String {
             switch self {
             case .movementPicker(let workoutIndex):
                 return "movementPicker_\(workoutIndex)"
+            case .replaceMovementPicker(let exerciseIndex, let workoutIndex):
+                return "replaceMovementPicker_\(workoutIndex)"
             case .datePicker:
                 return "datePicker"
             }
@@ -122,6 +125,15 @@ struct GeneratedPlanEditorView: View {
                                 viewModel.addMovement(movement, to: workoutIndex)
                             }
                         }
+                    case .replaceMovementPicker(let exerciseIndex, let workoutIndex):
+                        let currentExercise = viewModel.workouts[workoutIndex].exercises[exerciseIndex]
+                        let primaryMuscles = currentExercise.movement.primaryMuscles
+                        
+                        MovementPickerView(filterByMuscles: primaryMuscles) { movements in
+                            for movement in movements {
+                                viewModel.replaceMovement(at: exerciseIndex, from: workoutIndex, newMovement: movement)
+                            }
+                        }
                     case .datePicker:
                         DatePicker(
                             "Start Date",
@@ -213,6 +225,7 @@ struct GeneratedPlanEditorView: View {
                     workoutIndex: workoutIndex,
                     viewModel: viewModel,
                     scrollTarget: $scrollTarget,
+                    activeSheet: $activeSheet,
                     onAddExercise: {
                         activeSheet = .movementPicker(workoutIndex: workoutIndex)
                     }
@@ -240,6 +253,7 @@ struct WorkoutView: View {
     let workoutIndex: Int
     let viewModel: GeneratedPlanEditorViewModel
     @Binding var scrollTarget: GeneratedPlanEditorView.ScrollTarget?
+    @Binding var activeSheet: GeneratedPlanEditorView.ActiveSheet?
     let onAddExercise: () -> Void
     
     @State private var showingDayPicker = false
@@ -311,6 +325,7 @@ struct WorkoutView: View {
                     viewModel: viewModel,
                     workoutIndex: workoutIndex,
                     scrollTarget: $scrollTarget,
+                    activeSheet: $activeSheet,
                     onDelete: {
                         viewModel.removeMovement(at: exerciseIndex, from: workoutIndex)
                     }
@@ -364,6 +379,7 @@ struct ExerciseRow: View {
     let viewModel: GeneratedPlanEditorViewModel
     let workoutIndex: Int
     @Binding var scrollTarget: GeneratedPlanEditorView.ScrollTarget?
+    @Binding var activeSheet: GeneratedPlanEditorView.ActiveSheet?
     let onDelete: () -> Void
     
     @State private var showingSetsEditor = false
@@ -372,31 +388,51 @@ struct ExerciseRow: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: AppStyle.Layout.compactSpacing) {
-                HStack(spacing: AppStyle.Layout.compactSpacing) {
-                    // Exercise name
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(exercise.movement.name)
-                            .font(AppStyle.Typography.body())
-                            .foregroundColor(AppStyle.Colors.textPrimary)
-                            .lineLimit(1)
-                        
-                        HStack(spacing: 4) {
-                            equipmentTag
+                // Main content row with aligned elements
+                HStack(spacing: AppStyle.Layout.standardSpacing) {
+                    // Left side: Exercise name and information
+                    HStack(spacing: AppStyle.Layout.standardSpacing) {
+                        // Exercise name and tags
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(exercise.movement.name)
+                                .font(AppStyle.Typography.body())
+                                .foregroundColor(AppStyle.Colors.textPrimary)
+                                .lineLimit(1)
                             
-                            ForEach(exercise.movement.primaryMuscles, id: \.self) { muscle in
-                                muscleTag(muscle: muscle)
+                            HStack(spacing: 4) {
+                                equipmentTag
+                                
+                                ForEach(exercise.movement.primaryMuscles, id: \.self) { muscle in
+                                    muscleTag(muscle: muscle)
+                                }
                             }
                         }
                     }
                     
                     Spacer()
                     
-                    // Delete button
-                    Button(action: onDelete) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(AppStyle.Colors.textSecondary)
-                            .padding(4)
+                    // Right side: Action buttons
+                    VStack(spacing: AppStyle.Layout.compactSpacing) {
+                        // Delete button (aligned with movement title)
+                        Button(action: onDelete) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(AppStyle.Colors.danger)
+                        }
+                        
+                        // Replace button with similar primary muscle
+                        Button(action: {
+                            let parent = viewModel.workouts[workoutIndex]
+                            let exerciseIndex = parent.exercises.firstIndex { $0.id == exercise.id } ?? 0
+                            activeSheet = .replaceMovementPicker(exerciseIndex: exerciseIndex, workoutIndex: workoutIndex)
+                        }) {
+                            Image(systemName: "arrow.triangle.swap")
+                                .font(.system(size: 18))
+                                .foregroundColor(AppStyle.Colors.textSecondary)
+                        }
+                        .padding(.trailing, 4)
                     }
+                    .padding(.top, 2) // Slight adjustment to align with text
                 }
                 
                 // Sets and reps
@@ -506,7 +542,7 @@ struct ExerciseRow: View {
             goal: .hypertrophy,
             prioritizedMuscles: [.chest, .back],
             trainingDaysPerWeek: 4,
-            workoutDuration: .medium,
+            workoutDuration: .long,
             equipment: [.barbell, .dumbbell],
             preferredSplit: .upperLower,
             trainingExperience: .intermediate

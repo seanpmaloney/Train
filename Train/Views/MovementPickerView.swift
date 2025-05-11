@@ -2,8 +2,15 @@ import SwiftUI
 
 struct MovementPickerView: View {
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel = MovementPickerViewModel()
+    @StateObject private var viewModel: MovementPickerViewModel
     let onMovementSelected: ([MovementEntity]) -> Void
+    var filteredView : Bool
+    
+    init(filterByMuscles: [MuscleGroup]? = nil, onMovementSelected: @escaping ([MovementEntity]) -> Void) {
+        filteredView = (filterByMuscles != nil)
+        self.onMovementSelected = onMovementSelected
+        _viewModel = StateObject(wrappedValue: MovementPickerViewModel(filterByMuscles: filterByMuscles))
+    }
     
     var body: some View {
         NavigationStack {
@@ -17,7 +24,7 @@ struct MovementPickerView: View {
                 movementsList
             }
             .padding(.horizontal)
-            .navigationTitle("Add Movement")
+            .navigationTitle(filteredView ? "Replace Movement" : "Add Movement")
             .navigationBarTitleDisplayMode(.inline)
             .background(AppStyle.Colors.background)
             .toolbar {
@@ -26,12 +33,15 @@ struct MovementPickerView: View {
                         dismiss()
                     }
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        onMovementSelected(viewModel.getSelectedMovements())
-                        dismiss()
+                // Only show Done button when not in filtered/replacement mode
+                if !filteredView {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") {
+                            onMovementSelected(viewModel.getSelectedMovements())
+                            dismiss()
+                        }
+                        .disabled(!viewModel.hasSelections)
                     }
-                    .disabled(!viewModel.hasSelections)
                 }
             }
         }
@@ -111,7 +121,15 @@ struct MovementPickerView: View {
             LazyVStack(spacing: AppStyle.Layout.compactSpacing) {
                 ForEach(viewModel.filteredMovements) { movement in
                     MovementCard(movement: movement, isSelected: viewModel.isSelected(movement)) {
-                        viewModel.toggleSelection(movement)
+                        if filteredView {
+                            // In replacement mode: select single movement and immediately apply
+                            viewModel.selectSingleMovement(movement)
+                            onMovementSelected([movement])
+                            dismiss()
+                        } else {
+                            // Normal mode: toggle selection for multi-select
+                            viewModel.toggleSelection(movement)
+                        }
                     }
                 }
             }
