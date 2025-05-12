@@ -22,6 +22,7 @@ enum MovementType: String, CaseIterable, Codable, Identifiable {
     case cablePullover
     case chinUps
     case uprightRow
+    case superman
     
     // Legs
     case barbellBackSquat
@@ -34,6 +35,10 @@ enum MovementType: String, CaseIterable, Codable, Identifiable {
     case gobletSquat
     case sledPush
     case barbellFrontSquat
+    case bodyweightSquat
+    case quadFocusedLunge
+    case gluteFocusedLunge
+    case pistolSquat
     
     // Shoulders
     case overheadPress
@@ -53,6 +58,7 @@ enum MovementType: String, CaseIterable, Codable, Identifiable {
     case overheadTricepExtension
     case cableCurl
     case dumbbellCurl
+    case chairDips
     
     // Core
     case cableCrunch
@@ -79,8 +85,10 @@ enum MovementType: String, CaseIterable, Codable, Identifiable {
         case .dumbbellBenchPress: return "Dumbbell Bench Press"
         case .cableChestFly: return "Cable Chest Fly"
         case .dips: return "Dips"
+        case .chairDips: return "Chair Dips"
         case .barbellDeadlift: return "Barbell Deadlift"
         case .pullUps: return "Pull-Ups"
+        case .superman: return "Superman"
         case .bentOverRow: return "Bent Over Row"
         case .latPulldown: return "Lat Pulldown"
         case .seatedCableRow: return "Seated Cable Row"
@@ -96,6 +104,10 @@ enum MovementType: String, CaseIterable, Codable, Identifiable {
         case .legExtension: return "Leg Extension"
         case .lyingLegCurl: return "Lying Leg Curl"
         case .gobletSquat: return "Goblet Squat"
+        case .bodyweightSquat: return "Bodyweight Squat"
+        case .quadFocusedLunge: return "Quad Focused Lunge"
+        case .gluteFocusedLunge: return "Glute Focused Lunge"
+        case .pistolSquat: return "Pistol Squat"
         case .sledPush: return "Sled Push"
         case .barbellFrontSquat: return "Barbell Front Squat"
         case .overheadPress: return "Overhead Press"

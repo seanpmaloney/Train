@@ -1,0 +1,74 @@
+🧠 Task: Implement Feedback-Driven Weekly Progression System
+
+We want to build a system that adjusts next week’s workouts based on simple user feedback, targeting hypertrophy goals using smart defaults with adaptive overrides. The app repeats a weekly training template and uses feedback to shape progression intelligently.
+
+🧾 1. USER FEEDBACK INPUT STRUCTURE
+
+🔹 A. Pre-Workout
+- soreMuscles: [MuscleGroup]
+  - User selects muscles from a text list that still feel sore
+- jointPainAreas: [JointArea]  
+  - Options: .knee, .elbow, .shoulder
+  - Used to flag exercises that could aggravate pain (see joint logic below)
+
+🔹 B. After Each Exercise (ExerciseFeedback)
+- intensity: .tooEasy | .moderate | .challenging | .failed
+- setVolume: .tooEasy | .moderate | .challenging | .tooMuch
+
+🔹 C. Post-Workout
+- sessionFatigue: .fresh | .normal | .wiped | .completelyDrained
+
+🔁 2. DEFAULT PROGRESSION LOGIC
+
+By default, the app increases volume weekly by:
+- +2 sets per muscle group per week
+  - Distributed across movements that target that muscle
+  - Capped at the upper bound from:  
+    MuscleGroup.trainingGuidelines.hypertrophySetsRange
+- Slight increase in weight (e.g. 2.5–5%) if not blocked by feedback
+
+This continues until the target hypertrophy volume is reached, after which volume is held unless overridden.
+
+⚙️ 3. ADAPTATION LOGIC (OVERRIDES)
+
+🟥 A. Soreness-Based Set Reduction
+- If a muscle is marked sore at workout start:
+  - Find the last workout (before today) that trained that muscle
+  - Locate the corresponding workout next week
+  - Decrease sets for that muscle in that workout by 1
+
+🟡 B. Exercise-Level Adjustments
+For each ExerciseInstanceFeedback:
+
+- If joint pain affects that exercise (see joint logic below):
+  - Flag the movement (for UI icon)
+  - Do not apply weight/set progression this week
+
+- If setVolume == .tooMuch:  
+  Subtract 1 set from that exercise next week
+
+- If intensity == .failed:  
+  Hold weight steady (no increase)
+
+- If intensity == .tooEasy and setVolume == .tooEasy:  
+  Add 1 set to that exercise next week (if muscle is still under hypertrophy target)
+
+🟦 C. Session-Level Adjustment
+- If sessionFatigue == .completelyDrained:  
+  Subtract 2 total sets from next week’s same workout
+
+🦴 4. JOINT PAIN FLAGGING LOGIC
+
+Flag movements that may aggravate reported pain:
+
+if jointPainAreas.contains(.knee) && movement.isLowerBody:
+    exerciseInstance.shouldShowJointWarning = true
+
+if jointPainAreas.contains(.elbow) || jointPainAreas.contains(.shoulder),
+   movement.isUpperBody:
+    exerciseInstance.shouldShowJointWarning = true
+
+This flag will be used to display a ⚠️ warning icon on the ExerciseInstance card next week, suggesting:
+- Lower weight or reps
+- Consider swapping the movement
+- Optionally skip

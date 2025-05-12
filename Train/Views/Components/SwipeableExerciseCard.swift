@@ -92,7 +92,13 @@ struct SwipeableExerciseCard: View {
                                 .font(.system(size: 20))
                         }
                         .sheet(isPresented: $showingMovementInfo) {
-                            MovementInfoSheet(movement: displayExercise.movement)
+                            MovementInfoSheet(
+                                movement: displayExercise.movement,
+                                onReplaceMovement: { replacement in
+                                    // Replace and persist to app state
+                                    exercise.replaceMovement(with: replacement)
+                                }
+                            )
                         }
                         .padding(.trailing, 4)
                     }

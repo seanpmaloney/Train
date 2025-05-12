@@ -4,6 +4,13 @@ import SwiftUI
 struct MovementInfoSheet: View {
     let movement: MovementEntity
     @Environment(\.dismiss) private var dismiss
+    @State private var showingMovementPicker = false
+    var onReplaceMovement: ((MovementEntity) -> Void)?
+    
+    init(movement: MovementEntity, onReplaceMovement: ((MovementEntity) -> Void)? = nil) {
+        self.movement = movement
+        self.onReplaceMovement = onReplaceMovement
+    }
     
     var body: some View {
         NavigationView {
@@ -89,8 +96,12 @@ struct MovementInfoSheet: View {
                     
                     // Replace button
                     Button(action: {
-                        // This functionality will be implemented later
-                        print("Replace movement tapped: \(movement.name)")
+                        // Only show the replacement button if the replacement callback exists
+                        if onReplaceMovement != nil {
+                            showingMovementPicker = true
+                        } else {
+                            print("Replace movement tapped, but no callback provided: \(movement.name)")
+                        }
                     }) {
                         HStack {
                             Image(systemName: "arrow.triangle.swap")
@@ -119,6 +130,16 @@ struct MovementInfoSheet: View {
                     }) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundColor(AppStyle.Colors.textSecondary)
+                    }
+                }
+            }
+            .sheet(isPresented: $showingMovementPicker) {
+                // Present the movement picker with filtering by the primary muscles
+                // This allows the user to find similar movements that target the same muscles
+                MovementPickerView(filterByMuscles: movement.primaryMuscles) { selectedMovements in
+                    if let replacement = selectedMovements.first, let callback = onReplaceMovement {
+                        callback(replacement)
+                        dismiss() // Dismiss the entire sheet after replacement
                     }
                 }
             }

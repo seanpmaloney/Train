@@ -2,7 +2,7 @@ import Foundation
 
 class ExerciseInstanceEntity: ObservableObject, Identifiable, Codable {
     let id: UUID
-    let movement: MovementEntity
+    @Published var movement: MovementEntity
     var exerciseType: String
     var sets: [ExerciseSetEntity]
     var note: String?
@@ -41,5 +41,15 @@ class ExerciseInstanceEntity: ObservableObject, Identifiable, Codable {
         try container.encode(exerciseType, forKey: .exerciseType)
         try container.encode(sets, forKey: .sets)
         try container.encodeIfPresent(note, forKey: .note)
+    }
+    
+    // MARK: - Movement Replacement
+    
+    /// Replaces the current movement with a new one
+    /// This change is persisted to the workout and will save in state
+    /// - Parameter newMovement: The movement to replace the current one with
+    func replaceMovement(with newMovement: MovementEntity) {
+        self.movement = newMovement
+        objectWillChange.send()
     }
 } 

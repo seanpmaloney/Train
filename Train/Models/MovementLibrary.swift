@@ -141,6 +141,14 @@ struct MovementLibrary {
             movementPattern: .verticalPull,
             isCompound: false
         ),
+        MovementEntity(
+            type: .superman,
+            primaryMuscles: [.back, .lowerBack],
+            secondaryMuscles: [],
+            equipment: .bodyweight,
+            movementPattern: .core,
+            isCompound: false
+        ),
         
         // Legs
         MovementEntity(
@@ -217,6 +225,38 @@ struct MovementLibrary {
             primaryMuscles: [.quads],
             secondaryMuscles: [.glutes, .hamstrings],
             equipment: .barbell,
+            movementPattern: .squat,
+            isCompound: true
+        ),
+        MovementEntity(
+            type: .bodyweightSquat,
+            primaryMuscles: [.quads, .glutes],
+            secondaryMuscles: [.hamstrings],
+            equipment: .bodyweight,
+            movementPattern: .squat,
+            isCompound: true
+        ),
+        MovementEntity(
+            type: .quadFocusedLunge,
+            primaryMuscles: [.quads],
+            secondaryMuscles: [.glutes],
+            equipment: .bodyweight,
+            movementPattern: .lunge,
+            isCompound: true
+        ),
+        MovementEntity(
+            type: .gluteFocusedLunge,
+            primaryMuscles: [.glutes],
+            secondaryMuscles: [.quads, .hamstrings],
+            equipment: .bodyweight,
+            movementPattern: .lunge,
+            isCompound: true
+        ),
+        MovementEntity(
+            type: .pistolSquat,
+            primaryMuscles: [.quads],
+            secondaryMuscles: [.glutes],
+            equipment: .bodyweight,
             movementPattern: .squat,
             isCompound: true
         ),
@@ -338,6 +378,14 @@ struct MovementLibrary {
             equipment: .cable,
             movementPattern: .elbowFlexion,
             isCompound: false
+        ),
+        MovementEntity(
+            type: .chairDips,
+            primaryMuscles: [.triceps],
+            secondaryMuscles: [.chest],
+            equipment: .bodyweight,
+            movementPattern: .verticalPush,
+            isCompound: true
         ),
         
         // Core
