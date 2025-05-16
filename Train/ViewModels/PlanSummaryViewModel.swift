@@ -57,6 +57,7 @@ class PlanSummaryViewModel: ObservableObject {
         
         // Add workouts
         for (weekIndex, week) in weeks.enumerated() {
+            var workoutWeek = [WorkoutEntity]()
             for (dayIndex, day) in week.enumerated() where !day.movements.isEmpty {
                 let workoutDate = Calendar.current.date(
                     byAdding: .day,
@@ -84,8 +85,9 @@ class PlanSummaryViewModel: ObservableObject {
                         )
                     }
                 )
-                plan.workouts.append(workout)
+                workoutWeek.append(workout)
             }
+            plan.weeklyWorkouts.append(workoutWeek)
         }
         
         return plan

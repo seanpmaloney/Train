@@ -11,7 +11,6 @@ struct EnhancedTrainingView: View {
     @State private var showActiveWorkout = false
     @State private var hasActiveWorkoutDismissedByGesture = false
     @State private var selectedWeekIndex = 0
-    @State private var weekGroups: [EnhancedTrainingViewModel.WeekGroup] = []
     
     // MARK: - Initialization
     
@@ -32,9 +31,9 @@ struct EnhancedTrainingView: View {
                 
                 VStack(spacing: 0) {
                     // Week selector
-                    if !weekGroups.isEmpty {
+                    if let plan = appState.currentPlan, !plan.weeklyWorkouts.isEmpty {
                         WeekSelectorView(
-                            weekGroups: weekGroups,
+                            weeklyWorkouts: plan.weeklyWorkouts,
                             currentWeekIndex: selectedWeekIndex,
                             onWeekSelected: { index in
                                 withAnimation {
@@ -48,14 +47,14 @@ struct EnhancedTrainingView: View {
                     ScrollView {
                         VStack(spacing: 24) {
                             // Current week workouts section
-                            if !weekGroups.isEmpty {
+                            if let plan = appState.currentPlan, !plan.weeklyWorkouts.isEmpty, selectedWeekIndex < plan.weeklyWorkouts.count {
                                 workoutSection(
                                     title: nil,
-                                    workouts: weekGroups[selectedWeekIndex].workouts,
+                                    workouts: plan.weeklyWorkouts[selectedWeekIndex],
                                     isUpcoming: true
                                 )
                             } else {
-                                // Show upcoming workouts as fallback if no week groups
+                                // Show upcoming workouts as fallback if no week data
                                 workoutSection(
                                     title: nil,
                                     workouts: viewModel.upcomingWorkouts,
@@ -224,27 +223,40 @@ struct EnhancedTrainingView: View {
     
     // MARK: - Helper Methods
     
-    /// Finds a workout by ID in both upcoming and past workouts
+    /// Finds a workout by ID in all available workouts
     private func findWorkout(with id: UUID) -> WorkoutEntity? {
+        // First search in weeklyWorkouts if available
+        if let plan = appState.currentPlan, !plan.weeklyWorkouts.isEmpty {
+            for weekWorkouts in plan.weeklyWorkouts {
+                if let workout = weekWorkouts.first(where: { $0.id == id }) {
+                    return workout
+                }
+            }
+        }
+        
+        // Fallback to the old approach if not found
         if let workout = viewModel.upcomingWorkouts.first(where: { $0.id == id }) {
             return workout
         }
         return viewModel.pastWorkouts.first(where: { $0.id == id })
     }
     
-    // Function to refresh week groups and set the correct current week
+    // Function to refresh week data and set the current week
     private func refreshWeekGroups() {
-        weekGroups = viewModel.getWeekGroups()
+        guard let plan = appState.currentPlan else { return }
         
-        // Set the selected week to the current week if we have week groups
-        if !weekGroups.isEmpty {
-            if let currentWeekGroup = viewModel.getCurrentWeekGroup(),
-               let currentWeekIndex = weekGroups.firstIndex(where: { $0.weekNumber == currentWeekGroup.weekNumber }) {
-                selectedWeekIndex = currentWeekIndex
-            } else {
-                // Default to the first week if we can't find the current week
-                selectedWeekIndex = 0
-            }
+        let weeks = plan.weeklyWorkouts
+        guard !weeks.isEmpty else { return }
+        
+        // If there's an active workout, find which week it belongs to
+        if let activeId = appState.activeWorkoutId,
+           let (weekIdx, _) = weeks.enumerated().first(where: { (_, weekWorkouts) in 
+               weekWorkouts.contains(where: { workout in workout.id == activeId })
+           }) {
+            selectedWeekIndex = weekIdx
+        } else {
+            // Default to showing the first week
+            selectedWeekIndex = 0
         }
     }
 }

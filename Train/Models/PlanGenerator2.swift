@@ -70,12 +70,7 @@ struct PlanGenerator {
     mutating func generateWorkouts(for plan: TrainingPlanEntity, input: PlanInput, weeks: Int) {
         // STEP 1: Generate a base week of workouts
         let baseWeekWorkouts = generateBaseWeek(for: plan, input: input)
-        
-        // STEP 2: Apply base week to plan
-        for workout in baseWeekWorkouts {
-            plan.workouts.append(workout)
-            workout.trainingPlan = plan
-        }
+        plan.weeklyWorkouts.append(baseWeekWorkouts)
         
         // STEP 3: Copy and adjust for subsequent weeks
         if weeks > 1 {
@@ -126,26 +121,24 @@ struct PlanGenerator {
         weekNumber: Int,
         input: PlanInput
     ) {
+        var newWeek: [WorkoutEntity] = []
+
         for (dayIndex, baseWorkout) in baseWeek.enumerated() {
-            // Calculate new date for this workout
-            let dayNumber = dayIndex + 1
-            let newDate = calculateDate(weekNumber: weekNumber, dayNumber: dayNumber, startDate: plan.startDate)
-            
-            // Create a copy of the base workout
+            let newDate = calculateDate(weekNumber: weekNumber, dayNumber: dayIndex + 1, startDate: plan.startDate)
             let newWorkout = copyWorkout(baseWorkout, withNewDate: newDate)
-            
-            // Apply progressive overload to exercises
+
             applyProgressiveOverload(
                 to: newWorkout,
                 originalWorkout: baseWorkout,
                 weekNumber: weekNumber,
                 input: input
             )
-            
-            // Add to plan
-            plan.workouts.append(newWorkout)
+
             newWorkout.trainingPlan = plan
+            newWeek.append(newWorkout)
         }
+
+        plan.weeklyWorkouts.append(newWeek)
     }
     
     /// Create a single workout with exercises
@@ -727,7 +720,7 @@ struct PlanGenerator {
         /// - Parameter plan: The training plan to modify
          func avoidBackToBackMuscleUse(plan: TrainingPlanEntity) {
             // Get workouts sorted by date
-            let sortedWorkouts = plan.workouts.filter { $0.scheduledDate != nil }
+             let sortedWorkouts = plan.weeklyWorkouts.flatMap {$0}.filter { $0.scheduledDate != nil }
                 .sorted {
                     guard let date1 = $0.scheduledDate, let date2 = $1.scheduledDate else {
                         return false

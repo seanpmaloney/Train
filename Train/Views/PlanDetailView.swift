@@ -179,7 +179,7 @@ struct PlanDetailView: View {
     // Helper functions to get workout data
     private func hasWorkout(for day: Int) -> Bool {
         // Get workouts scheduled for this day of the week
-        return plan.workouts.contains { workout in
+        return plan.weeklyWorkouts.flatMap{$0}.contains { workout in
             guard let scheduledDate = workout.scheduledDate else { return false }
             let weekday = Calendar.current.component(.weekday, from: scheduledDate)
             // weekday is 1-based (Sunday = 1), we need 0-based
@@ -189,7 +189,7 @@ struct PlanDetailView: View {
     
     private func movementsForDay(_ day: Int) -> [MovementEntity] {
         // Find workout for this day and return its movements
-        let workout = plan.workouts.first { workout in
+        let workout = plan.weeklyWorkouts.flatMap{$0}.first { workout in
             guard let scheduledDate = workout.scheduledDate else { return false }
             let weekday = Calendar.current.component(.weekday, from: scheduledDate)
             return (weekday - 1) == day

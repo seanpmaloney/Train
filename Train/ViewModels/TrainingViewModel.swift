@@ -34,7 +34,7 @@ class TrainingViewModel: ObservableObject {
         
         // Get all future workouts from current plan
         if let currentPlan = appState.currentPlan {
-            upcomingWorkouts = currentPlan.workouts
+            upcomingWorkouts = currentPlan.weeklyWorkouts.flatMap{$0}
                 .filter { workout in
                     guard let scheduledDate = workout.scheduledDate else { return false }
                     return !calendar.isDate(scheduledDate, inSameDayAs: today) && scheduledDate >= today

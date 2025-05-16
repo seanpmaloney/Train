@@ -78,7 +78,7 @@ class EnhancedActiveWorkoutViewModel: ObservableObject {
         appState.savePlans()
         
         // Analyze performance and adjust future workouts if needed
-        WorkoutManager.shared.analyzeAndAdjustFutureWorkouts(completedWorkout: workout, appState: appState)
+        //WorkoutManager.shared.analyzeAndAdjustFutureWorkouts(completedWorkout: workout, appState: appState)
         
         // Trigger UI updates
         appState.objectWillChange.send()
@@ -153,5 +153,21 @@ class EnhancedActiveWorkoutViewModel: ObservableObject {
     /// Formats reps for display
     func formatReps(_ reps: Int) -> String {
         return "\(reps)"
+    }
+    
+    /// Uncompletes the last completed set in the workout
+    /// Used when the user goes back from the post-workout feedback screen
+    func uncompleteLastSet() {
+        // Find the last completed set in the workout
+        for exercise in exercises.reversed() {
+            for set in exercise.sets.reversed() {
+                if set.isComplete {
+                    // Found the last completed set, mark it as incomplete
+                    set.isComplete = false
+                    objectWillChange.send()
+                    return
+                }
+            }
+        }
     }
 }

@@ -100,6 +100,7 @@ struct SetEditRow: View {
     let exercise: ExerciseInstanceEntity
     let isEditable: Bool
     let viewModel: EnhancedActiveWorkoutViewModel
+    var onSetCompleted: ((ExerciseInstanceEntity) -> Void)? = nil
     
     @State private var showingWeightPad = false
     @State private var showingRepsPad = false
@@ -254,6 +255,11 @@ struct SetEditRow: View {
                         Button(action: {
                             withAnimation {
                                 set.toggleComplete()
+                                // Only trigger if this was the last set to complete
+                                // and ALL sets in the exercise are now complete
+                                if set.isComplete && exercise.isComplete, let callback = onSetCompleted {
+                                    callback(exercise)
+                                }
                             }
                         }) {
                             Image(systemName: set.isComplete ? "checkmark.circle.fill" : "circle")

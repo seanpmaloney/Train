@@ -11,7 +11,7 @@ extension EnhancedActiveWorkoutViewModel {
         // Make sure we have an appState and the current plan contains our workout
         guard let appState = appState,
               let currentPlan = appState.currentPlan,
-              currentPlan.workouts.contains(where: { $0.id == workout.id }) else {
+              currentPlan.weeklyWorkouts.flatMap({$0}).contains(where: { $0.id == workout.id }) else {
             // Return just the current exercise if no history is available
             return [currentExercise]
         }
@@ -26,7 +26,7 @@ extension EnhancedActiveWorkoutViewModel {
         historyExercises.append(currentExercise)
         
         // Add past exercises that match the movement type
-        for historicalWorkout in currentPlan.workouts {
+        for historicalWorkout in currentPlan.weeklyWorkouts.flatMap({$0}) {
             // Skip if not complete, future date, or current workout
             guard historicalWorkout.isComplete,
                   historicalWorkout.id != currentWorkoutId
@@ -50,8 +50,8 @@ extension EnhancedActiveWorkoutViewModel {
             if b.id == currentExercise.id { return true }
             
             // Otherwise sort by date
-            let aWorkout = currentPlan.workouts.first { $0.exercises.contains { $0.id == a.id } }
-            let bWorkout = currentPlan.workouts.first { $0.exercises.contains { $0.id == b.id } }
+            let aWorkout = currentPlan.weeklyWorkouts.flatMap({$0}).first { $0.exercises.contains { $0.id == a.id } }
+            let bWorkout = currentPlan.weeklyWorkouts.flatMap({$0}).first { $0.exercises.contains { $0.id == b.id } }
             
             let aDate = aWorkout?.scheduledDate ?? Date.distantPast
             let bDate = bWorkout?.scheduledDate ?? Date.distantPast
@@ -70,7 +70,7 @@ extension EnhancedActiveWorkoutViewModel {
         }
         
         // Find the workout containing this exercise
-        let containingWorkout = currentPlan.workouts.first { workout in
+        let containingWorkout = currentPlan.weeklyWorkouts.flatMap({$0}).first { workout in
             workout.exercises.contains { $0.id == exercise.id }
         }
         

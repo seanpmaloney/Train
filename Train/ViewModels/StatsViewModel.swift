@@ -321,12 +321,12 @@ class StatsViewModel: ObservableObject {
         
         // Add workouts from current plan if available
         if let currentPlan = appState.currentPlan {
-            allWorkouts.append(contentsOf: currentPlan.workouts)
+            allWorkouts.append(contentsOf: currentPlan.weeklyWorkouts.flatMap {$0})
         }
         
         // Add workouts from past plans
         for plan in appState.pastPlans {
-            allWorkouts.append(contentsOf: plan.workouts)
+            allWorkouts.append(contentsOf: plan.weeklyWorkouts.flatMap {$0})
         }
         
         return allWorkouts

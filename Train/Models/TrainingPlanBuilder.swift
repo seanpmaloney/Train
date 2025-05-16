@@ -38,6 +38,7 @@ class TrainingPlanBuilder {
         let calendar = Calendar.current
 
         for (weekIndex, weekSchedule) in schedule.enumerated() {
+            plan.weeklyWorkouts.append([])
             for (dayIndex, muscleGroups) in weekSchedule.enumerated() {
                 let date = calendar.date(byAdding: .day, value: weekIndex * 7 + dayIndex, to: config.startDate)!
                 let exercises = createExercises(
@@ -54,7 +55,7 @@ class TrainingPlanBuilder {
                     scheduledDate: date,
                     exercises: exercises
                 )
-                plan.workouts.append(workout)
+                plan.weeklyWorkouts[weekIndex].append(workout)
             }
         }
 
@@ -64,7 +65,7 @@ class TrainingPlanBuilder {
                 allMovements: allMovements,
                 startDate: calendar.date(byAdding: .day, value: config.weeks * 7, to: config.startDate)!
             )
-            plan.workouts.append(contentsOf: deloadWorkouts)
+            plan.weeklyWorkouts.append(deloadWorkouts)
         }
 
         return plan

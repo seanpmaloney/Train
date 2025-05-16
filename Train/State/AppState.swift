@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 // Add MainActor to the entire class since this is primarily UI state
 @MainActor
@@ -8,7 +9,7 @@ class AppState: ObservableObject {
     @Published var scheduledWorkouts: [WorkoutEntity] = []
     @Published var activeWorkout: WorkoutEntity?
     @Published var activeWorkoutId: UUID?
-    @Published private(set) var isLoaded: Bool = false
+    @Published var isLoaded: Bool = false
     
     private let saveQueue = DispatchQueue(label: "com.train.saveQueue", qos: .background)
     
@@ -77,6 +78,8 @@ class AppState: ObservableObject {
                 // Encode to JSON
                 let encoder = JSONEncoder()
                 encoder.dateEncodingStrategy = .iso8601
+                
+                // Register feedback subclasses for polymorphic JSON encoding (no longer needed here, handled in plans)
                 let data = try encoder.encode(savedPlans)
                 
                 // Get documents directory URL
@@ -144,14 +147,14 @@ class AppState: ObservableObject {
             
             let savedPlans = try decoder.decode(SavedPlans.self, from: data)
             
-            // Update UI state on main actor
+            // Update app state on main thread
             await MainActor.run {
                 self.currentPlan = savedPlans.currentPlan
                 self.pastPlans = savedPlans.pastPlans
                 self.scheduledWorkouts = savedPlans.scheduledWorkouts
                 self.activeWorkout = savedPlans.activeWorkout
                 self.isLoaded = true
-                print("Successfully loaded plans from \(url.path)")
+                print("Successfully loaded \(savedPlans.pastPlans.count) past plans")
             }
         } catch let DecodingError.keyNotFound(key, context) {
             await MainActor.run {
@@ -231,7 +234,7 @@ class AppState: ObservableObject {
     func unscheduleWorkoutsForPlan(_ plan: TrainingPlanEntity) {
         let initialCount = scheduledWorkouts.count
         scheduledWorkouts.removeAll { workout in
-            plan.workouts.contains { $0.id == workout.id }
+            plan.weeklyWorkouts.flatMap {$0}.contains { $0.id == workout.id }
         }
         
         if scheduledWorkouts.count != initialCount {
@@ -249,10 +252,21 @@ class AppState: ObservableObject {
     
     @MainActor
     public func markWorkoutComplete(_ workout: WorkoutEntity, isComplete: Bool) {
+        // Update scheduled workout if present
         if let index = scheduledWorkouts.firstIndex(where: { $0.id == workout.id }) {
             scheduledWorkouts[index].isComplete = isComplete
-            savePlans()
         }
+
+        // Also update workout inside the current plan's weeklyWorkouts if applicable
+        if let plan = getPlanForWorkout(workout) {
+            for weekIndex in 0..<plan.weeklyWorkouts.count {
+                if let workoutIndex = plan.weeklyWorkouts[weekIndex].firstIndex(where: { $0.id == workout.id }) {
+                    plan.weeklyWorkouts[weekIndex][workoutIndex].isComplete = isComplete
+                }
+            }
+        }
+
+        savePlans()
     }
     
     func getWorkouts(for date: Date) -> [WorkoutEntity] {
@@ -270,8 +284,6 @@ class AppState: ObservableObject {
         }
     }
     
-    // MARK: - Plan Management
-    
     func setCurrentPlan(_ plan: TrainingPlanEntity) {
         // Move current plan to past plans if it exists
         if let current = currentPlan {
@@ -283,6 +295,48 @@ class AppState: ObservableObject {
         
         // Save to persistent storage
         savePlans()
+    }
+    
+    /// A centralized method to finalize a plan - either a new one or an existing one
+    /// - Parameters:
+    ///   - plan: The plan to finalize (can be new or existing)
+    ///   - workouts: Array of workouts to add to the plan
+    ///   - clear: Whether to clear existing workouts (for editing existing plans)
+    ///   - setAsCurrent: Whether to set as the current plan
+    func finalizePlan(
+        _ plan: TrainingPlanEntity,
+        workouts: [[WorkoutEntity]] = [],
+        clear: Bool = false,
+        setAsCurrent: Bool = true
+    ) {
+        // Clear existing workouts if requested (for edited plans)
+        if clear {
+            plan.weeklyWorkouts.removeAll()
+        }
+        
+        // Add all workouts to the plan if provided
+        for week in workouts {
+            // Add to plan
+            plan.weeklyWorkouts.append(week)
+            for workout in week {
+                // Set parent reference
+                workout.trainingPlan = plan
+                
+                // Schedule workout
+                scheduleWorkout(workout)
+            }
+        }
+        
+        // Update plan's end date based on last workout
+        plan.endDate = plan.calculatedEndDate
+        
+        // Set as current plan if requested
+        if setAsCurrent {
+            setCurrentPlan(plan)
+        } else {
+            // Just save the changes without setting as current
+            savePlans()
+        }
     }
     
     func archiveCurrentPlan() {
@@ -313,12 +367,13 @@ class AppState: ObservableObject {
     // Creates a SavedPlans struct capturing the current state for serialization
     @MainActor
     private func createSavedPlansSnapshot() -> SavedPlans {
-        return SavedPlans(
+        let savedPlans = SavedPlans(
             currentPlan: self.currentPlan,
             pastPlans: self.pastPlans,
             scheduledWorkouts: self.scheduledWorkouts,
             activeWorkout: self.activeWorkout
         )
+        return savedPlans
     }
     
     @MainActor
@@ -367,5 +422,299 @@ class AppState: ObservableObject {
         
         // Save changes
         savePlans()
+    }
+    
+    // MARK: - Workout Feedback Management
+    
+    /// Record pre-workout feedback before starting a workout
+    func recordPreWorkoutFeedback(for workout: WorkoutEntity, soreMuscles: [MuscleGroup], jointPainAreas: [JointArea]) {
+        // Create feedback
+        let feedback = PreWorkoutFeedback(workoutId: workout.id, soreMuscles: soreMuscles, jointPainAreas: jointPainAreas)
+        
+        // Attach feedback directly to the workout
+        workout.preWorkoutFeedback = feedback
+        
+        // For backward compatibility, also add to plan's feedback collection if available
+        if let plan = getPlanForWorkout(workout) {
+            plan.addFeedback(feedback)
+        }
+        
+        savePlans()
+    }
+    
+    /// Records feedback for a specific exercise
+    func recordExerciseFeedback(for exercise: ExerciseInstanceEntity, in workout: WorkoutEntity, intensity: ExerciseIntensity, setVolume: SetVolumeRating) {
+        // Create feedback
+        let feedback = ExerciseFeedback(exerciseId: exercise.id, workoutId: workout.id, intensity: intensity, setVolume: setVolume)
+        
+        // Attach feedback directly to the exercise
+        exercise.feedback = feedback
+        
+        // For backward compatibility, also add to plan's feedback collection if available
+        if let plan = getPlanForWorkout(workout) {
+            plan.addFeedback(feedback)
+        }
+        
+        savePlans()
+    }
+    
+    /// Records post-workout feedback
+    func recordPostWorkoutFeedback(for workout: WorkoutEntity, fatigue: FatigueLevel) {
+        // Create feedback
+        let feedback = PostWorkoutFeedback(workoutId: workout.id, sessionFatigue: fatigue)
+        
+        // Attach feedback directly to the workout
+        workout.postWorkoutFeedback = feedback
+        
+        // For backward compatibility, also add to plan's feedback collection if available
+        if let plan = getPlanForWorkout(workout) {
+            plan.addFeedback(feedback)
+        }
+        
+        savePlans()
+    }
+    
+    /// Helper to get the plan that contains a workout
+    private func getPlanForWorkout(_ workout: WorkoutEntity) -> TrainingPlanEntity? {
+        if let plan = workout.trainingPlan {
+            return plan
+        }
+        
+        // If workout.trainingPlan is nil, try to find the plan
+        if let plan = currentPlan, planContainsWorkout(plan, workout) {
+            return plan
+        }
+        
+        for plan in pastPlans {
+            if planContainsWorkout(plan, workout) {
+                return plan
+            }
+        }
+        
+        return nil
+    }
+    
+    /// Helper to check if a plan contains a workout
+    private func planContainsWorkout(_ plan: TrainingPlanEntity, _ workout: WorkoutEntity) -> Bool {
+        return plan.weeklyWorkouts.flatMap { $0 }.contains { $0.id == workout.id }
+    }
+    
+    /// Get all feedback for a specific workout, prioritizing direct feedback on entities
+    func getFeedback(for workoutId: UUID) -> (pre: PreWorkoutFeedback?, exercises: [ExerciseFeedback], post: PostWorkoutFeedback?) {
+        // First try to find the workout directly in scheduled workouts or active workout
+        let workout = findWorkout(with: workoutId)
+        
+        if let workout = workout {
+            // Get exercise feedback directly from the workout's exercises
+            let exerciseFeedbacks = workout.exercises.compactMap { $0.feedback }
+            
+            // Return feedback directly from the workout entity if available
+            return (pre: workout.preWorkoutFeedback, 
+                    exercises: exerciseFeedbacks, 
+                    post: workout.postWorkoutFeedback)
+        }
+        
+        // Fallback to plan-based feedback for backward compatibility
+        
+        // Try current plan first
+        if let plan = currentPlan {
+            let feedback = plan.getFeedback(for: workoutId)
+            if feedback.pre != nil || !feedback.exercises.isEmpty || feedback.post != nil {
+                return feedback
+            }
+        }
+        
+        // Try past plans if not found
+        for plan in pastPlans {
+            let feedback = plan.getFeedback(for: workoutId)
+            if feedback.pre != nil || !feedback.exercises.isEmpty || feedback.post != nil {
+                return feedback
+            }
+        }
+        
+        // Return empty result if not found
+        return (pre: nil, exercises: [], post: nil)
+    }
+    
+    /// Helper to find a workout by ID across all possible locations
+    private func findWorkout(with workoutId: UUID) -> WorkoutEntity? {
+        // Check active workout
+        if let activeWorkout = activeWorkout, activeWorkout.id == workoutId {
+            return activeWorkout
+        }
+        
+        // Check scheduled workouts
+        if let workout = scheduledWorkouts.first(where: { $0.id == workoutId }) {
+            return workout
+        }
+        
+        // Check workouts in current plan
+        if let plan = currentPlan {
+            let allWorkouts = plan.weeklyWorkouts.flatMap { $0 }
+            if let workout = allWorkouts.first(where: { $0.id == workoutId }) {
+                return workout
+            }
+        }
+        
+        // Check workouts in past plans
+        for plan in pastPlans {
+            let allWorkouts = plan.weeklyWorkouts.flatMap { $0 }
+            if let workout = allWorkouts.first(where: { $0.id == workoutId }) {
+                return workout
+            }
+        }
+        
+        return nil
+    }
+    
+    /// Get the most recent feedback for a specific muscle from any plan
+    func getMostRecentFeedbackForMuscle(_ muscle: MuscleGroup) -> PreWorkoutFeedback? {
+        var allFeedback: [PreWorkoutFeedback] = []
+        
+        // Collect from current plan
+        if let plan = currentPlan, let feedback = plan.getMostRecentFeedbackForMuscle(muscle) {
+            allFeedback.append(feedback)
+        }
+        
+        // Collect from past plans
+        for plan in pastPlans {
+            if let feedback = plan.getMostRecentFeedbackForMuscle(muscle) {
+                allFeedback.append(feedback)
+            }
+        }
+        
+        // Return the most recent one
+        return allFeedback.sorted { $0.date > $1.date }.first
+    }
+    
+    /// Ends the current workout, records feedback, and checks for weekly progression
+    func endWorkout(with fatigue: FatigueLevel) {
+        guard let activeWorkout = self.activeWorkout else {
+            return
+        }
+        
+        // 1. Record post-workout feedback
+        recordPostWorkoutFeedback(for: activeWorkout, fatigue: fatigue)
+        
+        // 2. Mark workout as complete
+        markWorkoutComplete(activeWorkout, isComplete: true)
+        
+        // 4. Clear active workout
+        self.activeWorkout = nil
+        self.activeWorkoutId = nil
+        
+        // 5. Check if we need to apply weekly progression
+        applyWeeklyProgressionIfNeeded()
+        
+        // 6. Save changes
+        savePlans()
+    }
+    
+    /// Find an exercise entity by ID from any workout
+    func getExerciseById(_ id: UUID) -> ExerciseInstanceEntity? {
+        for workout in scheduledWorkouts {
+            if let exercise = workout.exercises.first(where: { $0.id == id }) {
+                return exercise
+            }
+        }
+        return nil
+    }
+    
+    // MARK: - Weekly Progression
+    
+    /// Applies weekly progression if there's a completed week that needs progression
+    func applyWeeklyProgressionIfNeeded() {
+        guard let plan = currentPlan else { return }
+        
+        // Find the most recently completed week
+        guard let completedWeekIndex = getLastCompletedWeekIndex(for: plan),
+              // Make sure there's a next week to progress to
+              completedWeekIndex + 1 < plan.weeklyWorkouts.count else { return }
+        
+        // Get workouts for completed and next week
+        let completedWeekWorkouts = plan.weeklyWorkouts[completedWeekIndex]
+        var nextWeekWorkouts = plan.weeklyWorkouts[completedWeekIndex + 1]
+        
+        // Collect feedback for all workouts in the completed week
+        var feedbackMap = [UUID: [WorkoutFeedback]]() 
+        for workout in completedWeekWorkouts {
+            let feedback = plan.getFeedback(for: workout.id)
+            var allFeedback: [WorkoutFeedback] = []
+            
+            if let preFeedback = feedback.pre {
+                allFeedback.append(preFeedback)
+            }
+            allFeedback.append(contentsOf: feedback.exercises)
+            if let postFeedback = feedback.post {
+                allFeedback.append(postFeedback)
+            }
+            
+            if !allFeedback.isEmpty {
+                feedbackMap[workout.id] = allFeedback
+            }
+        }
+        
+        // Create arrays for progression engine
+        var weeklyWorkouts = [completedWeekWorkouts, nextWeekWorkouts]
+        
+        // Apply progression
+        let logs = ProgressionEngine.applyProgression(
+            to: &weeklyWorkouts,
+            debug: true
+        )
+        
+        // Log progression results
+        for log in logs {
+            print("PROGRESSION: \(log)")
+        }
+        
+        // Update the plan with the progressed workouts
+        plan.weeklyWorkouts[completedWeekIndex + 1] = weeklyWorkouts[1]
+        
+        // Save changes
+        savePlans()
+    }
+    
+    /// Determine if a week is complete (all workouts completed)
+    private func isWeekComplete(weekIndex: Int, in plan: TrainingPlanEntity) -> Bool {
+        guard weekIndex < plan.weeklyWorkouts.count else { return false }
+        
+        let weekWorkouts = plan.weeklyWorkouts[weekIndex]
+        return !weekWorkouts.isEmpty && weekWorkouts.allSatisfy { $0.isComplete }
+    }
+    
+    /// Returns the index of the first week that has any incomplete workouts
+    /// Used for determining where the user is currently training
+    private func getFirstIncompleteWeekIndex(for plan: TrainingPlanEntity) -> Int? {
+        for (index, week) in plan.weeklyWorkouts.enumerated() {
+            if week.contains(where: { !$0.isComplete }) {
+                return index
+            }
+        }
+
+        // If all weeks are complete, return the last one
+        return plan.weeklyWorkouts.indices.last
+    }
+    
+    /// Returns the index of the most recent week where all workouts are complete
+    /// Used for progression logic to ensure the right week is progressed
+    private func getLastCompletedWeekIndex(for plan: TrainingPlanEntity) -> Int? {
+        // Scan the plan in reverse to find the most recent completed week
+        for index in (0..<plan.weeklyWorkouts.count).reversed() {
+            let week = plan.weeklyWorkouts[index]
+            
+            // Skip empty weeks
+            if week.isEmpty {
+                continue
+            }
+            
+            // Check if all workouts in this week are complete
+            if week.allSatisfy({ $0.isComplete }) {
+                return index
+            }
+        }
+        
+        // No complete weeks found
+        return nil
     }
 }

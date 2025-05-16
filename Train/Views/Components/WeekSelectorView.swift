@@ -2,7 +2,7 @@ import SwiftUI
 
 /// A minimal week selector inspired by Notion/Headspace design
 struct WeekSelectorView: View {
-    let weekGroups: [EnhancedTrainingViewModel.WeekGroup]
+    let weeklyWorkouts: [[WorkoutEntity]]
     let currentWeekIndex: Int
     let onWeekSelected: (Int) -> Void
     
@@ -33,8 +33,8 @@ struct WeekSelectorView: View {
                 
                 // Week dots
                 HStack(spacing: 6) {
-                    ForEach(0..<min(weekGroups.count, 7), id: \.self) { index in
-                        let isVisible = shouldShowDot(at: index, totalCount: weekGroups.count)
+                    ForEach(0..<min(weeklyWorkouts.count, 7), id: \.self) { index in
+                        let isVisible = shouldShowDot(at: index, totalCount: weeklyWorkouts.count)
                         if isVisible {
                             Circle()
                                 .fill(dotColor(for: index))
@@ -47,7 +47,7 @@ struct WeekSelectorView: View {
                                     : nil
                                 )
                                 .animation(.spring(), value: currentWeekIndex)
-                        } else if index == 3 && weekGroups.count > 7 {
+                        } else if index == 3 && weeklyWorkouts.count > 7 {
                             // Show ellipsis for truncated weeks
                             Text("...")
                                 .font(.system(size: 10))
@@ -58,15 +58,15 @@ struct WeekSelectorView: View {
                 
                 // Next button
                 Button(action: {
-                    if currentWeekIndex < weekGroups.count - 1 {
+                    if currentWeekIndex < weeklyWorkouts.count - 1 {
                         onWeekSelected(currentWeekIndex + 1)
                     }
                 }) {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(currentWeekIndex < weekGroups.count - 1 ? AppStyle.Colors.textSecondary : AppStyle.Colors.textSecondary.opacity(0.3))
+                        .foregroundColor(currentWeekIndex < weeklyWorkouts.count - 1 ? AppStyle.Colors.textSecondary : AppStyle.Colors.textSecondary.opacity(0.3))
                 }
-                .disabled(currentWeekIndex >= weekGroups.count - 1)
+                .disabled(currentWeekIndex >= weeklyWorkouts.count - 1)
             }
         }
         .padding(.vertical, 8)
@@ -106,19 +106,25 @@ struct WeekSelectorView: View {
 }
 
 #Preview {
-    // Create sample week groups
-    let weekGroups = (0..<8).map { week in
-        EnhancedTrainingViewModel.WeekGroup(
-            weekNumber: week + 1,
-            startDate: Date().addingTimeInterval(Double(week) * 7 * 24 * 60 * 60),
-            endDate: Date().addingTimeInterval(Double(week + 1) * 7 * 24 * 60 * 60),
-            workouts: []
-        )
+    // Create sample weekly workouts
+    let weeklyWorkouts: [[WorkoutEntity]] = (0..<8).map { week in
+        // Create a few sample workouts for each week
+        let startDate = Date().addingTimeInterval(Double(week) * 7 * 24 * 60 * 60)
+        return (0..<3).map { day in
+            let workout = WorkoutEntity(
+                title: "Workout \(day+1)",
+                description: "Sample workout",
+                isComplete: false,
+                scheduledDate: startDate.addingTimeInterval(Double(day) * 24 * 60 * 60),
+                exercises: []
+            )
+            return workout
+        }
     }
     
     return VStack {
         WeekSelectorView(
-            weekGroups: weekGroups,
+            weeklyWorkouts: weeklyWorkouts,
             currentWeekIndex: 2,
             onWeekSelected: { _ in }
         )
@@ -128,7 +134,7 @@ struct WeekSelectorView: View {
         
         // Another with fewer weeks
         WeekSelectorView(
-            weekGroups: Array(weekGroups.prefix(3)),
+            weeklyWorkouts: Array(weeklyWorkouts.prefix(3)),
             currentWeekIndex: 1,
             onWeekSelected: { _ in }
         )

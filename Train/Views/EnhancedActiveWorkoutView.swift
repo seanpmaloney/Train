@@ -16,6 +16,14 @@ struct EnhancedActiveWorkoutView: View {
     @State private var showingEndWorkoutConfirmation = false
     @State private var isTimerExpanded = false
     
+    // Feedback system state
+    @State private var showingPreWorkoutFeedback = true
+    @State private var showingExerciseFeedback = false
+    @State private var showingPostWorkoutFeedback = false
+    @State private var currentExerciseForFeedback: ExerciseInstanceEntity? = nil
+    @State private var isCollectingExerciseFeedback = false
+    @State private var processedExercises: Set<UUID> = []
+    
     // MARK: - Initialization
     
     init(workout: WorkoutEntity) {
@@ -32,10 +40,6 @@ struct EnhancedActiveWorkoutView: View {
                 VStack(spacing: 24) {
                     // Exercise list
                     exerciseListView
-                    
-                    // Action buttons
-                    actionButtonsView
-                        .padding(.vertical, 16)
                 }
                 .padding()
                 .padding(.bottom, 60) // Extra padding for safe area
@@ -103,15 +107,40 @@ struct EnhancedActiveWorkoutView: View {
                 }
             }
         }
-        .alert("End Workout", isPresented: $showingEndWorkoutConfirmation) {
-            Button("Cancel", role: .cancel) {}
-            Button("End Workout", role: .destructive) {
-                viewModel.completeWorkout(appState: appState)
-                dismiss()
-            }
-        } message: {
-            Text("Are you sure you want to end this workout? This will mark it as complete.")
+        // Pre-Workout Feedback Sheet
+        .sheet(isPresented: $showingPreWorkoutFeedback) {
+            PreWorkoutFeedbackView(workout: viewModel.workout)
         }
+        
+        // Exercise-specific Feedback Sheet - using sheet(item:) instead of sheet(isPresented:)
+        .sheet(item: $currentExerciseForFeedback, onDismiss: {
+            // Reset the feedback collection state
+            isCollectingExerciseFeedback = false
+            
+            // Check if the entire workout is complete and show post-workout feedback
+            if viewModel.getCompletionPercentage() >= 1.0 && !viewModel.isComplete && !showingPostWorkoutFeedback {
+                showingPostWorkoutFeedback = true
+            }
+        }) { exercise in
+            ExerciseFeedbackView(
+                exercise: exercise,
+                workout: viewModel.workout,
+                isCollectingFeedback: $isCollectingExerciseFeedback
+            )
+            .environmentObject(appState)
+        }
+        
+        // Post-Workout Feedback Sheet
+        .sheet(isPresented: $showingPostWorkoutFeedback, onDismiss: {
+            // If user chose to go back using the Back button, uncheck the last completed set
+            if !viewModel.isComplete && viewModel.getCompletionPercentage() == 1.0 {
+                viewModel.uncompleteLastSet()
+            }
+        }) {
+            PostWorkoutFeedbackView()
+                .environmentObject(appState) // Ensure app state is passed to the view
+        }
+        
         .onAppear {
             // Set the active workout ID when the view appears
             appState.activeWorkoutId = viewModel.workout.id
@@ -121,6 +150,11 @@ struct EnhancedActiveWorkoutView: View {
             
             // Connect view model to appState
             viewModel.connectAppState(appState)
+            
+            // Only show pre-workout feedback for workouts that haven't started yet
+            // (i.e., none of the sets are completed)
+            let hasStartedSets = viewModel.exercises.flatMap { $0.sets }.contains { $0.isComplete }
+            showingPreWorkoutFeedback = !hasStartedSets && !viewModel.workout.isComplete
         }
     }
     
@@ -179,31 +213,27 @@ struct EnhancedActiveWorkoutView: View {
             
             VStack(spacing: 16) {
                 ForEach(viewModel.exercises) { exercise in
-                    SwipeableExerciseCard(exercise: exercise, viewModel: viewModel)
-                }
-            }
-        }
-    }
-    
-    /// Action buttons view
-    private var actionButtonsView: some View {
-        VStack(spacing: 16) {
-            // Only show the End Workout button if the workout is not already complete
-            if !viewModel.isComplete {
-                Button(action: {
-                    showingEndWorkoutConfirmation = true
-                }) {
-                    HStack {
-                        Spacer()
-                        Text("End Workout")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        Spacer()
-                    }
-                    .padding(.vertical, 16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(AppStyle.Colors.danger)
+                    SwipeableExerciseCard(
+                        exercise: exercise, 
+                        viewModel: viewModel,
+                        onExerciseProgress: { completedExercise in
+                            // Check if this is a newly completed exercise
+                            if !processedExercises.contains(completedExercise.id) {
+                                // Process the completed exercise for feedback
+                                // With sheet(item:), setting this value directly presents the sheet
+                                isCollectingExerciseFeedback = true
+                                currentExerciseForFeedback = completedExercise
+                                
+                                // Mark this exercise as processed for feedback
+                                processedExercises.insert(completedExercise.id)
+                                
+                                // Also check if the entire workout is now complete
+                                if viewModel.getCompletionPercentage() >= 1.0 && !viewModel.isComplete {
+                                    // We'll show post-workout feedback after this exercise feedback is dismissed
+                                    // through the sheet dismissal handler
+                                }
+                            }
+                        }
                     )
                 }
             }
@@ -219,4 +249,15 @@ struct EnhancedActiveWorkoutView: View {
         formatter.timeStyle = .none
         return formatter.string(from: date)
     }
+    
+    // MARK: - Feedback Flow Methods
+    
+    /// Check for overall workout completion status
+    private func checkForCompletedExercises() {
+        // Only check if the whole workout is complete - individual exercises are handled via callbacks
+        if viewModel.getCompletionPercentage() >= 1.0 && !viewModel.isComplete && !showingPostWorkoutFeedback {
+            showingPostWorkoutFeedback = true
+        }
+    }
+    
 }

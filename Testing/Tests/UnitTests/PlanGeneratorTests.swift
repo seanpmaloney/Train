@@ -36,7 +36,7 @@ struct PlanGeneratorTests {
         
         // Then
         let expectedWorkoutCount = testContext.planInput.trainingDaysPerWeek * weeks
-        #expect(plan.workouts.count == expectedWorkoutCount)
+        #expect(plan.weeklyWorkouts.flatMap { $0 }.count == expectedWorkoutCount)
     }
     
     @MainActor @Test("Plan schedules workouts on correct days")
@@ -65,19 +65,18 @@ struct PlanGeneratorTests {
         plan.startDate = startDate
         
         // Then
-        #expect(plan.workouts.count == customPlanInput.trainingDaysPerWeek * weeks)
+        #expect(plan.weeklyWorkouts.flatMap { $0 }.count == customPlanInput.trainingDaysPerWeek * weeks)
         
         // Verify first week dates
         for dayIndex in 0..<customPlanInput.trainingDaysPerWeek {
-            let workout = plan.workouts[dayIndex]
+            let workout = plan.weeklyWorkouts[0][dayIndex]
             let expectedDate = calendar.date(byAdding: .day, value: dayIndex, to: startDate)
             #expect(workout.scheduledDate?.description == expectedDate?.description)
         }
         
         // Verify second week dates
         for dayIndex in 0..<customPlanInput.trainingDaysPerWeek {
-            let workoutIndex = customPlanInput.trainingDaysPerWeek + dayIndex
-            let workout = plan.workouts[workoutIndex]
+            let workout = plan.weeklyWorkouts[1][dayIndex]
             let expectedDate = calendar.date(byAdding: .day, value: 7 + dayIndex, to: startDate)
             #expect(workout.scheduledDate?.description == expectedDate?.description)
         }
@@ -128,7 +127,7 @@ struct PlanGeneratorTests {
         // Then: Verify workouts target the right muscle groups based on split
         
         // Upper/Lower split
-        for (i, workout) in upperLowerPlan.workouts.enumerated() {
+        for (i, workout) in upperLowerPlan.weeklyWorkouts.flatMap({ $0 }).enumerated() {
             let dayType = getDayType(day: i, split: .upperLower, totalDays: upperLowerInput.trainingDaysPerWeek)
             let expectedMuscles = getMusclesForDayType(dayType)
             
@@ -140,7 +139,7 @@ struct PlanGeneratorTests {
         }
         
         // Similar verification for PPL split
-        for (i, workout) in pplPlan.workouts.enumerated() {
+        for (i, workout) in pplPlan.weeklyWorkouts.flatMap({ $0 }).enumerated() {
             let dayType = getDayType(day: i+1, split: .pushPullLegs, totalDays: pplInput.trainingDaysPerWeek)
             let expectedMuscles = getMusclesForDayType(dayType)
             
@@ -151,7 +150,7 @@ struct PlanGeneratorTests {
         }
         
         // Full body should include exercises for multiple muscle areas
-        for workout in fullBodyPlan.workouts {
+        for workout in fullBodyPlan.weeklyWorkouts.flatMap({ $0 }) {
             var targetedMuscleGroups = Set<MuscleGroup>()
             for exercise in workout.exercises {
                 targetedMuscleGroups.insert(getPrimaryMuscle(exercise.movement))
@@ -177,7 +176,7 @@ struct PlanGeneratorTests {
         // Group workouts by week
         var workoutsByWeek: [[WorkoutEntity]] = Array(repeating: [], count: weeks)
         
-        for workout in plan.workouts {
+        for workout in plan.weeklyWorkouts.flatMap({ $0 }) {
             guard let date = workout.scheduledDate else {
                 #expect(false, "All workouts should have a scheduled date")
                 continue
@@ -362,7 +361,7 @@ struct PlanGeneratorTests {
         var totalSets = 0
         var totalExercises = 0
         
-        for workout in plan.workouts {
+        for workout in plan.weeklyWorkouts.flatMap({ $0 }) {
             for exercise in workout.exercises {
                 totalSets += exercise.sets.count
                 totalExercises += 1
@@ -377,7 +376,7 @@ struct PlanGeneratorTests {
         var totalReps = 0
         var totalCompoundSets = 0
         
-        for workout in plan.workouts {
+        for workout in plan.weeklyWorkouts.flatMap({ $0 }) {
             for exercise in workout.exercises {
                 // We'll define compounds based on common exercise types
                 let isCompound = isCompoundMovement(exercise.movement)

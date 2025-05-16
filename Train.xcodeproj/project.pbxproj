@@ -12,7 +12,6 @@
 		8B568C782DC4CF18004A39C6 /* SorenessCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C772DC4CF18004A39C6 /* SorenessCheckView.swift */; };
 		8B568C7A2DC62728004A39C6 /* Goals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C792DC62728004A39C6 /* Goals.swift */; };
 		8B568C7C2DC62739004A39C6 /* MuscleGoalSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C7B2DC62739004A39C6 /* MuscleGoalSelectionView.swift */; };
-		8B568C7E2DC627BB004A39C6 /* WorkoutDayPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C7D2DC627BB004A39C6 /* WorkoutDayPicker.swift */; };
 		8B568C802DC64990004A39C6 /* AdaptivePlanSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C7F2DC64990004A39C6 /* AdaptivePlanSetupView.swift */; };
 		8B568C822DC64DBA004A39C6 /* AdaptivePlanModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C812DC64DBA004A39C6 /* AdaptivePlanModels.swift */; };
 		8B568C842DC64DCC004A39C6 /* AdaptivePlanQuestionComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568C832DC64DCC004A39C6 /* AdaptivePlanQuestionComponents.swift */; };
@@ -26,6 +25,13 @@
 		8B56F2122DCAE88300132675 /* PlanGenerator2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2112DCAE87C00132675 /* PlanGenerator2.swift */; };
 		8B56F2142DCBA12B00132675 /* PlanInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2132DCBA12800132675 /* PlanInput.swift */; };
 		8B56F2162DCBA16D00132675 /* PlanGenUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2152DCBA16700132675 /* PlanGenUtilities.swift */; };
+		8B56F21D2DD23EDA00132675 /* PreWorkoutFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F21B2DD23EDA00132675 /* PreWorkoutFeedbackView.swift */; };
+		8B56F21E2DD23EDA00132675 /* PostWorkoutFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F21A2DD23EDA00132675 /* PostWorkoutFeedbackView.swift */; };
+		8B56F21F2DD23EDA00132675 /* ExerciseFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2192DD23EDA00132675 /* ExerciseFeedbackView.swift */; };
+		8B56F2212DD23EEB00132675 /* WorkoutFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2202DD23EEB00132675 /* WorkoutFeedback.swift */; };
+		8B56F2232DD2D35700132675 /* AppState+Progression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2222DD2D35700132675 /* AppState+Progression.swift */; };
+		8B56F22A2DD56E4300132675 /* ProgressionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2262DD56E4300132675 /* ProgressionEngine.swift */; };
+		8B56F22E2DD5729200132675 /* ProgressionEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F22D2DD5729200132675 /* ProgressionEngineTests.swift */; };
 		8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */; };
 		8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */; };
 		8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A352DAAA08300404F43 /* TrainingType.swift */; };
@@ -108,7 +114,6 @@
 		8B568C772DC4CF18004A39C6 /* SorenessCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SorenessCheckView.swift; sourceTree = "<group>"; };
 		8B568C792DC62728004A39C6 /* Goals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goals.swift; sourceTree = "<group>"; };
 		8B568C7B2DC62739004A39C6 /* MuscleGoalSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuscleGoalSelectionView.swift; sourceTree = "<group>"; };
-		8B568C7D2DC627BB004A39C6 /* WorkoutDayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDayPicker.swift; sourceTree = "<group>"; };
 		8B568C7F2DC64990004A39C6 /* AdaptivePlanSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptivePlanSetupView.swift; sourceTree = "<group>"; };
 		8B568C812DC64DBA004A39C6 /* AdaptivePlanModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptivePlanModels.swift; sourceTree = "<group>"; };
 		8B568C832DC64DCC004A39C6 /* AdaptivePlanQuestionComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptivePlanQuestionComponents.swift; sourceTree = "<group>"; };
@@ -123,6 +128,13 @@
 		8B56F2112DCAE87C00132675 /* PlanGenerator2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanGenerator2.swift; sourceTree = "<group>"; };
 		8B56F2132DCBA12800132675 /* PlanInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanInput.swift; sourceTree = "<group>"; };
 		8B56F2152DCBA16700132675 /* PlanGenUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanGenUtilities.swift; sourceTree = "<group>"; };
+		8B56F2192DD23EDA00132675 /* ExerciseFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseFeedbackView.swift; sourceTree = "<group>"; };
+		8B56F21A2DD23EDA00132675 /* PostWorkoutFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostWorkoutFeedbackView.swift; sourceTree = "<group>"; };
+		8B56F21B2DD23EDA00132675 /* PreWorkoutFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreWorkoutFeedbackView.swift; sourceTree = "<group>"; };
+		8B56F2202DD23EEB00132675 /* WorkoutFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutFeedback.swift; sourceTree = "<group>"; };
+		8B56F2222DD2D35700132675 /* AppState+Progression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppState+Progression.swift"; sourceTree = "<group>"; };
+		8B56F2262DD56E4300132675 /* ProgressionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionEngine.swift; sourceTree = "<group>"; };
+		8B56F22D2DD5729200132675 /* ProgressionEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionEngineTests.swift; sourceTree = "<group>"; };
 		8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
 		8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardViewModel.swift; sourceTree = "<group>"; };
@@ -218,6 +230,24 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		8B56F21C2DD23EDA00132675 /* Feedback */ = {
+			isa = PBXGroup;
+			children = (
+				8B56F2192DD23EDA00132675 /* ExerciseFeedbackView.swift */,
+				8B56F21A2DD23EDA00132675 /* PostWorkoutFeedbackView.swift */,
+				8B56F21B2DD23EDA00132675 /* PreWorkoutFeedbackView.swift */,
+			);
+			path = Feedback;
+			sourceTree = "<group>";
+		};
+		8B56F2282DD56E4300132675 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				8B56F2262DD56E4300132675 /* ProgressionEngine.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
 		8B7A5A192DA9FC4500404F43 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -248,6 +278,7 @@
 		8B7BCF8D2D9DFD3F0089F6D3 /* Train */ = {
 			isa = PBXGroup;
 			children = (
+				8B56F2282DD56E4300132675 /* Engine */,
 				8B568C732DC37E21004A39C6 /* Services */,
 				8B7BCF9E2D9E0AF90089F6D3 /* Train.entitlements */,
 				8B7BCF8E2D9DFD3F0089F6D3 /* TrainApp.swift */,
@@ -295,6 +326,7 @@
 			isa = PBXGroup;
 			children = (
 				8B7BCFD92DA1460F0089F6D3 /* ActiveWorkoutView.swift */,
+				8B56F21C2DD23EDA00132675 /* Feedback */,
 				8B568C772DC4CF18004A39C6 /* SorenessCheckView.swift */,
 				8B568C7B2DC62739004A39C6 /* MuscleGoalSelectionView.swift */,
 				8B568C912DC68BDA004A39C6 /* GeneratedPlanEditorView.swift */,
@@ -307,7 +339,6 @@
 				8B7BD04D2DA754F70089F6D3 /* PlanTemplatePickerView.swift */,
 				8B568C7F2DC64990004A39C6 /* AdaptivePlanSetupView.swift */,
 				8B7BD0512DA755EB0089F6D3 /* PlanEditorView.swift */,
-				8B568C7D2DC627BB004A39C6 /* WorkoutDayPicker.swift */,
 				8B9877542DBB195A00767AE2 /* DayPickerView.swift */,
 				8B7BD0552DA756A90089F6D3 /* MovementPickerView.swift */,
 				8B7BD04A2DA752650089F6D3 /* PlansView.swift */,
@@ -329,6 +360,7 @@
 			children = (
 				8B568C812DC64DBA004A39C6 /* AdaptivePlanModels.swift */,
 				8B7BD0272DA5EFD20089F6D3 /* MovementEntity.swift */,
+				8B56F2202DD23EEB00132675 /* WorkoutFeedback.swift */,
 				8B7BD0472DA74FCA0089F6D3 /* MovementLibrary.swift */,
 				8B56F2132DCBA12800132675 /* PlanInput.swift */,
 				8B9877522DBB15B100767AE2 /* WorkoutDay.swift */,
@@ -367,6 +399,7 @@
 			isa = PBXGroup;
 			children = (
 				8B7BD05D2DA757900089F6D3 /* AppState.swift */,
+				8B56F2222DD2D35700132675 /* AppState+Progression.swift */,
 			);
 			name = State;
 			path = Train/State;
@@ -453,6 +486,7 @@
 			isa = PBXGroup;
 			children = (
 				8B568C8D2DC67478004A39C6 /* PlanGeneratorTests.swift */,
+				8B56F22D2DD5729200132675 /* ProgressionEngineTests.swift */,
 				8BD541882DBE812A00D5E1C3 /* Services */,
 				8BD541892DBE812A00D5E1C3 /* Utilities */,
 				8BD5418B2DBE812A00D5E1C3 /* ViewModels */,
@@ -580,6 +614,7 @@
 				8B568C8E2DC67478004A39C6 /* PlanGeneratorTests.swift in Sources */,
 				8BD541932DBE812A00D5E1C3 /* TestHelpers.swift in Sources */,
 				8BD541942DBE812A00D5E1C3 /* AppStateTests.swift in Sources */,
+				8B56F22E2DD5729200132675 /* ProgressionEngineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -596,6 +631,7 @@
 				8B568C762DC454C7004A39C6 /* MovementInfoSheet.swift in Sources */,
 				8B568C7C2DC62739004A39C6 /* MuscleGoalSelectionView.swift in Sources */,
 				8B568C882DC659F0004A39C6 /* PlanGenerator.swift in Sources */,
+				8B56F2212DD23EEB00132675 /* WorkoutFeedback.swift in Sources */,
 				8B7BD05A2DA757440089F6D3 /* PlanSummaryViewModel.swift in Sources */,
 				8B568C782DC4CF18004A39C6 /* SorenessCheckView.swift in Sources */,
 				8B7BCFE12DA1460F0089F6D3 /* WeightInputAccessory.swift in Sources */,
@@ -614,11 +650,12 @@
 				8B7A5A3E2DABE3E200404F43 /* TodaysTrainingCard.swift in Sources */,
 				8B568C942DC6A4F1004A39C6 /* DefaultExerciseSelector.swift in Sources */,
 				8B56F2122DCAE88300132675 /* PlanGenerator2.swift in Sources */,
-				8B568C7E2DC627BB004A39C6 /* WorkoutDayPicker.swift in Sources */,
 				8B7BCFD82DA145F20089F6D3 /* HealthKitManager.swift in Sources */,
 				8B568C802DC64990004A39C6 /* AdaptivePlanSetupView.swift in Sources */,
 				8B568C7A2DC62728004A39C6 /* Goals.swift in Sources */,
+				8B56F22A2DD56E4300132675 /* ProgressionEngine.swift in Sources */,
 				8B7BCFBE2DA145110089F6D3 /* CalendarCardView.swift in Sources */,
+				8B56F2232DD2D35700132675 /* AppState+Progression.swift in Sources */,
 				8B7BD0582DA756B00089F6D3 /* MovementPickerViewModel.swift in Sources */,
 				8B7BD05F2DA757900089F6D3 /* AppState.swift in Sources */,
 				8B9877532DBB15B100767AE2 /* WorkoutDay.swift in Sources */,
@@ -646,6 +683,9 @@
 				8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */,
 				8B98775D2DBB25C500767AE2 /* WeekSelectorView.swift in Sources */,
 				8B7BD0192DA357FB0089F6D3 /* ExerciseSet.swift in Sources */,
+				8B56F21D2DD23EDA00132675 /* PreWorkoutFeedbackView.swift in Sources */,
+				8B56F21E2DD23EDA00132675 /* PostWorkoutFeedbackView.swift in Sources */,
+				8B56F21F2DD23EDA00132675 /* ExerciseFeedbackView.swift in Sources */,
 				8B568C902DC68BC3004A39C6 /* GeneratedPlanEditorViewModel.swift in Sources */,
 				8B7A5A382DAB0CF000404F43 /* UpcomingTrainingViewModel.swift in Sources */,
 				8B7BCFDF2DA1460F0089F6D3 /* ActiveWorkoutView.swift in Sources */,
@@ -844,6 +884,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Deadset;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.\n";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -878,6 +919,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Deadset;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.\n";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

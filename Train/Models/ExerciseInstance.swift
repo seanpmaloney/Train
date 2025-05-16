@@ -6,13 +6,19 @@ class ExerciseInstanceEntity: ObservableObject, Identifiable, Codable {
     var exerciseType: String
     var sets: [ExerciseSetEntity]
     var note: String?
+    // Flag to indicate if this exercise might aggravate joint pain
+    var shouldShowJointWarning: Bool = false
+    // Exercise-specific feedback
+    var feedback: ExerciseFeedback?
     
-    init(movement: MovementEntity, exerciseType : String = "", sets: [ExerciseSetEntity] = [], note: String? = nil) {
+    init(movement: MovementEntity, exerciseType : String = "", sets: [ExerciseSetEntity] = [], note: String? = nil, shouldShowJointWarning: Bool = false, feedback: ExerciseFeedback? = nil) {
         self.id = UUID()
         self.movement = movement
         self.sets = sets
         self.note = note
         self.exerciseType = exerciseType
+        self.shouldShowJointWarning = shouldShowJointWarning
+        self.feedback = feedback
     }
     
     // MARK: - Codable
@@ -22,7 +28,9 @@ class ExerciseInstanceEntity: ObservableObject, Identifiable, Codable {
         case movement
         case exerciseType
         case sets
+        case feedback
         case note
+        case shouldShowJointWarning
     }
     
     required init(from decoder: Decoder) throws {
@@ -32,6 +40,8 @@ class ExerciseInstanceEntity: ObservableObject, Identifiable, Codable {
         self.exerciseType = try container.decode(String.self, forKey: .exerciseType)
         self.sets = try container.decode([ExerciseSetEntity].self, forKey: .sets)
         self.note = try container.decodeIfPresent(String.self, forKey: .note)
+        self.shouldShowJointWarning = try container.decodeIfPresent(Bool.self, forKey: .shouldShowJointWarning) ?? false
+        self.feedback = try container.decodeIfPresent(ExerciseFeedback.self, forKey: .feedback)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -41,6 +51,17 @@ class ExerciseInstanceEntity: ObservableObject, Identifiable, Codable {
         try container.encode(exerciseType, forKey: .exerciseType)
         try container.encode(sets, forKey: .sets)
         try container.encodeIfPresent(note, forKey: .note)
+        try container.encode(shouldShowJointWarning, forKey: .shouldShowJointWarning)
+        try container.encodeIfPresent(feedback, forKey: .feedback)
+    }
+    
+    // MARK: - Exercise Status
+    
+    /// Whether the exercise is complete (all sets are complete)
+    var isComplete: Bool {
+        // An exercise is complete when all its sets are marked as complete
+        guard !sets.isEmpty else { return false }
+        return sets.allSatisfy { $0.isComplete }
     }
     
     // MARK: - Movement Replacement

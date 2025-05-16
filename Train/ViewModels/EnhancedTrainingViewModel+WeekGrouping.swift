@@ -18,13 +18,13 @@ extension EnhancedTrainingViewModel {
     /// Get all weeks in the current plan
     func getWeekGroups() -> [WeekGroup] {
         guard let currentPlan = appState.currentPlan, 
-              !currentPlan.workouts.isEmpty else {
+              !currentPlan.weeklyWorkouts.isEmpty else {
             return []
         }
 
         let calendar = Calendar.current
         var weekGroups: [WeekGroup] = []
-        let sortedWorkouts = currentPlan.workouts.sorted { $0.scheduledDate ?? Date() < $1.scheduledDate ?? Date() }
+        let sortedWorkouts = currentPlan.weeklyWorkouts.flatMap{$0}.sorted { $0.scheduledDate ?? Date() < $1.scheduledDate ?? Date() }
         
         guard let firstWorkoutDate = sortedWorkouts.first?.scheduledDate else { return [] }
         let firstWeekStart = calendar.startOfWeek(for: firstWorkoutDate)

@@ -6,6 +6,7 @@ struct SwipeableExerciseCard: View {
     
     @ObservedObject var exercise: ExerciseInstanceEntity
     @ObservedObject var viewModel: EnhancedActiveWorkoutViewModel
+    var onExerciseProgress: ((ExerciseInstanceEntity) -> Void)? = nil
     
     @State private var exerciseHistory: [ExerciseInstanceEntity] = []
     @State private var currentIndex: Int = 0
@@ -48,11 +49,20 @@ struct SwipeableExerciseCard: View {
                 // Exercise header
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(currentDisplayExercise?.movement.name ?? exercise.movement.name)
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .foregroundColor(isViewingHistory ? AppStyle.Colors.textSecondary : AppStyle.Colors.textPrimary)
-                            .lineLimit(1)
+                        HStack(spacing: 6) {
+                            Text(currentDisplayExercise?.movement.name ?? exercise.movement.name)
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(isViewingHistory ? AppStyle.Colors.textSecondary : AppStyle.Colors.textPrimary)
+                                .lineLimit(1)
+                                
+                            // Joint warning indicator
+                            if let displayExercise = currentDisplayExercise, displayExercise.shouldShowJointWarning {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.orange)
+                                    .font(.subheadline)
+                            }
+                        }
                         
                         // Muscle group pills
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -112,7 +122,12 @@ struct SwipeableExerciseCard: View {
                                 set: set,
                                 exercise: displayExercise,
                                 isEditable: !isViewingHistory && !viewModel.isComplete,
-                                viewModel: viewModel
+                                viewModel: viewModel,
+                                onSetCompleted: { exercise in
+                                    if let callback = onExerciseProgress {
+                                        callback(exercise)
+                                    }
+                                }
                             )
                             .id("\(displayExercise.id)-\(set.id)")
                             .transition(.opacity)

@@ -19,7 +19,7 @@ class TodaysTrainingViewModel: ObservableObject {
         
         // Find today's workout from current plan
         if let currentPlan = appState.currentPlan {
-            todaysWorkout = currentPlan.workouts.first { workout in
+            todaysWorkout = currentPlan.weeklyWorkouts.flatMap{$0}.first { workout in
                 if let scheduledDate = workout.scheduledDate {
                     return calendar.isDate(scheduledDate, inSameDayAs: today)
                 }

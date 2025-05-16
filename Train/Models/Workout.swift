@@ -9,13 +9,19 @@ class WorkoutEntity: ObservableObject, Identifiable, Codable {
     @Published var exercises: [ExerciseInstanceEntity]
     weak var trainingPlan: TrainingPlanEntity?
     
-    init(title: String, description: String, isComplete: Bool, scheduledDate: Date? = nil, exercises: [ExerciseInstanceEntity] = []) {
+    // Feedback properties
+    var preWorkoutFeedback: PreWorkoutFeedback?
+    var postWorkoutFeedback: PostWorkoutFeedback?
+    
+    init(title: String, description: String, isComplete: Bool, scheduledDate: Date? = nil, exercises: [ExerciseInstanceEntity] = [], preWorkoutFeedback: PreWorkoutFeedback? = nil, postWorkoutFeedback: PostWorkoutFeedback? = nil) {
         self.id = UUID()
         self.title = title
         self.description = description
         self.isComplete = isComplete
         self.scheduledDate = scheduledDate
         self.exercises = exercises
+        self.preWorkoutFeedback = preWorkoutFeedback
+        self.postWorkoutFeedback = postWorkoutFeedback
     }
     
     // MARK: - Codable
@@ -27,6 +33,8 @@ class WorkoutEntity: ObservableObject, Identifiable, Codable {
         case isComplete
         case scheduledDate
         case exercises
+        case preWorkoutFeedback
+        case postWorkoutFeedback
     }
     
     required init(from decoder: Decoder) throws {
@@ -37,6 +45,8 @@ class WorkoutEntity: ObservableObject, Identifiable, Codable {
         self.isComplete = try container.decode(Bool.self, forKey: .isComplete)
         self.scheduledDate = try container.decodeIfPresent(Date.self, forKey: .scheduledDate)
         self.exercises = try container.decode([ExerciseInstanceEntity].self, forKey: .exercises)
+        self.preWorkoutFeedback = try container.decodeIfPresent(PreWorkoutFeedback.self, forKey: .preWorkoutFeedback)
+        self.postWorkoutFeedback = try container.decodeIfPresent(PostWorkoutFeedback.self, forKey: .postWorkoutFeedback)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -47,6 +57,8 @@ class WorkoutEntity: ObservableObject, Identifiable, Codable {
         try container.encode(isComplete, forKey: .isComplete)
         try container.encodeIfPresent(scheduledDate, forKey: .scheduledDate)
         try container.encode(exercises, forKey: .exercises)
+        try container.encodeIfPresent(preWorkoutFeedback, forKey: .preWorkoutFeedback)
+        try container.encodeIfPresent(postWorkoutFeedback, forKey: .postWorkoutFeedback)
     }
     
     func copy() -> WorkoutEntity {
@@ -55,7 +67,8 @@ class WorkoutEntity: ObservableObject, Identifiable, Codable {
             return ExerciseInstanceEntity(
                 movement: exercise.movement,
                 exerciseType: exercise.exerciseType,
-                sets: copiedSets
+                sets: copiedSets,
+                feedback: exercise.feedback
             )
         }
         
@@ -64,7 +77,9 @@ class WorkoutEntity: ObservableObject, Identifiable, Codable {
             description: self.description,
             isComplete: self.isComplete,
             scheduledDate: self.scheduledDate,
-            exercises: copiedExercises
+            exercises: copiedExercises,
+            preWorkoutFeedback: self.preWorkoutFeedback,
+            postWorkoutFeedback: self.postWorkoutFeedback
         )
     }
 } 

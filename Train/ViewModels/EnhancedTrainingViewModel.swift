@@ -114,7 +114,7 @@ class EnhancedTrainingViewModel: ObservableObject {
         let today = calendar.startOfDay(for: Date())
         
         // Separate workouts into past and upcoming
-        let (past, upcoming) = currentPlan.workouts.reduce(into: ([WorkoutEntity](), [WorkoutEntity]())) { result, workout in
+        let (past, upcoming) = currentPlan.weeklyWorkouts.flatMap{$0}.reduce(into: ([WorkoutEntity](), [WorkoutEntity]())) { result, workout in
             // Sort completed workouts into past
             if workout.isComplete {
                 result.0.append(workout)

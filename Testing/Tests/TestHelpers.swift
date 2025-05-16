@@ -40,9 +40,10 @@ struct MockData {
     
     static func createMockPlan() -> TrainingPlanEntity {
         let plan = TrainingPlanEntity(name: "Plan", notes: "Note", startDate: Date.now, daysPerWeek: 5, isCompleted: false)
-        plan.workouts.append(createMockWorkout(title: "workout1"))
-        plan.workouts.append(createMockWorkout(title: "workout2"))
-        plan.workouts.append(createMockWorkout(title: "workout3"))
+        plan.weeklyWorkouts = Array(repeating: [], count: 1)
+        plan.weeklyWorkouts[0].append(createMockWorkout(title: "workout1"))
+        plan.weeklyWorkouts[0].append(createMockWorkout(title: "workout2"))
+        plan.weeklyWorkouts[0].append(createMockWorkout(title: "workout3"))
         return plan
     }
     

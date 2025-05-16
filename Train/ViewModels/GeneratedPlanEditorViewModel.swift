@@ -72,7 +72,7 @@ class GeneratedPlanEditorViewModel: ObservableObject {
         let calendar = Calendar.current
         
         // Get the first week's worth of workouts, sorted by date
-        let sortedWorkouts = trainingPlan.workouts.sorted { workout1, workout2 in
+        let sortedWorkouts = trainingPlan.weeklyWorkouts.flatMap {$0}.sorted { workout1, workout2 in
             guard let date1 = workout1.scheduledDate, let date2 = workout2.scheduledDate else {
                 return false
             }
@@ -251,8 +251,8 @@ class GeneratedPlanEditorViewModel: ObservableObject {
         // Update basic plan details
         trainingPlan.name = planName
         
-        // Remove all existing workouts - we'll create fresh ones
-        trainingPlan.workouts.removeAll()
+        // Create array to collect all generated workouts
+        var workoutPlan = [[WorkoutEntity]]()
         
         // Get calendar for date calculations
         let calendar = Calendar.current
@@ -263,7 +263,8 @@ class GeneratedPlanEditorViewModel: ObservableObject {
         // Create workouts for each week
         for weekIndex in 0..<planLength {
             // For each workout in our model
-            for (workoutIndex, workoutModel) in workouts.enumerated() {
+            var weekOfWorkouts = [WorkoutEntity]()
+            for (_, workoutModel) in workouts.enumerated() {
                 // Skip if no day selected
                 guard let selectedDay = workoutModel.dayOfWeek else { continue }
                 
@@ -301,29 +302,20 @@ class GeneratedPlanEditorViewModel: ObservableObject {
                     workout.exercises.append(exercise)
                 }
                 
-                // Calculate date for this workout using the same approach as in EnhancedTrainingViewModel+WeekGrouping
+                // Calculate date for this workout
                 var dateComponents = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: startOfWeek)
                 dateComponents.weekday = selectedDay.calendarWeekday
                 dateComponents.weekOfYear! += weekIndex // Advance to correct week
                 
                 if let workoutDate = calendar.date(from: dateComponents) {
                     workout.scheduledDate = workoutDate
-                    
-                    // Set parent reference
-                    workout.trainingPlan = trainingPlan
-                    
-                    // Add to plan
-                    trainingPlan.workouts.append(workout)
+                    weekOfWorkouts.append(workout)
                 }
             }
+            workoutPlan.append(weekOfWorkouts)
         }
         
-        // Update plan's end date based on last workout
-        trainingPlan.endDate = trainingPlan.calculatedEndDate
-        
-        // Save the plan with our changes
-        appState.scheduleWorkouts(trainingPlan.workouts)
-        appState.setCurrentPlan(trainingPlan)
-        appState.savePlans()
+        // Use the centralized method to finalize the plan
+        appState.finalizePlan(trainingPlan, workouts: workoutPlan, clear: true)
     }
 }

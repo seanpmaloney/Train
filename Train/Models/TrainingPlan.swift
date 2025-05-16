@@ -1,5 +1,7 @@
 import Foundation
 
+typealias WorkoutFeedbackBundle = (pre: PreWorkoutFeedback?, exercises: [ExerciseFeedback], post: PostWorkoutFeedback?)
+
 class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
     var id: UUID = UUID()
     @Published var name: String
@@ -8,12 +10,16 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
     @Published var endDate: Date
     @Published var daysPerWeek: Int
     @Published var isCompleted: Bool
-    @Published var workouts: [WorkoutEntity] = []
     @Published var musclePreferences: [MuscleTrainingPreference]?
     @Published var trainingGoal: TrainingGoal?
+    @Published var weeklyWorkouts: [[WorkoutEntity]] = []
+    @Published var workoutFeedbacks: [WorkoutFeedback] = []
     
     var calculatedEndDate: Date {
-        workouts.map { $0.scheduledDate ?? startDate }.max() ?? startDate
+        weeklyWorkouts
+            .flatMap { $0 }
+            .compactMap { $0.scheduledDate }
+            .max() ?? startDate
     }
     
     /// Returns muscle groups that are prioritized for growth, or empty array if no preferences
@@ -37,7 +43,7 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
     
     // MARK: - Codable
     enum CodingKeys: String, CodingKey {
-        case id, name, notes, startDate, endDate, daysPerWeek, isCompleted, workouts, musclePreferences, trainingGoal
+        case id, name, notes, startDate, endDate, daysPerWeek, isCompleted, weeklyWorkouts, musclePreferences, trainingGoal, workoutFeedbacks
     }
     
     required init(from decoder: Decoder) throws {
@@ -49,11 +55,12 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
         endDate = try container.decode(Date.self, forKey: .endDate)
         daysPerWeek = try container.decode(Int.self, forKey: .daysPerWeek)
         isCompleted = try container.decode(Bool.self, forKey: .isCompleted)
-        workouts = try container.decode([WorkoutEntity].self, forKey: .workouts)
+        weeklyWorkouts = try container.decode([[WorkoutEntity]].self, forKey: .weeklyWorkouts)
         
         // Handle optional new properties for backward compatibility
         musclePreferences = try container.decodeIfPresent([MuscleTrainingPreference].self, forKey: .musclePreferences)
         trainingGoal = try container.decodeIfPresent(TrainingGoal.self, forKey: .trainingGoal)
+        workoutFeedbacks = try container.decode([WorkoutFeedback].self, forKey: .workoutFeedbacks)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -65,7 +72,8 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
         try container.encode(endDate, forKey: .endDate)
         try container.encode(daysPerWeek, forKey: .daysPerWeek)
         try container.encode(isCompleted, forKey: .isCompleted)
-        try container.encode(workouts, forKey: .workouts)
+        try container.encode(weeklyWorkouts, forKey: .weeklyWorkouts)
+        try container.encode(workoutFeedbacks, forKey: .workoutFeedbacks)
         
         // Encode new properties only if they exist
         try container.encodeIfPresent(musclePreferences, forKey: .musclePreferences)
@@ -73,8 +81,39 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
     }
     
     func percentageCompleted() -> Double {
-        let totalWorkouts = workouts.count
-        let completedWorkouts = workouts.filter { $0.isComplete }.count
-        return totalWorkouts > 0 ? Double(completedWorkouts) / Double(totalWorkouts) : 0.0
+        let allWorkouts = weeklyWorkouts.flatMap { $0 }
+        let completed = allWorkouts.filter { $0.isComplete }.count
+        return allWorkouts.isEmpty ? 0.0 : Double(completed) / Double(allWorkouts.count)
+    }
+    
+    // MARK: - Feedback Management
+    
+    /// Adds feedback to this plan
+    func addFeedback(_ feedback: WorkoutFeedback) {
+        // Check if the feedback is for a workout in this plan
+        let workoutIds = Set(weeklyWorkouts.flatMap { $0 }.map { $0.id })
+        guard Set(weeklyWorkouts.flatMap { $0 }.map { $0.id }).contains(feedback.workoutId) else { return }
+        
+        workoutFeedbacks.append(feedback)
+    }
+    
+    /// Get all feedback for a specific workout
+    func getFeedback(for workoutId: UUID) -> WorkoutFeedbackBundle {
+        let allFeedback = workoutFeedbacks.filter { $0.workoutId == workoutId }
+        
+        let preFeedback = allFeedback.first { $0 is PreWorkoutFeedback } as? PreWorkoutFeedback
+        let exerciseFeedbacks = allFeedback.compactMap { $0 as? ExerciseFeedback }
+        let postFeedback = allFeedback.first { $0 is PostWorkoutFeedback } as? PostWorkoutFeedback
+        
+        return (pre: preFeedback, exercises: exerciseFeedbacks, post: postFeedback)
+    }
+    
+    /// Get the most recent feedback for a specific muscle
+    func getMostRecentFeedbackForMuscle(_ muscle: MuscleGroup) -> PreWorkoutFeedback? {
+        return workoutFeedbacks
+            .compactMap { $0 as? PreWorkoutFeedback }
+            .filter { $0.soreMuscles.contains(muscle) }
+            .sorted { $0.date > $1.date }
+            .first
     }
 }

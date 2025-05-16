@@ -202,6 +202,9 @@ class PlanEditorViewModel: ObservableObject {
             isCompleted: false
         )
         
+        // Array to collect all workouts we're creating
+        var allWorkouts = [[WorkoutEntity]]()
+        
         // Generate workouts for each week
         let calendar = Calendar.current
         
@@ -211,6 +214,7 @@ class PlanEditorViewModel: ObservableObject {
         // For each week in the plan
         for weekIndex in 0..<planLength {
             // For each day that has movements
+            var weekOfWorkouts = [WorkoutEntity]()
             for (dayIndex, day) in days.enumerated() where !day.movements.isEmpty {
                 // Create workout for this day
                 let workout = WorkoutEntity(
@@ -274,23 +278,14 @@ class PlanEditorViewModel: ObservableObject {
                     // Only include workouts on or after the plan start date
                     if workoutDate >= planStartDate {
                         workout.scheduledDate = workoutDate
-                        
-                        // Add workout to plan
-                        plan.workouts.append(workout)
-                        
-                        // Schedule workout in calendar
-                        appState.scheduleWorkout(workout)
+                        weekOfWorkouts.append(workout)
                     }
                 }
             }
+            allWorkouts.append(weekOfWorkouts)
         }
         
-        appState.savePlans()
-        
-        // Update plan's end date based on last workout
-        plan.endDate = plan.calculatedEndDate
-        
-        // Set as current plan
-        appState.setCurrentPlan(plan)
+        // Use the centralized method to finalize the plan
+        appState.finalizePlan(plan, workouts: allWorkouts)
     }
 }
