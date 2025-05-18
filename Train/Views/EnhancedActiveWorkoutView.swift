@@ -22,7 +22,6 @@ struct EnhancedActiveWorkoutView: View {
     @State private var showingPostWorkoutFeedback = false
     @State private var currentExerciseForFeedback: ExerciseInstanceEntity? = nil
     @State private var isCollectingExerciseFeedback = false
-    @State private var processedExercises: Set<UUID> = []
     
     // MARK: - Initialization
     
@@ -131,12 +130,7 @@ struct EnhancedActiveWorkoutView: View {
         }
         
         // Post-Workout Feedback Sheet
-        .sheet(isPresented: $showingPostWorkoutFeedback, onDismiss: {
-            // If user chose to go back using the Back button, uncheck the last completed set
-            if !viewModel.isComplete && viewModel.getCompletionPercentage() == 1.0 {
-                viewModel.uncompleteLastSet()
-            }
-        }) {
+        .sheet(isPresented: $showingPostWorkoutFeedback) {
             PostWorkoutFeedbackView()
                 .environmentObject(appState) // Ensure app state is passed to the view
         }
@@ -217,22 +211,8 @@ struct EnhancedActiveWorkoutView: View {
                         exercise: exercise, 
                         viewModel: viewModel,
                         onExerciseProgress: { completedExercise in
-                            // Check if this is a newly completed exercise
-                            if !processedExercises.contains(completedExercise.id) {
-                                // Process the completed exercise for feedback
-                                // With sheet(item:), setting this value directly presents the sheet
                                 isCollectingExerciseFeedback = true
                                 currentExerciseForFeedback = completedExercise
-                                
-                                // Mark this exercise as processed for feedback
-                                processedExercises.insert(completedExercise.id)
-                                
-                                // Also check if the entire workout is now complete
-                                if viewModel.getCompletionPercentage() >= 1.0 && !viewModel.isComplete {
-                                    // We'll show post-workout feedback after this exercise feedback is dismissed
-                                    // through the sheet dismissal handler
-                                }
-                            }
                         }
                     )
                 }

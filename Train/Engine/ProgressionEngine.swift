@@ -11,7 +11,8 @@
  *   - Current volume is below the hypertrophy upper bound
  *   - No soreness, pain, or fatigue-related feedback blocks progression
  * - Soreness:
- *   - If a muscle is sore *and being trained that day*, one set is removed from the previous workout that also trained it.
+ *   - If a muscle is sore *and being trained that day*, one set is removed from the previous workout that caused the soreness, in the following week of the plan.
+ *     This is to ensure that when the next week comes around, the user is not still sore on the day that they need to train the muscle again
  * - Joint Pain:
  *   - Flags next week's exercises that target muscles near the affected joint.
  *   - Block progression for those muscles and flag the UI for user awareness.

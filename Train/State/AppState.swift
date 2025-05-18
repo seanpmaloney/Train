@@ -110,7 +110,7 @@ class AppState: ObservableObject {
         }
     }
     
-    // Mark loading operation as nonisolated 
+    // Mark loading operation as nonisolated
     func loadPlans() {
         // Capture fileName before using it in a non-isolated context
         let fileNameCopy = self.fileName
@@ -509,8 +509,8 @@ class AppState: ObservableObject {
             let exerciseFeedbacks = workout.exercises.compactMap { $0.feedback }
             
             // Return feedback directly from the workout entity if available
-            return (pre: workout.preWorkoutFeedback, 
-                    exercises: exerciseFeedbacks, 
+            return (pre: workout.preWorkoutFeedback,
+                    exercises: exerciseFeedbacks,
                     post: workout.postWorkoutFeedback)
         }
         
@@ -599,12 +599,12 @@ class AppState: ObservableObject {
         // 2. Mark workout as complete
         markWorkoutComplete(activeWorkout, isComplete: true)
         
+        // 5. Check if we need to apply weekly progression
+        applyWeeklyProgressionIfNeeded(justCompletedWorkout: activeWorkout)
+        
         // 4. Clear active workout
         self.activeWorkout = nil
         self.activeWorkoutId = nil
-        
-        // 5. Check if we need to apply weekly progression
-        applyWeeklyProgressionIfNeeded()
         
         // 6. Save changes
         savePlans()
@@ -623,20 +623,27 @@ class AppState: ObservableObject {
     // MARK: - Weekly Progression
     
     /// Applies weekly progression if there's a completed week that needs progression
-    func applyWeeklyProgressionIfNeeded() {
+    func applyWeeklyProgressionIfNeeded(justCompletedWorkout: WorkoutEntity? = nil) {
         guard let plan = currentPlan else { return }
         
         // Find the most recently completed week
         guard let completedWeekIndex = getLastCompletedWeekIndex(for: plan),
               // Make sure there's a next week to progress to
               completedWeekIndex + 1 < plan.weeklyWorkouts.count else { return }
-        
         // Get workouts for completed and next week
         let completedWeekWorkouts = plan.weeklyWorkouts[completedWeekIndex]
-        var nextWeekWorkouts = plan.weeklyWorkouts[completedWeekIndex + 1]
+        
+        // Check if the just completed workout belongs to the completed week
+        if let justCompletedWorkout = justCompletedWorkout,
+           !completedWeekWorkouts.contains(where: { $0.id == justCompletedWorkout.id }) {
+            // Return early if the completed workout is not part of the completed week
+            return
+        }
+
+        let nextWeekWorkouts = plan.weeklyWorkouts[completedWeekIndex + 1]
         
         // Collect feedback for all workouts in the completed week
-        var feedbackMap = [UUID: [WorkoutFeedback]]() 
+        var feedbackMap = [UUID: [WorkoutFeedback]]()
         for workout in completedWeekWorkouts {
             let feedback = plan.getFeedback(for: workout.id)
             var allFeedback: [WorkoutFeedback] = []
@@ -673,6 +680,10 @@ class AppState: ObservableObject {
         
         // Save changes
         savePlans()
+        
+        // Explicitly mark the plan as changed to notify subscribers
+        // This line is needed to refresh the EnhancedTrainingView
+        objectWillChange.send()
     }
     
     /// Determine if a week is complete (all workouts completed)

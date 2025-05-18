@@ -90,10 +90,23 @@ class TrainingPlanEntity: ObservableObject, Identifiable, Codable {
     
     /// Adds feedback to this plan
     func addFeedback(_ feedback: WorkoutFeedback) {
-        // Check if the feedback is for a workout in this plan
-        let workoutIds = Set(weeklyWorkouts.flatMap { $0 }.map { $0.id })
-        guard Set(weeklyWorkouts.flatMap { $0 }.map { $0.id }).contains(feedback.workoutId) else { return }
-        
+        // Ensure the workout belongs to this plan
+        let allWorkoutIds = Set(weeklyWorkouts.flatMap { $0 }.map(\.id))
+        guard allWorkoutIds.contains(feedback.workoutId) else { return }
+
+        // Remove existing feedback for same target and type
+        workoutFeedbacks.removeAll {
+            switch (feedback, $0) {
+            case let (new as ExerciseFeedback, existing as ExerciseFeedback):
+                return new.workoutId == existing.workoutId && new.exerciseId == existing.exerciseId
+            case (_ as PreWorkoutFeedback, _ as PreWorkoutFeedback),
+                 (_ as PostWorkoutFeedback, _ as PostWorkoutFeedback):
+                return feedback.workoutId == $0.workoutId
+            default:
+                return false
+            }
+        }
+
         workoutFeedbacks.append(feedback)
     }
     

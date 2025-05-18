@@ -83,10 +83,6 @@ extension AppState {
         
         // Save changes to persist the progression
         savePlans()
-        
-        // Explicitly notify observers that the plan has changed
-        // This ensures SwiftUI updates since nested property changes aren't automatically detected
-        self.objectWillChange.send()
     }
     
     /// Apply weight progression to a workout based on feedback

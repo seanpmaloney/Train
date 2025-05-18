@@ -255,8 +255,15 @@ struct EnhancedTrainingView: View {
            }) {
             selectedWeekIndex = weekIdx
         } else {
-            // Default to showing the first week
-            selectedWeekIndex = 0
+            // If there's no active workout, find the first incomplete week
+            if let firstIncompleteIndex = weeks.firstIndex(where: { week in
+                week.contains(where: { !$0.isComplete })
+            }) {
+                selectedWeekIndex = firstIncompleteIndex
+            } else {
+                // If all weeks are complete, show the last one
+                selectedWeekIndex = weeks.count - 1
+            }
         }
     }
 }
