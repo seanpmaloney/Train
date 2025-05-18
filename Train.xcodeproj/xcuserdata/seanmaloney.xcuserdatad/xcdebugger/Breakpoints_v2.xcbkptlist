@@ -478,8 +478,8 @@
             filePath = "Train/Models/PlanGenerator2.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1172"
-            endingLineNumber = "1172"
+            startingLineNumber = "1169"
+            endingLineNumber = "1169"
             landmarkName = "calculateWeeklyVolumeForMuscle(muscle:goal:isPrioritized:experienceLevel:weekNumber:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -543,8 +543,8 @@
             filePath = "Train/Models/PlanGenerator2.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1216"
-            endingLineNumber = "1216"
+            startingLineNumber = "1219"
+            endingLineNumber = "1219"
             landmarkName = "calculateSetsForMovement(movement:in:muscleTargets:weekNumber:daysPerMuscle:goal:experienceLevel:input:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -559,8 +559,8 @@
             filePath = "Train/Models/PlanGenerator2.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "911"
-            endingLineNumber = "911"
+            startingLineNumber = "908"
+            endingLineNumber = "908"
             landmarkName = "enforceMovementVariety(for:input:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -575,8 +575,8 @@
             filePath = "Train/Models/PlanGenerator2.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "921"
-            endingLineNumber = "921"
+            startingLineNumber = "918"
+            endingLineNumber = "918"
             landmarkName = "enforceMovementVariety(for:input:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -784,8 +784,8 @@
             filePath = "Train/Models/PlanGenerator2.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1238"
-            endingLineNumber = "1238"
+            startingLineNumber = "1241"
+            endingLineNumber = "1241"
             landmarkName = "calculateSetsForMovement(movement:in:muscleTargets:weekNumber:daysPerMuscle:goal:experienceLevel:input:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -816,8 +816,8 @@
             filePath = "Train/Models/PlanGenerator2.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1219"
-            endingLineNumber = "1219"
+            startingLineNumber = "1222"
+            endingLineNumber = "1222"
             landmarkName = "calculateSetsForMovement(movement:in:muscleTargets:weekNumber:daysPerMuscle:goal:experienceLevel:input:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -979,6 +979,70 @@
             startingLineNumber = "213"
             endingLineNumber = "213"
             landmarkName = "exerciseListView"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "05D9DB40-3FB4-4A82-95E1-3D888FB0C57F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/Services/WorkoutManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "84"
+            endingLineNumber = "84"
+            landmarkName = "isSetSkipped(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3EDC6A8F-097B-4E0B-AE6A-22703A7BA042"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/Models/PlanGenerator2.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "528"
+            endingLineNumber = "528"
+            landmarkName = "addProgressiveSet(to:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "48B80EBA-C507-4EB6-B2A5-0AA23ACD0A94"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/Models/PlanGenerator2.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "452"
+            endingLineNumber = "452"
+            landmarkName = "applyProgressiveOverload(to:originalWorkout:weekNumber:input:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "28AF7F22-4ADE-4028-813C-8BAFA42386DA"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/Views/Components/ExerciseEditView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "258"
+            endingLineNumber = "258"
+            landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>

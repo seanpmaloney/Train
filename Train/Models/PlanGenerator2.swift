@@ -418,7 +418,6 @@ struct PlanGenerator {
         for originalSet in original.sets {
             let setCopy = ExerciseSetEntity(
                 weight: originalSet.weight,
-                completedReps: 0,
                 targetReps: originalSet.targetReps,
                 isComplete: false
             )
@@ -531,7 +530,6 @@ struct PlanGenerator {
         // Create a new set with the same parameters
         let newSet = ExerciseSetEntity(
             weight: lastSet.weight,
-            completedReps: 0,
             targetReps: lastSet.targetReps,
             isComplete: false
         )
@@ -705,7 +703,6 @@ struct PlanGenerator {
             for _ in 0..<setCount {
                 let set = ExerciseSetEntity(
                     weight: weight,
-                    completedReps: 0,
                     targetReps: targetReps,
                     isComplete: false
                 )
@@ -1188,7 +1185,13 @@ struct PlanGenerator {
         ///   - goal: Training goal (hypertrophy or strength)
         /// - Returns: Range representing min-max sets per week
     private func initialWeeklyVolumeRange(for muscle: MuscleGroup, isPrioritized: Bool) -> ClosedRange<Int> {
-        return isPrioritized ? muscle.trainingGuidelines.hypertrophySetsRange : muscle.trainingGuidelines.maintenanceSetsRange
+        // start with 1/2 the hypertrophy range so users can ramp up onto the program
+        if isPrioritized {
+            let range = muscle.trainingGuidelines.hypertrophySetsRange
+            return (range.lowerBound / 2)...(range.upperBound / 2)
+        } else {
+            return muscle.trainingGuidelines.maintenanceSetsRange
+        }
         }
         
         /// Allocates an appropriate number of sets to a movement based on weekly volume targets

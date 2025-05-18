@@ -173,7 +173,7 @@ struct SetEditRow: View {
                                     .frame(width: 90, alignment: .trailing)
                             } else {
                                 // Single value that shows target when not entered, actual when entered
-                                if set.completedReps > 0 {
+                                if set.completedReps >= 0 {
                                     Text("\(set.completedReps)")
                                         .font(.body)
                                         .foregroundColor(AppStyle.Colors.textPrimary)
@@ -190,11 +190,10 @@ struct SetEditRow: View {
                         .sheet(isPresented: $showingRepsPad) {
                             CustomNumberPadView(
                                 title: "Reps",
-                                initialValue: Double(set.completedReps > 0 ? set.completedReps : set.targetReps),
+                                initialValue: Double(set.completedReps >= 0 ? set.completedReps : set.targetReps),
                                 mode: .reps
                             ) { newValue in
-                                viewModel.updateRepsAndSubsequentSets(
-                                    in: exercise,
+                                viewModel.updateReps(
                                     for: set,
                                     to: Int(newValue)
                                 )
@@ -210,7 +209,7 @@ struct SetEditRow: View {
                                 .frame(width: 90, alignment: .trailing)
                         } else {
                             // Show either completed or target reps based on what was recorded
-                            if set.completedReps > 0 {
+                            if set.completedReps >= 0 {
                                 Text("\(set.completedReps)")
                                     .font(.body)
                                     .foregroundColor(AppStyle.Colors.textPrimary)
@@ -254,6 +253,11 @@ struct SetEditRow: View {
                     } else {
                         Button(action: {
                             withAnimation {
+                                // if user hasn't updated the reps,
+                                // use target reps as the completed reps
+                                if set.completedReps == -1 {
+                                    set.completedReps = set.targetReps
+                                }
                                 set.toggleComplete()
                                 // Only trigger if this was the last set to complete
                                 // and ALL sets in the exercise are now complete
@@ -274,13 +278,13 @@ struct SetEditRow: View {
                         Button(action: {
                             viewModel.skipSet(in: exercise, set: set)
                         }) {
-                            Label("Skip Set", systemImage: "minus.circle")
+                            Label("Skip Set", systemImage: "arrow.uturn.backward.circle")
                         }
                         
 //                        Button(action: {
 //                            viewModel.deleteSet(in: exercise, set: set)
 //                        }) {
-//                            Label("Delete Set", systemImage: "trash")
+//                            Label("Delete Set", systemImage: "minus.circle")
 //                        }
                         
                         Button(action: {

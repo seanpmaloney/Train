@@ -77,7 +77,6 @@ class PlanSummaryViewModel: ObservableObject {
                             sets: (0..<3).map { _ in // Default to 3 sets, could be made configurable
                                 ExerciseSetEntity(
                                     weight: 0,
-                                    completedReps: 0,
                                     targetReps: template?.goal == .strength ? 5 : 10,
                                     isComplete: false
                                 )

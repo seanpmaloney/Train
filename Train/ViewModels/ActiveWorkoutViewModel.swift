@@ -26,7 +26,7 @@ class ActiveWorkoutViewModel: ObservableObject {
     
     func addSet(to exercise: ExerciseSetEntity) {
         guard !isReadOnly else { return }
-        let set = ExerciseSetEntity(weight: 100.0, completedReps: 0, targetReps: 8, isComplete: false)
+        let set = ExerciseSetEntity(weight: 100.0, targetReps: 8, isComplete: false)
         
         if let index = workout.exercises.firstIndex(where: { $0.id == exercise.id }) {
             workout.exercises[index].sets.append(set)

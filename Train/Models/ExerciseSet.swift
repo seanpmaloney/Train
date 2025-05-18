@@ -7,7 +7,7 @@ class ExerciseSetEntity: ObservableObject, Identifiable, Codable {
     @Published var completedReps: Int
     @Published var isComplete: Bool
 
-    init(weight: Double = 0, completedReps: Int = 0, targetReps: Int = 0, isComplete: Bool = false) {
+    init(weight: Double = 0, completedReps: Int = -1, targetReps: Int = 0, isComplete: Bool = false) {
         self.id = UUID()
         self.weight = weight
         self.targetReps = targetReps

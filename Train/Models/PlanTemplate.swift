@@ -216,7 +216,7 @@ struct PlanTemplate: Identifiable {
     /// Helper function to create an exercise instance with sets and reps
     private static func createExerciseInstance(movement: MovementEntity, sets: Int, reps: Int) -> ExerciseInstanceEntity {
         let exerciseSets = (0..<sets).map { _ in
-            ExerciseSetEntity(weight: 0, completedReps: 0, targetReps: reps, isComplete: false)
+            ExerciseSetEntity(weight: 0, targetReps: reps, isComplete: false)
         }
         return ExerciseInstanceEntity(movement: movement, exerciseType: "strength", sets: exerciseSets)
     }

@@ -236,7 +236,7 @@ class TrainingPlanBuilder {
                 let movements = allMovements.filter { $0.muscleGroups.contains(where: { $0 == muscle }) }
                 if let movement = movements.randomElement() {
                     let sets = (0..<(Int.random(in: 1...2))).map { _ in
-                        ExerciseSetEntity(weight: 100.0, completedReps: 0, targetReps: 8, isComplete: false)
+                        ExerciseSetEntity(weight: 100.0, targetReps: 8, isComplete: false)
                     }
                     
                     exercises.append(ExerciseInstanceEntity(
@@ -273,7 +273,7 @@ class TrainingPlanBuilder {
                 let type = goal == .strength ? "Strength" : goal == .hypertrophy ? "Hypertrophy" : "Hybrid"
 
                 let sets = (0..<(baseSets + addedVolume)).map { _ in
-                    ExerciseSetEntity(weight: 100.0, completedReps: 0, targetReps: reps, isComplete: false)
+                    ExerciseSetEntity(weight: 100.0, targetReps: reps, isComplete: false)
                 }
 
                 instances.append(ExerciseInstanceEntity(movement: movement, exerciseType: type, sets: sets))

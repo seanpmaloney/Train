@@ -63,8 +63,8 @@ class WorkoutManager {
                 set.weight = defaultWeight
             }
             
-            // Reset completed reps to 0 (not skipped) but keep target reps unless specified
-            set.completedReps = 0
+            // Reset completed reps to -1 (untouched) but keep target reps unless specified
+            set.completedReps = -1
             if let defaultReps = defaultReps {
                 set.targetReps = defaultReps
             }
@@ -92,7 +92,6 @@ class WorkoutManager {
             // Create a new set with the same values as the last set, but not completed
             let newSet = ExerciseSetEntity(
                 weight: lastSet.weight,
-                completedReps: 0,  // Start with 0 completed reps
                 targetReps: lastSet.targetReps,
                 isComplete: false
             )
@@ -106,7 +105,6 @@ class WorkoutManager {
             // If there are no existing sets (unlikely), create a default one
             let newSet = ExerciseSetEntity(
                 weight: 0,
-                completedReps: 0,
                 targetReps: 8,
                 isComplete: false
             )
@@ -159,7 +157,6 @@ class WorkoutManager {
         for _ in 0..<sets {
             let set = ExerciseSetEntity(
                 weight: 0,
-                completedReps: 0,
                 targetReps: 8,
                 isComplete: false
             )
