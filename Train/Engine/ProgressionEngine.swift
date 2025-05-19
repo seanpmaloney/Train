@@ -154,7 +154,7 @@ struct ProgressionEngine {
         )
         
         // 5. Apply weight progression based on feedback
-        applyWeightProgression(
+        applyWeightOrRepProgression(
             fromCurrentWeek: currentWeek,
             toNextWeek: &nextWeek,
             log: &progressionLog,
@@ -731,7 +731,7 @@ struct ProgressionEngine {
         return prioritizedMuscles.isEmpty || prioritizedMuscles.contains(muscle)
     }
     /// Apply weight progression based on exercise feedback
-    private static func applyWeightProgression(
+    private static func applyWeightOrRepProgression(
         fromCurrentWeek currentWeek: [WorkoutEntity],
         toNextWeek nextWeek: inout [WorkoutEntity],
         log: inout [String],
@@ -786,6 +786,13 @@ struct ProgressionEngine {
                     let referenceIndex = min(setIndex, currentExercise.sets.count - 1)
                     let currentWeight = currentExercise.sets[referenceIndex].weight
                     
+                    if feedback.intensity == .challenging {
+                        // Increase target reps by 1 up to a reasonable cap (e.g., 15)
+                        set.targetReps = min(set.targetReps + 1, 15)
+                        nextExercise.sets[setIndex] = set
+                        continue // Skip weight update
+                    }
+                    
                     // Calculate the raw weight adjustment based on feedback
                     let newWeight = updatedWeight(
                         currentWeight: currentWeight,
@@ -793,7 +800,6 @@ struct ProgressionEngine {
                         recentFeedbacks: recentFeedbacks,
                         equipment: currentExercise.movement.equipment
                     )
-
                     
                     // Update the weight if it changed
                     if newWeight != currentWeight {

@@ -1289,9 +1289,58 @@ struct ProgressionEngineTests {
         #expect(totalAddedSets <= prioritizedMuscleGroups.count * 2,
                "Each prioritized muscle should not get more than 2 sets per week")
     }
+    @Test("Challenging intensity increases reps by 1 without changing weight")
+    func testChallengingIntensityIncreasesRepsOnly() throws {
+        // Create a barbell movement
+        let movement = MovementEntity(
+            type: .barbellBenchPress,
+            primaryMuscles: [.chest],
+            secondaryMuscles: [],
+            equipment: .barbell
+        )
+        
+        // Create an exercise with a set of 10 reps at 100lbs
+        let set = ExerciseSetEntity(weight: 100, completedReps: 10, targetReps: 10, isComplete: true)
+        let exercise = ExerciseInstanceEntity(
+            movement: movement,
+            exerciseType: "Bench Press",
+            sets: [set]
+        )
+        
+        // Create week 1 and week 2 workouts
+        let workout1 = WorkoutEntity(
+            title: "Title",
+            description: "Test workout for progression testing",
+            isComplete: false,
+            scheduledDate: Date(),
+            exercises: [exercise]
+        )
+        let workout2 = workout1.copy()
+        
+        // Add feedback indicating the exercise was challenging
+        workout1.exercises[0].feedback = ExerciseFeedback(
+            exerciseId: workout1.exercises[0].id,
+            workoutId: workout1.id,
+            intensity: .challenging,
+            setVolume: .moderate
+        )
+        
+        var weeklyWorkouts: [[WorkoutEntity]] = [
+            [workout1],
+            [workout2]
+        ]
+        
+        // Apply progression
+        ProgressionEngine.applyProgression(to: &weeklyWorkouts)
+        
+        let updatedSet = weeklyWorkouts[1][0].exercises[0].sets[0]
+        
+        // Reps should increase by 1 (from 10 to 11), weight should stay at 100
+        #expect(updatedSet.targetReps == 11, "Target reps should increase by 1")
+        #expect(updatedSet.weight == 100, "Weight should remain the same")
+    }
+
 }
-
-
     // MARK: - Stubbed Test Cases for Comprehensive Coverage
 
     @Test("1. Quads progress across 4 weeks with no feedback")

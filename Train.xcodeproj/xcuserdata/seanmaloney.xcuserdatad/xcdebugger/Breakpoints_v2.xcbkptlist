@@ -1024,8 +1024,8 @@
             filePath = "Train/Engine/ProgressionEngine.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "836"
-            endingLineNumber = "836"
+            startingLineNumber = "842"
+            endingLineNumber = "842"
             landmarkName = "updatedWeight(currentWeight:feedback:recentFeedbacks:equipment:)"
             landmarkType = "7">
          </BreakpointContent>
