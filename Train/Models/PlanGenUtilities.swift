@@ -70,8 +70,8 @@ func getMusclesForDayType(_ dayType: WorkoutDayType) -> [MuscleGroup] {
 func getExerciseCount(for duration: WorkoutDuration) -> Int {
     switch duration {
     case .short: return 4
-    case .medium: return 6
-    case .long: return 8
+    case .medium: return 5
+    case .long: return 7
     }
 }
 
@@ -86,16 +86,25 @@ func getRepRange(
     goal: TrainingGoal,
     experienceLevel: TrainingExperience
 ) -> (lower: Int, upper: Int) {
-    // Base rep ranges by goal
+
+    var range: (lower: Int, upper: Int)
+    switch experienceLevel {
+        case .beginner: range = (2, 2)
+        case .intermediate: fallthrough
+        case .advanced: range = (0, 0)
+    }
+    
+    var goalRange: (lower: Int, upper: Int)
     switch goal {
     case .strength:
         // Strength focus: lower reps, higher intensity
-        return muscle.muscleSize == .large ? (3, 6) : (5, 8)
+        goalRange = muscle.muscleSize == .large ? (3, 6) : (5, 8)
         
     case .hypertrophy:
         // Hypertrophy focus: moderate reps
-        return muscle.muscleSize == .large ? (6, 12) : (8, 15)
+        goalRange = muscle.muscleSize == .large ? (6, 15) : (8, 20)
     }
+    return (range.lower + goalRange.lower, range.upper + goalRange.upper)
 }
 
 

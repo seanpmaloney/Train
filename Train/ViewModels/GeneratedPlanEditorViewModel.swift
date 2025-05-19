@@ -280,13 +280,9 @@ class GeneratedPlanEditorViewModel: ObservableObject {
                     // Create sets for this exercise
                     var exerciseSets = [ExerciseSetEntity]()
                     
-                    // Simple progressive overload - add 1 rep per week if possible
-                    let weeklyRepIncrease = min(weekIndex, 2) // Max +2 reps over time
-                    let targetReps = exerciseModel.targetReps + weeklyRepIncrease
-                    
                     // Create the sets
                     for _ in 0..<exerciseModel.targetSets {
-                        let set = ExerciseSetEntity(targetReps: targetReps)
+                        let set = ExerciseSetEntity(targetReps: exerciseModel.targetReps)
                         exerciseSets.append(set)
                     }
                     

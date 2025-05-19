@@ -171,13 +171,6 @@ struct PlanEditorView: View {
             Divider()
                 .background(AppStyle.Colors.textSecondary.opacity(0.2))
             
-            Toggle(isOn: $viewModel.useProgressiveOverload) {
-                Text("Automatic Progressive Overload")
-                    .font(AppStyle.Typography.body())
-                    .foregroundColor(AppStyle.Colors.textSecondary)
-            }
-            .tint(AppStyle.Colors.primary)
-            
         }
         .padding()
         .background(AppStyle.Colors.surface)

@@ -153,6 +153,14 @@ struct ProgressionEngine {
             debug: debug
         )
         
+        // 5. Apply weight progression based on feedback
+        applyWeightProgression(
+            fromCurrentWeek: currentWeek,
+            toNextWeek: &nextWeek,
+            log: &progressionLog,
+            debug: debug
+        )
+        
         // Update the workouts array with our modified next week
         weeklyWorkouts[nextWeekIndex] = nextWeek
         
@@ -645,9 +653,17 @@ struct ProgressionEngine {
                     continue
                 }
                 
-                // Add one set to this exercise
+                // Add one set by duplicating the most recent one (if available)
                 var updatedExercise = exercise
-                let newSet = ExerciseSetEntity()  // Create a new default set
+                
+                let newSet: ExerciseSetEntity = exercise.sets.last.map {
+                    ExerciseSetEntity(
+                        weight: $0.weight,
+                        targetReps: $0.targetReps,
+                        isComplete: false
+                    )
+                } ?? ExerciseSetEntity() // fallback to empty if no sets (shouldn't occur)
+                
                 updatedExercise.sets.append(newSet)
                 
                 // Update the exercise in the next week
@@ -713,6 +729,113 @@ struct ProgressionEngine {
         // Check if our target muscle is in the prioritized set, or if there are no preferences at all
         // If there are no muscle preferences, treat all muscles as prioritized
         return prioritizedMuscles.isEmpty || prioritizedMuscles.contains(muscle)
+    }
+    /// Apply weight progression based on exercise feedback
+    private static func applyWeightProgression(
+        fromCurrentWeek currentWeek: [WorkoutEntity],
+        toNextWeek nextWeek: inout [WorkoutEntity],
+        log: inout [String],
+        debug: Bool
+    ) {
+        if debug {
+            log.append("WEIGHT: Starting weight progression analysis")
+        }
+        
+        // Process each workout pair (current week → next week)
+        for (currentIndex, currentWorkout) in currentWeek.enumerated() {
+            // Ensure we don't go out of bounds
+            guard currentIndex < nextWeek.count else { continue }
+            
+            // Get the corresponding workout in next week
+            let nextWorkout = nextWeek[currentIndex]
+            
+            // Process each exercise pair
+            for (_, currentExercise) in currentWorkout.exercises.enumerated() {
+                // Find matching exercise in next week's workout
+                guard let nextExerciseIndex = nextWorkout.exercises.firstIndex(where: { $0.movement.id == currentExercise.movement.id }) else {
+                    continue
+                }
+                
+                // Skip bodyweight exercises
+                if currentExercise.movement.equipment == .bodyweight {
+                    if debug {
+                        log.append("WEIGHT: Skipping weight progression for bodyweight exercise \(currentExercise.movement.name)")
+                    }
+                    continue
+                }
+                
+                // Get feedback for the current exercise
+                guard let feedback = currentExercise.feedback else {
+                    if debug {
+                        log.append("WEIGHT: No feedback available for \(currentExercise.movement.name)")
+                    }
+                    continue
+                }
+                
+                // Get recent feedback for this movement (for consecutive failed detection)
+                // This is simplified - in a real implementation we'd need to look back multiple weeks
+                let recentFeedbacks: [ExerciseIntensity] = [feedback.intensity] // Placeholder for now
+                
+                // Get a reference to the next week's exercise to avoid deep indexing
+                let nextExercise = nextWorkout.exercises[nextExerciseIndex]
+                
+                // Process each set in the exercise
+                for setIndex in 0..<nextExercise.sets.count {
+                    // Get the current set
+                    let set = nextExercise.sets[setIndex]
+                    let referenceIndex = min(setIndex, currentExercise.sets.count - 1)
+                    let currentWeight = currentExercise.sets[referenceIndex].weight
+                    
+                    // Calculate the raw weight adjustment based on feedback
+                    let newWeight = updatedWeight(
+                        currentWeight: currentWeight,
+                        feedback: feedback.intensity,
+                        recentFeedbacks: recentFeedbacks,
+                        equipment: currentExercise.movement.equipment
+                    )
+
+                    
+                    // Update the weight if it changed
+                    if newWeight != currentWeight {
+                        set.weight = newWeight
+                        nextExercise.sets[setIndex] = set
+                        
+                        if debug {
+                            let changeDirection = newWeight > currentWeight ? "increased" : "decreased"
+                            let changePercent = abs(((newWeight / currentWeight) - 1) * 100)
+                            log.append("WEIGHT: \(currentExercise.movement.name) weight \(changeDirection) from \(currentWeight) to \(newWeight) (\(String(format: "%.1f", changePercent))% change) based on \(feedback.intensity) feedback")
+                        }
+                    }
+                }
+                
+                // Update the exercise in the next workout
+                nextWorkout.exercises[nextExerciseIndex] = nextExercise
+            }
+            
+            // Update the workout in the next week
+            nextWeek[currentIndex] = nextWorkout
+        }
+    }
+    
+    /// Calculate updated weight based on feedback and recent feedback history
+    private static func updatedWeight(
+        currentWeight: Double,
+        feedback: ExerciseIntensity,
+        recentFeedbacks: [ExerciseIntensity],
+        equipment: EquipmentType
+    ) -> Double {
+        // If weight is very light (under 5 lbs), don't apply percentage changes
+        guard currentWeight >= 5 else { return currentWeight }
+
+        let increment: Double = switch (feedback, equipment) {
+            case (.tooEasy, .dumbbell), (.tooEasy, .machine), (.tooEasy, .cable): 5
+            case (.moderate, .dumbbell), (.moderate, .machine), (.moderate, .cable): 2.5
+            case (.tooEasy, .barbell): 10
+            case (.moderate, .barbell): 5
+            case (.failed, _): equipment == .barbell ? -5 : -2.5
+            default: 0
+        }
+        return currentWeight + increment
     }
 }
 

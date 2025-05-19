@@ -207,7 +207,8 @@ struct PlanGeneratorTests {
             }
         }
         
-        // Check that each week has more volume than the previous
+        // Check that each week has same volume than the previous
+        // ProgressionEngine handles progression
         for i in 1..<weeks {
             #expect(
                 setsByWeekForPrioritizedMuscles[i] >= setsByWeekForPrioritizedMuscles[i-1],

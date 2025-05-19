@@ -6,7 +6,6 @@ class PlanEditorViewModel: ObservableObject {
     @Published var days: [DayPlan]
     @Published var planLength: Int = 4
     @Published var planName: String = ""
-    @Published var useProgressiveOverload: Bool = false
     
     var planStartDate: Date {
         get { _planStartDate }
@@ -225,13 +224,9 @@ class PlanEditorViewModel: ObservableObject {
                 
                 // Add exercises to workout
                 for movement in day.movements {
-                    // Calculate progressive overload reps if enabled
-                    let targetReps = useProgressiveOverload ? 
-                        movement.targetReps + weekIndex : movement.targetReps
-                    
                     var exerciseSets = [ExerciseSetEntity]()
                     for _ in 0..<movement.targetSets {
-                        let setEntity = ExerciseSetEntity(targetReps: targetReps)
+                        let setEntity = ExerciseSetEntity(targetReps: movement.targetReps)
                         exerciseSets.append(setEntity)
                     }
                     

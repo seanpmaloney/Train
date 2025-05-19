@@ -127,13 +127,6 @@ struct PlanGenerator {
             let newDate = calculateDate(weekNumber: weekNumber, dayNumber: dayIndex + 1, startDate: plan.startDate)
             let newWorkout = copyWorkout(baseWorkout, withNewDate: newDate)
 
-            applyProgressiveOverload(
-                to: newWorkout,
-                originalWorkout: baseWorkout,
-                weekNumber: weekNumber,
-                input: input
-            )
-
             newWorkout.trainingPlan = plan
             newWeek.append(newWorkout)
         }
@@ -266,7 +259,7 @@ struct PlanGenerator {
                     )
                     
                     // Get rep range based on goal and muscle
-                    let (minReps, maxReps) = getRepRange(
+                    let (minReps, _) = getRepRange(
                         for: muscle,
                         goal: input.goal,
                         experienceLevel: input.trainingExperience
@@ -360,11 +353,26 @@ struct PlanGenerator {
             }
         }
         
+        // I know we just did a bunch of work to create the workout based on
+        // number of sets but we are going to default everything to 2 sets now
+        // because we wanted to build the plan with the intention of progressing
+        // into the hypertrophy range, but the progressionEngine will handle this
+        // but we wanted to make sure we got setup to handle larger volumes without
+        // having like 2 moves per workout with like 6 sets each towards the end of
+        // the plan...
+        adjustSetCountsForRampUp(in: workout, week: weekNumber)
         // Ensure movement variety
         enforceMovementVariety(for: workout, input: input)
     }
     
     // MARK: - Helper Methods
+    
+    func adjustSetCountsForRampUp(in workout: WorkoutEntity, week: Int) {
+        for i in 0..<workout.exercises.count {
+            let exercise = workout.exercises[i]
+            workout.exercises[i].sets = Array(exercise.sets.prefix(2)) // Always start with 2 sets
+        }
+    }
     
     /// Calculate the date for a workout
     /// - Parameters:
@@ -425,117 +433,6 @@ struct PlanGenerator {
         }
         
         return copy
-    }
-    
-    /// Apply progressive overload to exercises in a workout for a future week
-    /// - Parameters:
-    ///   - workout: The workout to modify
-    ///   - originalWorkout: The workout from the base week
-    ///   - weekNumber: The week number (1-based)
-    ///   - input: User preferences and settings
-    private func applyProgressiveOverload(
-        to workout: WorkoutEntity,
-        originalWorkout: WorkoutEntity,
-        weekNumber: Int,
-        input: PlanInput
-    ) {
-        for exercise in workout.exercises {
-            // Get the primary muscle targeted by this exercise
-            guard let primaryMuscle = exercise.movement.primaryMuscles.first else {
-                continue
-            }
-            
-            // Check if this muscle is prioritized
-            let isPrioritized = input.prioritizedMuscles.contains(primaryMuscle)
-            
-            // Only ramp volume for prioritized muscles
-            if isPrioritized {
-                // For each subsequent week, progressively add:
-                // - Beginners: Add 1 rep per week for first 2 weeks, then 1 set
-                // - Intermediate: Add 1 set every other week
-                // - Advanced: Add 1 set per week for prioritized muscles
-                
-                let weeksSinceStart = weekNumber - 1
-                
-                switch input.trainingExperience {
-                case .beginner:
-                    if weeksSinceStart <= 2 {
-                        // First, increase reps by 1-2 per week
-                        for set in exercise.sets {
-                            set.targetReps += weeksSinceStart
-                        }
-                    } else {
-                        // After initial weeks, add a set
-                        let additionalSets = (weeksSinceStart - 2) / 2
-                        for _ in 0..<additionalSets {
-                            if exercise.sets.count < 5 { // Cap at 5 sets
-                                addProgressiveSet(to: exercise)
-                            }
-                        }
-                    }
-                    
-                case .intermediate:
-                    // Add a set every other week for prioritized muscles
-                    let additionalSets = weeksSinceStart / 2
-                    for _ in 0..<additionalSets {
-                        if exercise.sets.count < 5 { // Cap at 5 sets
-                            addProgressiveSet(to: exercise)
-                        }
-                    }
-                    
-                case .advanced:
-                    // Add sets more aggressively for advanced lifters
-                    let additionalSets = min(weeksSinceStart, 5 - exercise.sets.count)
-                    for _ in 0..<additionalSets {
-                        if exercise.sets.count < 5 { // Cap at 5 sets
-                            addProgressiveSet(to: exercise)
-                        }
-                    }
-                }
-                
-                // Weight progression for non-bodyweight exercises
-                if exercise.movement.equipment != .bodyweight {
-                    let increment = getWeightIncrementForEquipment(exercise.movement.equipment)
-                    for set in exercise.sets {
-                        set.weight += increment * Double(weeksSinceStart)
-                    }
-                }
-            }
-        }
-    }
-    
-    /// Get appropriate weight increment based on equipment
-    /// - Parameter equipment: The equipment type
-    /// - Returns: The weight increment in pounds/kg
-    private func getWeightIncrementForEquipment(_ equipment: EquipmentType) -> Double {
-        switch equipment {
-        case .barbell:
-            return 5.0  // 5 lb increments for barbell
-        case .dumbbell:
-            return 2.5  // 2.5 lb increments for dumbbells
-        case .machine, .cable:
-            return 5.0  // 5 lb increments for machines
-        case .bodyweight:
-            return 0.0  // No increments for bodyweight
-        }
-    }
-
-    
-    /// Add a new set to an exercise as part of progression
-    /// - Parameter exercise: The exercise to add a set to
-    private func addProgressiveSet(to exercise: ExerciseInstanceEntity) {
-        // Get values from the last set as a template
-        guard let lastSet = exercise.sets.last else { return }
-        
-        // Create a new set with the same parameters
-        let newSet = ExerciseSetEntity(
-            weight: lastSet.weight,
-            targetReps: lastSet.targetReps,
-            isComplete: false
-        )
-        
-        // Add to the exercise
-        exercise.sets.append(newSet)
     }
         
     /// Find a suitable movement that targets a specific muscle
@@ -1023,18 +920,6 @@ struct PlanGenerator {
         }
     }
         
-        // Determine set targets for a muscle based on week and experience
-        func calculateInitialSets(for muscle: MuscleGroup, week: Int, experience: TrainingExperience) -> Int {
-            // Return set count based on experience and week index
-            fatalError("Not implemented")
-        }
-        
-        // Adjust future workout based on completed one
-        func adjustProgressionAfterWorkout(plan: TrainingPlanEntity, completedWorkout: WorkoutEntity) {
-            // Modify matching workout next week
-            // Increase sets, reps, or weight based on rules
-        }
-        
         /// Calculate appropriate weekly set targets for a muscle based on factors
         /// - Parameters:
         ///   - muscle: The target muscle group
@@ -1148,7 +1033,7 @@ struct PlanGenerator {
             
             // 2. Determine base target value - higher for prioritized muscles
             let baseTarget = isPrioritized
-                ? volumeRange.lowerBound // start at lower bound for hypertrophy
+            ? (volumeRange.lowerBound + volumeRange.upperBound) / 2 // middle of range for hypertrophy
                 : volumeRange.upperBound // start and stay at upper bound of maintenence range
             
             // 3. Apply experience multiplier for priority muscles since maintenence is already low
@@ -1161,12 +1046,8 @@ struct PlanGenerator {
                 }
             } else { experienceFactor = 1.0 }
             
-            // 4. Apply progressive overload based on week number
-            // increase each week by 10%
-            let weeklyProgressionFactor = 1.1
-            
             // 5. Calculate final target and ensure it's at least 1 set
-            let weeklyTarget = max(1, Int(Double(baseTarget) * experienceFactor * weeklyProgressionFactor))
+            let weeklyTarget = max(1, Int(Double(baseTarget) * experienceFactor))
             
             // 6. Cap weekly volume based on muscle size to prevent overtraining
             let maxWeeklyVolume: Int
@@ -1187,8 +1068,7 @@ struct PlanGenerator {
     private func initialWeeklyVolumeRange(for muscle: MuscleGroup, isPrioritized: Bool) -> ClosedRange<Int> {
         // start with 1/2 the hypertrophy range so users can ramp up onto the program
         if isPrioritized {
-            let range = muscle.trainingGuidelines.hypertrophySetsRange
-            return (range.lowerBound / 2)...(range.upperBound / 2)
+            return muscle.trainingGuidelines.hypertrophySetsRange
         } else {
             return muscle.trainingGuidelines.maintenanceSetsRange
         }
