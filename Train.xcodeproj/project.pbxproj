@@ -32,6 +32,8 @@
 		8B56F2232DD2D35700132675 /* AppState+Progression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2222DD2D35700132675 /* AppState+Progression.swift */; };
 		8B56F22A2DD56E4300132675 /* ProgressionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2262DD56E4300132675 /* ProgressionEngine.swift */; };
 		8B56F22E2DD5729200132675 /* ProgressionEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F22D2DD5729200132675 /* ProgressionEngineTests.swift */; };
+		8B56F2312DDEAC1700132675 /* NavigationDestinations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F22F2DDEAC1700132675 /* NavigationDestinations.swift */; };
+		8B56F2332DDEB00C00132675 /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2322DDEB00C00132675 /* NavigationCoordinator.swift */; };
 		8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */; };
 		8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */; };
 		8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A352DAAA08300404F43 /* TrainingType.swift */; };
@@ -135,6 +137,8 @@
 		8B56F2222DD2D35700132675 /* AppState+Progression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppState+Progression.swift"; sourceTree = "<group>"; };
 		8B56F2262DD56E4300132675 /* ProgressionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionEngine.swift; sourceTree = "<group>"; };
 		8B56F22D2DD5729200132675 /* ProgressionEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionEngineTests.swift; sourceTree = "<group>"; };
+		8B56F22F2DDEAC1700132675 /* NavigationDestinations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationDestinations.swift; sourceTree = "<group>"; };
+		8B56F2322DDEB00C00132675 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
 		8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardViewModel.swift; sourceTree = "<group>"; };
@@ -248,6 +252,15 @@
 			path = Engine;
 			sourceTree = "<group>";
 		};
+		8B56F2302DDEAC1700132675 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				8B56F22F2DDEAC1700132675 /* NavigationDestinations.swift */,
+				8B56F2322DDEB00C00132675 /* NavigationCoordinator.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
 		8B7A5A192DA9FC4500404F43 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -278,6 +291,7 @@
 		8B7BCF8D2D9DFD3F0089F6D3 /* Train */ = {
 			isa = PBXGroup;
 			children = (
+				8B56F2302DDEAC1700132675 /* Navigation */,
 				8B56F2282DD56E4300132675 /* Engine */,
 				8B568C732DC37E21004A39C6 /* Services */,
 				8B7BCF9E2D9E0AF90089F6D3 /* Train.entitlements */,
@@ -645,6 +659,7 @@
 				8B7A5A3C2DABE3D000404F43 /* TrainingViewModel.swift in Sources */,
 				8B568C822DC64DBA004A39C6 /* AdaptivePlanModels.swift in Sources */,
 				8B9877452DB9B7B100767AE2 /* EnhancedTrainingView.swift in Sources */,
+				8B56F2312DDEAC1700132675 /* NavigationDestinations.swift in Sources */,
 				8B98772D2DAF32D400767AE2 /* LoadingScreenView.swift in Sources */,
 				8B7BD0482DA74FCB0089F6D3 /* MovementLibrary.swift in Sources */,
 				8B7A5A3E2DABE3E200404F43 /* TodaysTrainingCard.swift in Sources */,
@@ -679,6 +694,7 @@
 				8B98775C2DBB25C500767AE2 /* ExerciseHistoryIndicator.swift in Sources */,
 				8B9877492DB9B7B700767AE2 /* EnhancedTrainingViewModel.swift in Sources */,
 				8B56F2142DCBA12B00132675 /* PlanInput.swift in Sources */,
+				8B56F2332DDEB00C00132675 /* NavigationCoordinator.swift in Sources */,
 				8B98774A2DB9B7B700767AE2 /* EnhancedActiveWorkoutViewModel.swift in Sources */,
 				8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */,
 				8B98775D2DBB25C500767AE2 /* WeekSelectorView.swift in Sources */,

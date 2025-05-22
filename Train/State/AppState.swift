@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftUI
 
 // Add MainActor to the entire class since this is primarily UI state
 @MainActor
@@ -361,7 +362,15 @@ class AppState: ObservableObject {
     }
     
     func isPlanCurrent(_ plan: TrainingPlanEntity) -> Bool {
-        return currentPlan?.id == plan.id
+        currentPlan?.id == plan.id
+    }
+    
+    /// Finds a plan by its ID in either current or past plans
+    func findPlan(with id: UUID) -> TrainingPlanEntity? {
+        if let currentPlan = currentPlan, currentPlan.id == id {
+            return currentPlan
+        }
+        return pastPlans.first { $0.id == id }
     }
     
     // Creates a SavedPlans struct capturing the current state for serialization

@@ -11,6 +11,7 @@ import SwiftUI
 struct TrainApp: App {
     @StateObject private var healthKit = HealthKitManager.shared
     @StateObject private var appState = AppState()
+    @StateObject private var navigationCoordinator = NavigationCoordinator()
     @Environment(\.scenePhase) private var scenePhase
     
     // Track previous phase to prevent duplicate refreshes
@@ -40,6 +41,7 @@ struct TrainApp: App {
                     }
                 }
                 .environmentObject(appState)
+                .environmentObject(navigationCoordinator)
         }
     }
 }

@@ -2,10 +2,10 @@ import SwiftUI
 
 struct PlansView: View {
     @EnvironmentObject private var appState: AppState
-    @State private var showingNewPlanSheet = false
+    @EnvironmentObject private var navigation: NavigationCoordinator
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigation.path) {
             ScrollView {
                 VStack(spacing: AppStyle.Layout.compactSpacing) {
                     if let plan = appState.currentPlan {
@@ -22,15 +22,34 @@ struct PlansView: View {
             }
             .background(AppStyle.Colors.background)
             .navigationTitle("Plans")
-//            .sheet(isPresented: $showingNewPlanSheet) {
-//                PlanTemplatePickerView()
-//            }
+            .navigationDestination(for: NavigationDestination.self) { destination in
+                switch destination {
+                case .templatePicker:
+                    PlanTemplatePickerView()
+                case .adaptivePlanSetup:
+                    AdaptivePlanSetupView()
+                case .generatedPlanEditor(let id):
+                    if let plan = appState.findPlan(with: id) {
+                        GeneratedPlanEditorView(generatedPlan: plan, appState: appState, planCreated: .constant(false))
+                    } else {
+                        Text("Plan not found")
+                    }
+                case .planEditor(let id):
+                    PlanEditorView(template: nil, appState: appState)
+                case .planDetail(let planId):
+                    if let plan = appState.findPlan(with: planId) {
+                        PlanDetailView(plan: plan)
+                    }
+                }
+            }
         }
     }
     
     
     private var createPlanButton: some View {
-        NavigationLink(destination: PlanTemplatePickerView()) {
+        Button {
+            navigation.navigateToTemplatePicker()
+        } label: {
             HStack {
                 Text("Create New Plan")
                     .font(AppStyle.Typography.body())
@@ -52,7 +71,9 @@ struct PlansView: View {
                 .font(AppStyle.Typography.caption())
                 .foregroundColor(AppStyle.Colors.textSecondary)
             
-            NavigationLink(destination: PlanDetailView(plan: plan)) {
+            Button {
+                navigation.navigateToPlanDetail(planId: plan.id)
+            } label: {
                 VStack(spacing: AppStyle.Layout.compactSpacing) {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
@@ -91,7 +112,9 @@ struct PlansView: View {
                 .foregroundColor(AppStyle.Colors.textSecondary)
             
             ForEach(appState.pastPlans, id: \.id) { plan in
-                NavigationLink(destination: PlanDetailView(plan: plan)) {
+                Button {
+                    navigation.navigateToPlanDetail(planId: plan.id)
+                } label: {
                     PastPlanCard(plan: plan)
                 }
             }

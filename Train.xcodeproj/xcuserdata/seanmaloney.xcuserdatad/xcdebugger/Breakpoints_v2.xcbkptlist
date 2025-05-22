@@ -359,22 +359,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7E3CC4DA-7A1B-40CF-B8B3-00DAF3C7BCDF"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Train/Views/AdaptivePlanSetupView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "379"
-            endingLineNumber = "379"
-            landmarkName = "proceedToNextQuestion()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "AB748177-F65F-4594-8F47-E85AF5391AC3"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -658,22 +642,6 @@
             startingLineNumber = "131"
             endingLineNumber = "131"
             landmarkName = "body"
-            landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "6A2D4183-B2F0-4723-B6BC-E88E24499DB6"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Train/Views/AdaptivePlanSetupView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "277"
-            endingLineNumber = "277"
-            landmarkName = "trainingExperienceQuestion"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1034,7 +1002,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "6F091F01-843B-49AA-9073-0F2DB261C086"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Train/ViewModels/PlanEditorViewModel.swift"
@@ -1044,36 +1012,6 @@
             endingLineNumber = "193"
             landmarkName = "finalizePlan()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "6F091F01-843B-49AA-9073-0F2DB261C086 - 464113d8e7876c37"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Train.PlanEditorViewModel.finalizePlan() -&gt; ()"
-                  moduleName = "Train.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/seanmaloney/Projects/Train/Train/ViewModels/PlanEditorViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "193"
-                  endingLineNumber = "193">
-               </Location>
-               <Location
-                  uuid = "6F091F01-843B-49AA-9073-0F2DB261C086 - d7dd3f073f21d43f"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Train.PlanEditorViewModel.DayPlan) -&gt; Swift.Bool in Train.PlanEditorViewModel.finalizePlan() -&gt; ()"
-                  moduleName = "Train.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/seanmaloney/Projects/Train/Train/ViewModels/PlanEditorViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "193"
-                  endingLineNumber = "193">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

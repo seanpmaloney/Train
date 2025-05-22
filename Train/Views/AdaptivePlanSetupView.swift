@@ -6,14 +6,12 @@ struct AdaptivePlanSetupView: View {
     
     // Dependencies
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var navigation: NavigationCoordinator
     @Environment(\.dismiss) private var dismiss
     
     // Preferences data model
     @State private var preferences = PlanPreferences()
     
-    // Plan generation state
-    @State private var generatedPlan: TrainingPlanEntity?
-    @State private var showPlanEditor = false
     
     // State for question navigation
     @State private var currentQuestion = 0
@@ -91,12 +89,6 @@ struct AdaptivePlanSetupView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             animateIn = true
-        }
-        .navigationDestination(isPresented: $showPlanEditor) {
-            if let plan = generatedPlan {
-                // Pass the generated plan to our specialized editor view
-                GeneratedPlanEditorView(generatedPlan: plan, appState: appState, planCreated: .constant(true))
-            }
         }
     }
     
@@ -386,21 +378,12 @@ struct AdaptivePlanSetupView: View {
             print("Error: Incomplete preferences data")
             return
         }
-        
         // Create the plan using PlanGenerator within MainActor context
         Task { @MainActor in
-            // Create exercise selector using the factory method
-//            let exerciseSelector = DefaultExerciseSelector.create()
-            
-            // Initialize plan generator with our dependencies
             var generator = PlanGenerator()
-            
-            // Generate the plan
             let plan = generator.generatePlan(input: input, forWeeks: 4)
-            
-            // Store the generated plan and show the editor
-            generatedPlan = plan
-            showPlanEditor = true
+            appState.addPlan(plan)
+            navigation.navigateToGeneratedPlanEditor(planId: plan.id)
         }
     }
 }

@@ -5,6 +5,7 @@ struct PlanEditorView: View {
     @State private var scrollTarget: ScrollTarget?
     @State private var requiredPadding: CGFloat = 0
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var navigation: NavigationCoordinator
     @Binding var planCreated: Bool
     
     private let numberPadHeight: CGFloat = 390
@@ -100,7 +101,8 @@ struct PlanEditorView: View {
                         Button("Create") {
                             viewModel.finalizePlan()
                             planCreated = true
-                            dismiss()
+                            // Return to root view
+                            navigation.returnToRoot()
                         }
                         .disabled(viewModel.planName.isEmpty || viewModel.totalMovementCount == 0)
                     }

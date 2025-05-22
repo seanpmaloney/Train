@@ -3,23 +3,23 @@ import SwiftUI
 struct PlanTemplatePickerView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var appState: AppState
-    @State private var planCreated = false // State to track if a plan was created
+    @EnvironmentObject private var navigation: NavigationCoordinator
     
     var body: some View {
-        NavigationStack {
             ScrollView {
                 VStack(spacing: AppStyle.Layout.compactSpacing) {
                     // Adaptive Plan Option (Special)
-                    NavigationLink {
-                        // Navigate to the new questionnaire flow
-                        AdaptivePlanSetupView()
+                    Button {
+                        // Navigate to the adaptive plan setup
+                        navigation.navigateToAdaptivePlanSetup()
                     } label: {
                         adaptivePlanCard
                     }
                     
                     // Custom Plan Option
-                    NavigationLink {
-                        PlanEditorView(template: nil, appState: appState, planCreated: $planCreated)
+                    Button {
+                        // Navigate to the custom plan editor
+                        navigation.navigateToPlanEditor(templateId: nil)
                     } label: {
                         customPlanCard
                     }
@@ -29,13 +29,6 @@ struct PlanTemplatePickerView: View {
             .background(AppStyle.Colors.background)
             .navigationTitle("Choose Template")
             .navigationBarTitleDisplayMode(.inline)
-            // When planCreated changes to true, dismiss this view
-            .onChange(of: planCreated) { created in
-                if created {
-                    dismiss()
-                }
-            }
-        }
     }
     
     private var customPlanCard: some View {
