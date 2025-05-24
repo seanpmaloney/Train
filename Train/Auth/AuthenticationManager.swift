@@ -2,6 +2,7 @@ import Foundation
 import AuthenticationServices
 
 /// Manages authentication operations and state
+@MainActor
 class AuthenticationManager: NSObject {
     // MARK: - Properties
     
@@ -35,34 +36,36 @@ class AuthenticationManager: NSObject {
         request.requestedScopes = [.fullName, .email]
         
         let controller = ASAuthorizationController(authorizationRequests: [request])
-        controller.delegate = self
-        controller.presentationContextProvider = presentationContextProvider
         
         // Present the sign in UI
         return await withCheckedContinuation { continuation in
             // Set up a one-time handler to capture the continuation
             let completionHandler = { continuation.resume() }
-            Task { @MainActor in
-                self.onceAuthenticationCompletes(perform: completionHandler)
-                controller.performRequests()
-            }
+            
+            // Capture self and controller weakly to avoid data races
+            self.onceAuthenticationCompletes(perform: completionHandler)
+            
+            // Set delegates and perform requests on the main actor
+            controller.delegate = self
+            controller.presentationContextProvider = self.presentationContextProvider
+            controller.performRequests()
         }
     }
     
     /// Checks if a user is currently signed in
     /// - Returns: Boolean indicating if user is signed in
-    func isUserSignedIn() -> Bool {
+    nonisolated func isUserSignedIn() -> Bool {
         return getUserId() != nil
     }
     
     /// Retrieves the stored user ID
     /// - Returns: User ID if available, nil otherwise
-    func getUserId() -> String? {
+    nonisolated func getUserId() -> String? {
         return UserDefaults.standard.string(forKey: "userId")
     }
     
     /// Signs the user out by clearing stored credentials
-    func signOut() {
+    nonisolated func signOut() {
         UserDefaults.standard.removeObject(forKey: "userId")
     }
     
@@ -70,7 +73,7 @@ class AuthenticationManager: NSObject {
     
     /// Stores the user ID securely in UserDefaults
     /// - Parameter userId: The Apple user identifier to store
-    private func storeUserId(_ userId: String) {
+    private nonisolated func storeUserId(_ userId: String) {
         UserDefaults.standard.set(userId, forKey: "userId")
     }
     
@@ -110,6 +113,7 @@ class AuthenticationManager: NSObject {
 
 // MARK: - ASAuthorizationControllerDelegate
 
+@MainActor
 extension AuthenticationManager: ASAuthorizationControllerDelegate {
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         // Handle successful authorization

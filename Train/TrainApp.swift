@@ -6,16 +6,27 @@
 //
 
 import SwiftUI
+// Firebase will need to be added via Swift Package Manager in Xcode
+// import Firebase
 
 @main
 struct TrainApp: App {
     @StateObject private var healthKit = HealthKitManager.shared
     @StateObject private var appState = AppState()
     @StateObject private var navigationCoordinator = NavigationCoordinator()
+    @StateObject private var userSessionManager = UserSessionManager()
     @Environment(\.scenePhase) private var scenePhase
     
     // Track previous phase to prevent duplicate refreshes
     @State private var previousPhase: ScenePhase = .inactive
+    
+    init() {
+        // Initialize Firebase
+        // In a real implementation, this would be uncommented:
+        // FirebaseApp.configure()
+        
+        print("TrainApp initialized with user accounts")
+    }
     
     var body: some Scene {
         WindowGroup {
@@ -42,6 +53,7 @@ struct TrainApp: App {
                 }
                 .environmentObject(appState)
                 .environmentObject(navigationCoordinator)
+                .environmentObject(userSessionManager)
         }
     }
 }

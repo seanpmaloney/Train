@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Charts
+import AuthenticationServices
 
 struct VitalStat: View {
     let icon: String
@@ -127,12 +128,17 @@ struct VitalsRow: View {
 struct ContentView: View {
     @StateObject private var healthKit = HealthKitManager.shared
     @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var userSessionManager: UserSessionManager
     @State private var selectedTab = 0
+    @State private var showingAccountView = false
     
     var body: some View {
         NavigationStack {
             if !appState.isLoaded {
                 LoadingView()
+            } else if !userSessionManager.isAuthenticated && appState.requiresAuthentication {
+                // Show login view when not authenticated and authentication is required
+                LoginView()
             } else {
                 ZStack {
                     // Background color
@@ -149,19 +155,26 @@ struct ContentView: View {
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text(getTimeBasedGreeting())
                                                 .foregroundColor(AppStyle.Colors.textSecondary)
-                                            Text("Sean")
+                                            Text(userSessionManager.currentUser?.displayName ?? "")
                                                 .font(.title)
                                                 .fontWeight(.bold)
+                                            
+                                            Text(Date(), style: .date)
+                                                .font(.subheadline)
+                                                .foregroundColor(.secondary)
                                         }
+                                        
                                         Spacer()
                                         
-                                        Circle()
-                                            .fill(AppStyle.Colors.surface)
-                                            .frame(width: 40, height: 40)
-                                            .overlay(
-                                                Image(systemName: "bell")
-                                                    .foregroundColor(AppStyle.Colors.textSecondary)
-                                            )
+                                        // Account button
+                                        Button(action: {
+                                            showingAccountView = true
+                                        }) {
+                                            Image(systemName: userSessionManager.isAuthenticated ? "person.circle.fill" : "person.circle")
+                                                .font(.system(size: 40))
+                                                .foregroundColor(userSessionManager.isAuthenticated ? AppStyle.Colors.primary : .secondary)
+                                        }
+                                            .background(AppStyle.Colors.background)
                                     }
                                     .padding(.horizontal)
                                     .padding(.top, 8)
@@ -206,6 +219,13 @@ struct ContentView: View {
         }
         .preferredColorScheme(.dark)
         .environmentObject(appState)
+        .sheet(isPresented: $showingAccountView) {
+            if userSessionManager.isAuthenticated {
+                AccountView()
+            } else {
+                LoginView()
+            }
+        }
     }
     
     private func getTimeBasedGreeting() -> String {
