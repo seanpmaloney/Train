@@ -12,6 +12,10 @@ class AppState: ObservableObject {
     @Published var activeWorkoutId: UUID?
     @Published var isLoaded: Bool = false
     
+    // User account related properties
+    @Published var requiresAuthentication: Bool = false // Set to true when features require authentication
+    @Published var syncEnabled: Bool = false // Whether to sync data with Firebase
+    
     private let saveQueue = DispatchQueue(label: "com.train.saveQueue", qos: .background)
     
     // Use a property for the filename to allow customization in tests
@@ -47,6 +51,8 @@ class AppState: ObservableObject {
         let pastPlans: [TrainingPlanEntity]
         let scheduledWorkouts: [WorkoutEntity]
         let activeWorkout: WorkoutEntity?
+        let requiresAuthentication: Bool
+        let syncEnabled: Bool
     }
     
     // MARK: File I/O operations marked as nonisolated
@@ -60,7 +66,9 @@ class AppState: ObservableObject {
                 currentPlan: self.currentPlan,
                 pastPlans: self.pastPlans,
                 scheduledWorkouts: self.scheduledWorkouts,
-                activeWorkout: self.activeWorkout
+                activeWorkout: self.activeWorkout,
+                requiresAuthentication: self.requiresAuthentication,
+                syncEnabled: self.syncEnabled
             )
             
             // Now perform the file operations in the background
@@ -154,6 +162,8 @@ class AppState: ObservableObject {
                 self.pastPlans = savedPlans.pastPlans
                 self.scheduledWorkouts = savedPlans.scheduledWorkouts
                 self.activeWorkout = savedPlans.activeWorkout
+                self.requiresAuthentication = savedPlans.requiresAuthentication
+                self.syncEnabled = savedPlans.syncEnabled
                 self.isLoaded = true
                 print("Successfully loaded \(savedPlans.pastPlans.count) past plans")
             }
@@ -187,6 +197,54 @@ class AppState: ObservableObject {
     
     init() {
         loadPlans()
+    }
+    
+    // MARK: - User Account Management
+    
+    /// Get all plans (current and past)
+    func getAllPlans() -> [TrainingPlanEntity] {
+        var allPlans = pastPlans
+        if let currentPlan = currentPlan {
+            allPlans.append(currentPlan)
+        }
+        return allPlans
+    }
+    
+    /// Update a plan with new data (for syncing)
+    func updatePlan(_ updatedPlan: TrainingPlanEntity) {
+        if let currentPlan = currentPlan, currentPlan.id == updatedPlan.id {
+            self.currentPlan = updatedPlan
+        } else if let index = pastPlans.firstIndex(where: { $0.id == updatedPlan.id }) {
+            pastPlans[index] = updatedPlan
+        } else {
+            // New plan, add it
+            addPlan(updatedPlan)
+        }
+        
+        savePlans()
+    }
+    
+    /// Clear all data (for account deletion)
+    func clearAllData() {
+        currentPlan = nil
+        pastPlans = []
+        scheduledWorkouts = []
+        activeWorkout = nil
+        activeWorkoutId = nil
+        
+        savePlans()
+    }
+    
+    /// Enable or disable authentication requirement
+    func setRequiresAuthentication(_ requires: Bool) {
+        requiresAuthentication = requires
+        savePlans()
+    }
+    
+    /// Enable or disable data syncing
+    func setSyncEnabled(_ enabled: Bool) {
+        syncEnabled = enabled
+        savePlans()
     }
     
     // MARK: - Calendar Management
@@ -380,7 +438,9 @@ class AppState: ObservableObject {
             currentPlan: self.currentPlan,
             pastPlans: self.pastPlans,
             scheduledWorkouts: self.scheduledWorkouts,
-            activeWorkout: self.activeWorkout
+            activeWorkout: self.activeWorkout,
+            requiresAuthentication: false,
+            syncEnabled: false
         )
         return savedPlans
     }

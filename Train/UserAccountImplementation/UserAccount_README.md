@@ -83,12 +83,129 @@ The user account system follows these key architectural principles:
 - Feature access control
 - Subscription UI
 
+### Stage 2.5: Social Feed Integration (3 weeks)
+
+- Social feed models and services
+- Feed unlock logic based on workout completion
+- Tabbed feed UI (Discover and Friends)
+- Post creation and viewing
+- Follow/unfollow functionality
+- User search functionality
+
+See [Social Feed Implementation Guide](SocialFeed.md) for detailed implementation.
+
+#### 2.5.1 Social Feed Models
+
+```swift
+// Models/WorkoutType.swift
+enum WorkoutType: String, Codable, CaseIterable, Identifiable {
+    case strength
+    case cardio
+    case run
+    case swim
+    case cycle
+    case yoga
+    case hiit
+    case rest
+    
+    var id: String { rawValue }
+    
+    // Display properties omitted for brevity
+}
+
+// Models/FeedUnlock.swift
+struct FeedUnlock: Codable, Identifiable {
+    let id: UUID
+    let userId: String
+    let workoutType: WorkoutType
+    let unlockDate: Date
+    
+    // Init omitted for brevity
+}
+
+// Models/PostEntity.swift
+struct PostEntity: Codable, Identifiable, Equatable {
+    let id: UUID
+    let userId: String
+    let userName: String
+    let workoutType: WorkoutType
+    let content: String
+    let createdAt: Date
+    let expiresAt: Date
+    var mediaURL: URL?
+    
+    // Init omitted for brevity
+}
+```
+
+#### 2.5.2 Social Feed Service
+
+```swift
+// Services/SocialFeedService.swift
+protocol SocialFeedService {
+    func getFriendsFeed(limit: Int, lastPostId: UUID?) async throws -> [PostEntity]
+    func getDiscoverFeed(limit: Int, lastPostId: UUID?) async throws -> [PostEntity]
+    func hasFeedUnlocked() -> Bool
+    func unlockFeed(workoutType: WorkoutType) async throws
+    func createPost(content: String, workoutType: WorkoutType, mediaURL: URL?) async throws -> PostEntity
+    func followUser(userId: String) async throws
+    func unfollowUser(userId: String) async throws
+    func getFollowing() async throws -> [UserEntity]
+}
+```
+
+#### 2.5.3 Firestore Structure
+
+```
+/users/{userId}
+  - Standard user fields
+  - lastPostDate: Timestamp
+  - feedUnlockDate: Timestamp
+  - following: [String]
+  - followerCount: Number
+
+/posts/{postId}
+  - id: String
+  - userId: String
+  - userName: String
+  - workoutType: String
+  - content: String
+  - createdAt: Timestamp
+  - expiresAt: Timestamp
+  - mediaURL: String (optional)
+
+/follows/{followId}
+  - followerId: String
+  - followeeId: String
+  - createdAt: Timestamp
+```
+
+#### 2.5.4 Feed Unlock Logic
+
+```swift
+// In WorkoutCompletionViewModel
+func completeWorkout() async {
+    // Normal workout completion logic
+    // ...
+    
+    // Determine workout type from the completed workout
+    let workoutType: WorkoutType = .strength // This would be determined from the workout
+    
+    // Unlock feed
+    try? await socialFeedService.unlockFeed(workoutType: workoutType)
+    
+    // Show post creation prompt
+    showCreatePostPrompt = true
+}
+```
+
 ### Stage 3: Data Synchronization (3 weeks)
 
 - Entity model updates for user ownership
 - Firestore sync service
 - Conflict resolution
 - Background sync management
+- Social feed data synchronization
 
 ### Stage 4: Account Management (2 weeks)
 
@@ -130,6 +247,23 @@ Train/
 │   └── Views/
 │       ├── SubscriptionView.swift
 │       └── FeatureLockedView.swift
+├── Social/
+│   ├── Models/
+│   │   ├── PostEntity.swift
+│   │   ├── WorkoutCompletion.swift
+│   │   └── WorkoutType.swift
+│   ├── Services/
+│   │   ├── SocialFeedService.swift
+│   │   ├── PostService.swift
+│   │   └── FollowService.swift
+│   ├── ViewModels/
+│   │   ├── FeedViewModel.swift
+│   │   └── PostViewModel.swift
+│   └── Views/
+│       ├── FeedView.swift
+│       ├── PostView.swift
+│       ├── CreatePostView.swift
+│       └── UserProfileView.swift
 └── Sync/
     ├── Models/
     │   └── SyncStatus.swift

@@ -20,6 +20,21 @@ struct UserEntity: Codable, Identifiable, Equatable {
     /// Last login date
     var lastLoginAt: Date
     
+    /// Date of the user's last post to the social feed
+    var lastPostDate: Date?
+    
+    /// IDs of users this user follows
+    var following: [String] = []
+    
+    /// Count of users following this user (we don't store the actual followers for privacy)
+    var followerCount: Int = 0
+    
+    /// Whether the user has unlocked the social feed today
+    var hasFeedUnlockedToday: Bool {
+        guard let lastPostDate = lastPostDate else { return false }
+        return Calendar.current.isDateInToday(lastPostDate)
+    }
+    
     /// User's subscription tier
     enum SubscriptionTier: String, Codable, CaseIterable {
         case free
@@ -30,11 +45,11 @@ struct UserEntity: Codable, Identifiable, Equatable {
         var features: [Feature] {
             switch self {
             case .free:
-                return [.basicPlans, .workoutTracking]
+                return [.basicPlans, .workoutTracking, .socialFeed]
             case .pro:
-                return [.basicPlans, .workoutTracking, .customPlans, .analytics]
+                return [.basicPlans, .workoutTracking, .customPlans, .analytics, .socialFeed]
             case .premium:
-                return [.basicPlans, .workoutTracking, .customPlans, .analytics, .advancedProgression, .exportData]
+                return [.basicPlans, .workoutTracking, .customPlans, .analytics, .advancedProgression, .exportData, .socialFeed]
             }
         }
         
@@ -65,6 +80,7 @@ struct UserEntity: Codable, Identifiable, Equatable {
         case analytics = "Analytics"
         case advancedProgression = "Advanced Progression"
         case exportData = "Data Export"
+        case socialFeed = "Social Feed"
         
         /// Description of the feature
         var description: String {
@@ -75,6 +91,7 @@ struct UserEntity: Codable, Identifiable, Equatable {
             case .analytics: return "Detailed analytics and insights"
             case .advancedProgression: return "Advanced progression algorithms"
             case .exportData: return "Export your data in various formats"
+            case .socialFeed: return "Connect with other users and share your progress"
             }
         }
     }
@@ -93,7 +110,10 @@ struct UserEntity: Codable, Identifiable, Equatable {
         displayName: String? = nil,
         tier: SubscriptionTier = .free,
         createdAt: Date = Date(),
-        lastLoginAt: Date = Date()
+        lastLoginAt: Date = Date(),
+        lastPostDate: Date? = nil,
+        following: [String] = [],
+        followerCount: Int = 0
     ) {
         self.id = id
         self.email = email
@@ -101,5 +121,8 @@ struct UserEntity: Codable, Identifiable, Equatable {
         self.tier = tier
         self.createdAt = createdAt
         self.lastLoginAt = lastLoginAt
+        self.lastPostDate = lastPostDate
+        self.following = following
+        self.followerCount = followerCount
     }
 }

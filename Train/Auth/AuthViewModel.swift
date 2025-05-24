@@ -3,6 +3,7 @@ import SwiftUI
 import AuthenticationServices
 
 /// ViewModel for handling authentication-related UI logic
+@MainActor
 class AuthViewModel: NSObject, ObservableObject {
     // MARK: - Published Properties
     
@@ -18,14 +19,20 @@ class AuthViewModel: NSObject, ObservableObject {
     private let userSession: UserSession
     
     /// Authentication manager for handling sign-in operations
-    private lazy var authManager: AuthenticationManager = {
+    private var _authManager: AuthenticationManager?
+    
+    private var authManager: AuthenticationManager {
+        if let manager = _authManager {
+            return manager
+        }
+        
         let manager = AuthenticationManager(presentationContextProvider: self)
         
         // Configure callbacks
         manager.onAuthSuccess = { [weak self] userId in
             guard let self = self else { return }
             
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.userSession.updateSession(userId: userId)
                 self.isAuthenticating = false
                 self.errorMessage = nil
@@ -35,7 +42,7 @@ class AuthViewModel: NSObject, ObservableObject {
         manager.onAuthError = { [weak self] error in
             guard let self = self else { return }
             
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.errorMessage = "Sign in failed: \(error.localizedDescription)"
                 self.isAuthenticating = false
             }
@@ -44,14 +51,15 @@ class AuthViewModel: NSObject, ObservableObject {
         manager.onAuthCanceled = { [weak self] in
             guard let self = self else { return }
             
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 // Just reset the loading state, no error needed for cancellation
                 self.isAuthenticating = false
             }
         }
         
+        _authManager = manager
         return manager
-    }()
+    }
     
     // MARK: - Initialization
     
@@ -65,7 +73,6 @@ class AuthViewModel: NSObject, ObservableObject {
     // MARK: - Public Methods
     
     /// Initiates Apple Sign In process
-    @MainActor
     func signInWithApple() async {
         isAuthenticating = true
         errorMessage = nil
@@ -75,13 +82,17 @@ class AuthViewModel: NSObject, ObservableObject {
     
     /// Signs the user out
     func signOut() {
-        authManager.signOut()
-        userSession.clearSession()
+        Task {
+            // Call the nonisolated method from the main actor
+            authManager.signOut()
+            userSession.clearSession()
+        }
     }
 }
 
 // MARK: - ASAuthorizationControllerPresentationContextProviding
 
+@MainActor
 extension AuthViewModel: ASAuthorizationControllerPresentationContextProviding {
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         // Find the active window to present from
