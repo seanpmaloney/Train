@@ -269,10 +269,22 @@ struct EnhancedTrainingView: View {
                 .font(.headline)
                 .foregroundColor(AppStyle.Colors.textPrimary)
             
-            Text(isUpcoming ? "Create a plan to get started" : "Complete workouts to see them here")
-                .font(.subheadline)
-                .foregroundColor(AppStyle.Colors.textSecondary)
-                .multilineTextAlignment(.center)
+            if (isUpcoming) {
+                Button(action: {
+                    showingPlanCreation = true
+                }) {
+                    Text("Create a plan to get started")
+                        .font(.subheadline)
+                        .foregroundColor(AppStyle.Colors.primary)
+                        .multilineTextAlignment(.center)
+                }
+            } else {
+                Text("Complete workouts to see them here")
+                    .font(.subheadline)
+                    .foregroundColor(AppStyle.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+            
         }
         .frame(maxWidth: .infinity)
         .padding(24)

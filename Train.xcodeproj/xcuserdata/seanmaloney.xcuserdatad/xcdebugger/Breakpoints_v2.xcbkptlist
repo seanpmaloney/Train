@@ -1056,8 +1056,8 @@
             filePath = "Train/Views/EnhancedTrainingView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "276"
-            endingLineNumber = "276"
+            startingLineNumber = "288"
+            endingLineNumber = "288"
             landmarkName = "emptyStateView(for:)"
             landmarkType = "7">
          </BreakpointContent>
