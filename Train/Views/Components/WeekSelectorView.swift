@@ -9,16 +9,11 @@ struct WeekSelectorView: View {
     @Namespace private var animation
     
     var body: some View {
-        VStack(spacing: 8) {
-            // Week label
-            Text("Week \(currentWeekIndex + 1)")
-                .font(.headline)
-                .foregroundColor(AppStyle.Colors.textPrimary)
-                .padding(.bottom, 2)
-                .animation(.easeInOut, value: currentWeekIndex)
+        HStack(spacing: 8) {
+            Spacer()
             
-            // Week indicators
-            HStack(spacing: 12) {
+            // Week selector controls in a horizontal layout
+            HStack(spacing: 8) {
                 // Previous button
                 Button(action: {
                     if currentWeekIndex > 0 {
@@ -31,30 +26,12 @@ struct WeekSelectorView: View {
                 }
                 .disabled(currentWeekIndex <= 0)
                 
-                // Week dots
-                HStack(spacing: 6) {
-                    ForEach(0..<min(weeklyWorkouts.count, 7), id: \.self) { index in
-                        let isVisible = shouldShowDot(at: index, totalCount: weeklyWorkouts.count)
-                        if isVisible {
-                            Circle()
-                                .fill(dotColor(for: index))
-                                .frame(width: isCurrentWeek(index) ? 8 : 6, height: isCurrentWeek(index) ? 8 : 6)
-                                .overlay(
-                                    isCurrentWeek(index) ?
-                                    Circle()
-                                        .stroke(AppStyle.Colors.primary, lineWidth: 1.5)
-                                        .matchedGeometryEffect(id: "currentWeekIndicator", in: animation)
-                                    : nil
-                                )
-                                .animation(.spring(), value: currentWeekIndex)
-                        } else if index == 3 && weeklyWorkouts.count > 7 {
-                            // Show ellipsis for truncated weeks
-                            Text("...")
-                                .font(.system(size: 10))
-                                .foregroundColor(AppStyle.Colors.textSecondary)
-                        }
-                    }
-                }
+                // Week label
+                Text("Week \(currentWeekIndex + 1)")
+                    .font(.headline)
+                    .foregroundColor(AppStyle.Colors.textPrimary)
+                    .animation(.easeInOut, value: currentWeekIndex)
+                    .frame(minWidth: 80)
                 
                 // Next button
                 Button(action: {
@@ -68,6 +45,10 @@ struct WeekSelectorView: View {
                 }
                 .disabled(currentWeekIndex >= weeklyWorkouts.count - 1)
             }
+            .padding(.vertical, 4)
+            .padding(.horizontal, 8)
+            .background(AppStyle.Colors.surface.opacity(0.5))
+            .cornerRadius(8)
         }
         .padding(.vertical, 8)
     }

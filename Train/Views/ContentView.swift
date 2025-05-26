@@ -166,15 +166,17 @@ struct ContentView: View {
                                         
                                         Spacer()
                                         
-                                        // Account button
+                                        // Settings button
                                         Button(action: {
                                             showingAccountView = true
                                         }) {
-                                            Image(systemName: userSessionManager.isAuthenticated ? "person.circle.fill" : "person.circle")
-                                                .font(.system(size: 40))
-                                                .foregroundColor(userSessionManager.isAuthenticated ? AppStyle.Colors.primary : .secondary)
+                                            Image(systemName: "gearshape.fill")
+                                                .font(.system(size: 24))
+                                                .foregroundColor(AppStyle.Colors.textPrimary)
+                                                .padding(8)
+                                                .background(AppStyle.Colors.surface)
+                                                .clipShape(Circle())
                                         }
-                                            .background(AppStyle.Colors.background)
                                     }
                                     .padding(.horizontal)
                                     .padding(.top, 8)

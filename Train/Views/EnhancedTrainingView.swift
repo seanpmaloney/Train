@@ -6,11 +6,14 @@ struct EnhancedTrainingView: View {
     
     @StateObject private var viewModel: EnhancedTrainingViewModel
     @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var navigationCoordinator: NavigationCoordinator
     @State private var isPastWorkoutsExpanded = true
     @State private var activeWorkout: WorkoutEntity? = nil
     @State private var showActiveWorkout = false
     @State private var hasActiveWorkoutDismissedByGesture = false
     @State private var selectedWeekIndex = 0
+    @State private var showingPlanCreation = false
+    @State private var initialPlanId: UUID?
     
     // MARK: - Initialization
     
@@ -21,6 +24,13 @@ struct EnhancedTrainingView: View {
     // MARK: - Body
     
     var body: some View {
+        mainContentView()    
+    }
+    
+    // MARK: - View Components
+    
+    @ViewBuilder
+    private func mainContentView() -> some View {
         ZStack(alignment: .bottomTrailing) {
         
             NavigationStack {
@@ -30,19 +40,8 @@ struct EnhancedTrainingView: View {
                 }
                 
                 VStack(spacing: 0) {
-                    // Week selector
-                    if let plan = appState.currentPlan, !plan.weeklyWorkouts.isEmpty {
-                        WeekSelectorView(
-                            weeklyWorkouts: plan.weeklyWorkouts,
-                            currentWeekIndex: selectedWeekIndex,
-                            onWeekSelected: { index in
-                                withAnimation {
-                                    selectedWeekIndex = index
-                                }
-                            }
-                        )
-                        .padding(.top, 8)
-                    }
+                    // Combined plan header and week selector
+                    planHeaderView()
                     
                     ScrollView {
                         VStack(spacing: 24) {
@@ -68,26 +67,86 @@ struct EnhancedTrainingView: View {
                     .background(AppStyle.Colors.background.ignoresSafeArea())
                 }
                 .onAppear {
+                    initialPlanId = appState.currentPlan?.id
                     refreshWeekGroups()
                 }
+                .fullScreenCover(isPresented: $showingPlanCreation) {
+                    planCreationView()
+                }
                 .onChange(of: appState.activeWorkoutId) { newId in
-                    if let id = newId {
-                        if let workout = findWorkout(with: id) {
-                            activeWorkout = workout
-                            showActiveWorkout = true
-                            hasActiveWorkoutDismissedByGesture = false
-                        }
-                    } else {
-                        activeWorkout = nil
-                        showActiveWorkout = false
-                        hasActiveWorkoutDismissedByGesture = false
-                        
-                        // Refresh week groups when returning from workout
-                        refreshWeekGroups()
-                    }
+                    handleActiveWorkoutChange(newId: newId)
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func planCreationView() -> some View {
+        NavigationStack(path: $navigationCoordinator.path) {
+            PlanTemplatePickerView()
+                .environmentObject(appState)
+                .environmentObject(navigationCoordinator)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            showingPlanCreation = false
+                            navigationCoordinator.returnToRoot()
+                        }
+                    }
+                }
+                .navigationDestination(for: NavigationDestination.self) { destination in
+                    switch destination {
+                    case .templatePicker:
+                        PlanTemplatePickerView()
+                            .environmentObject(appState)
+                            .environmentObject(navigationCoordinator)
+                    case .adaptivePlanSetup:
+                        AdaptivePlanSetupView()
+                            .environmentObject(appState)
+                            .environmentObject(navigationCoordinator)
+                    case .generatedPlanEditor(let planId):
+                        if let plan = appState.findPlan(with: planId) {
+                            GeneratedPlanEditorView(generatedPlan: plan, appState: appState, planCreated: .constant(false))
+                                .environmentObject(navigationCoordinator)
+                        } else {
+                            Text("Plan not found")
+                        }
+                    case .planEditor(_):
+                        PlanEditorView(template: nil, appState: appState)
+                            .environmentObject(navigationCoordinator)
+                    case .planDetail(let planId):
+                        if let plan = appState.findPlan(with: planId) {
+                            PlanDetailView(plan: plan)
+                                .environmentObject(appState)
+                                .environmentObject(navigationCoordinator)
+                        }
+                    }
+                }
+        }
+        .onChange(of: appState.currentPlan?.id) { newId in
+            if let newId = newId, newId != initialPlanId {
+                showingPlanCreation = false
+                navigationCoordinator.returnToRoot()
+            }
+        }
+    }
+                
+    // MARK: - Navigation Logic
+    
+    private func handleActiveWorkoutChange(newId: UUID?) {
+        if let id = newId {
+            if let workout = findWorkout(with: id) {
+                activeWorkout = workout
+                showActiveWorkout = true
+                hasActiveWorkoutDismissedByGesture = false
+            }
+        } else {
+            activeWorkout = nil
+            showActiveWorkout = false
+            hasActiveWorkoutDismissedByGesture = false
             
+            // Refresh week groups when returning from workout
+            refreshWeekGroups()
             // Use NavigationLink to present the active workout instead of sheet
             NavigationLink(
                 isActive: $showActiveWorkout,
@@ -222,6 +281,95 @@ struct EnhancedTrainingView: View {
     }
     
     // MARK: - Helper Methods
+    
+    /// Creates a header view showing current plan with option to create a new plan
+    /// and integrated week navigation
+    private func planHeaderView() -> some View {
+        HStack(alignment: .center) {
+            if let plan = appState.currentPlan {
+                // Left side: Plan info with dropdown
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Current Plan")
+                        .font(.caption)
+                        .foregroundColor(AppStyle.Colors.textSecondary)
+                    HStack(spacing: 4) {
+                        Text(plan.name)
+                            .font(.headline)
+                            .foregroundColor(AppStyle.Colors.textPrimary)
+                        
+                        // Dropdown menu for plan actions
+                        Menu {
+                            Button(action: {
+                                showingPlanCreation = true
+                            }) {
+                                Label("Create New Plan", systemImage: "plus")
+                            }
+                        } label: {
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppStyle.Colors.textSecondary)
+                        }
+                    }
+                }
+                
+                Spacer()
+                
+                // Right side: Week navigation (only if plan has weekly workouts)
+                if !plan.weeklyWorkouts.isEmpty {
+                    HStack(spacing: 12) {
+                        // Week indicator with navigation
+                        Button(action: {
+                            if selectedWeekIndex > 0 {
+                                withAnimation {
+                                    selectedWeekIndex -= 1
+                                }
+                            }
+                        }) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 12))
+                                .foregroundColor(selectedWeekIndex > 0 ? AppStyle.Colors.textSecondary : AppStyle.Colors.textSecondary.opacity(0.3))
+                        }
+                        .disabled(selectedWeekIndex <= 0)
+                        
+                        Text("Week \(selectedWeekIndex + 1)")
+                            .font(.subheadline)
+                            .foregroundColor(AppStyle.Colors.textSecondary)
+                            .frame(minWidth: 60, alignment: .center)
+                        
+                        Button(action: {
+                            if selectedWeekIndex < plan.weeklyWorkouts.count - 1 {
+                                withAnimation {
+                                    selectedWeekIndex += 1
+                                }
+                            }
+                        }) {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12))
+                                .foregroundColor(selectedWeekIndex < plan.weeklyWorkouts.count - 1 ? AppStyle.Colors.textSecondary : AppStyle.Colors.textSecondary.opacity(0.3))
+                        }
+                        .disabled(selectedWeekIndex >= plan.weeklyWorkouts.count - 1)
+                    }
+                }
+            } else {
+                // No plan message
+                Text("No active plan")
+                    .font(.headline)
+                    .foregroundColor(AppStyle.Colors.textSecondary)
+                
+                Spacer()
+                
+                Button(action: {
+                    showingPlanCreation = true
+                }) {
+                    Text("Create Plan")
+                        .font(.headline)
+                        .foregroundColor(AppStyle.Colors.primary)
+                }
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 16)
+    }
     
     /// Finds a workout by ID in all available workouts
     private func findWorkout(with id: UUID) -> WorkoutEntity? {

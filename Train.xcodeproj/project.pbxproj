@@ -50,6 +50,7 @@
 		8B56F2772DE0071A00132675 /* UserSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F26A2DE0071A00132675 /* UserSession.swift */; };
 		8B56F27A2DE158B200132675 /* UserAccount_README.md in Resources */ = {isa = PBXBuildFile; fileRef = 8B56F2792DE158B200132675 /* UserAccount_README.md */; };
 		8B56F27B2DE158B200132675 /* SocialFeed.md in Resources */ = {isa = PBXBuildFile; fileRef = 8B56F2782DE158B200132675 /* SocialFeed.md */; };
+		8B56F27D2DE1F25400132675 /* PlanCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F27C2DE1F25400132675 /* PlanCreationView.swift */; };
 		8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */; };
 		8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */; };
 		8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A352DAAA08300404F43 /* TrainingType.swift */; };
@@ -169,6 +170,7 @@
 		8B56F26A2DE0071A00132675 /* UserSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSession.swift; sourceTree = "<group>"; };
 		8B56F2782DE158B200132675 /* SocialFeed.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SocialFeed.md; sourceTree = "<group>"; };
 		8B56F2792DE158B200132675 /* UserAccount_README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = UserAccount_README.md; sourceTree = "<group>"; };
+		8B56F27C2DE1F25400132675 /* PlanCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCreationView.swift; sourceTree = "<group>"; };
 		8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
 		8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardViewModel.swift; sourceTree = "<group>"; };
@@ -441,6 +443,7 @@
 				8B9877442DB9B7B100767AE2 /* EnhancedActiveWorkoutView.swift */,
 				8B98774D2DB9B88B00767AE2 /* Components */,
 				8B9877432DB9B7B100767AE2 /* EnhancedTrainingView.swift */,
+				8B56F27C2DE1F25400132675 /* PlanCreationView.swift */,
 				8B7BD05B2DA757640089F6D3 /* PlanSummaryView.swift */,
 				8B98776B2DBC2C0E00767AE2 /* StatsView.swift */,
 				8B98772C2DAF32D400767AE2 /* LoadingScreenView.swift */,
@@ -738,6 +741,7 @@
 				8B7BCFE32DA1460F0089F6D3 /* TrainingView.swift in Sources */,
 				8B7BCFE42DA1460F0089F6D3 /* RestTimer.swift in Sources */,
 				8B98775F2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift in Sources */,
+				8B56F27D2DE1F25400132675 /* PlanCreationView.swift in Sources */,
 				8B568C8A2DC65B5C004A39C6 /* VolumeRampStrategy.swift in Sources */,
 				8B7BD05C2DA757640089F6D3 /* PlanSummaryView.swift in Sources */,
 				8B56F2162DCBA16D00132675 /* PlanGenUtilities.swift in Sources */,
