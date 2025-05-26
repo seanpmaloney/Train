@@ -13,7 +13,11 @@ struct EnhancedTrainingView: View {
     @State private var hasActiveWorkoutDismissedByGesture = false
     @State private var selectedWeekIndex = 0
     @State private var showingPlanCreation = false
+    @State private var showingPlansView = false
     @State private var initialPlanId: UUID?
+    
+    // Track the previous plan ID to detect plan changes
+    @State private var previousPlanId: UUID?
     
     // MARK: - Initialization
     
@@ -24,7 +28,14 @@ struct EnhancedTrainingView: View {
     // MARK: - Body
     
     var body: some View {
-        mainContentView()    
+        mainContentView()
+            .onChange(of: appState.currentPlan?.id) { oldValue, newValue in
+                handlePlanChange(oldValue: oldValue, newValue: newValue)
+            }
+            .onAppear {
+                // Store initial plan ID for change detection
+                previousPlanId = appState.currentPlan?.id
+            }
     }
     
     // MARK: - View Components
@@ -45,15 +56,18 @@ struct EnhancedTrainingView: View {
                     
                     ScrollView {
                         VStack(spacing: 24) {
-                            // Current week workouts section
-                            if let plan = appState.currentPlan, !plan.weeklyWorkouts.isEmpty, selectedWeekIndex < plan.weeklyWorkouts.count {
+                            if appState.currentPlan == nil {
+                                // No plan state - show empty view
+                                emptyStateView(for: true)
+                            } else if let plan = appState.currentPlan, !plan.weeklyWorkouts.isEmpty, selectedWeekIndex < plan.weeklyWorkouts.count {
+                                // Current plan with weekly workouts
                                 workoutSection(
                                     title: nil,
                                     workouts: plan.weeklyWorkouts[selectedWeekIndex],
                                     isUpcoming: true
                                 )
-                            } else {
-                                // Show upcoming workouts as fallback if no week data
+                            } else if appState.currentPlan != nil {
+                                // Plan exists but no weekly workouts data
                                 workoutSection(
                                     title: nil,
                                     workouts: viewModel.upcomingWorkouts,
@@ -75,6 +89,24 @@ struct EnhancedTrainingView: View {
                 }
                 .onChange(of: appState.activeWorkoutId) { newId in
                     handleActiveWorkoutChange(newId: newId)
+                }
+                
+                // Full screen cover for viewing all plans
+                .fullScreenCover(isPresented: $showingPlansView) {
+                    NavigationStack {
+                        PlansView()
+                            .environmentObject(appState)
+                            .environmentObject(navigationCoordinator)
+                            .toolbar {
+                                ToolbarItem(placement: .cancellationAction) {
+                                    Button("Close") {
+                                        showingPlansView = false
+                                        navigationCoordinator.returnToRoot()
+                                    }
+                                }
+                            }
+                    }
+                    // No need for onDisappear as we handle this reactively in the parent view
                 }
             }
         }
@@ -131,8 +163,32 @@ struct EnhancedTrainingView: View {
         }
     }
                 
-    // MARK: - Navigation Logic
+    // MARK: - State Management
     
+    /// Handles changes to the current plan
+    private func handlePlanChange(oldValue: UUID?, newValue: UUID?) {
+        // If plan was archived (plan changed to nil) or plan changed
+        if oldValue != newValue {
+            // Reset week index to default when plan changes
+            selectedWeekIndex = 0
+            
+            // The ViewModel is already observing appState.currentPlan
+            // so it automatically updates workouts on plan changes
+            // We just need to force a UI refresh in some cases
+            viewModel.objectWillChange.send()
+            
+            // If we have a new plan with weekly workouts, refresh the grouping
+            if newValue != nil {
+                refreshWeekGroups()
+            }
+        }
+        
+        // Update tracking state
+        previousPlanId = newValue
+        initialPlanId = newValue
+    }
+    
+    /// Handles changes to the active workout
     private func handleActiveWorkoutChange(newId: UUID?) {
         if let id = newId {
             if let workout = findWorkout(with: id) {
@@ -316,6 +372,11 @@ struct EnhancedTrainingView: View {
                             }) {
                                 Label("Create New Plan", systemImage: "plus")
                             }
+                            Button(action: {
+                                showingPlansView = true
+                            }) {
+                                Label("View Plans", systemImage: "list.bullet")
+                            }
                         } label: {
                             Image(systemName: "chevron.down")
                                 .font(.system(size: 12))
@@ -363,20 +424,37 @@ struct EnhancedTrainingView: View {
                     }
                 }
             } else {
-                // No plan message
-                Text("No active plan")
-                    .font(.headline)
-                    .foregroundColor(AppStyle.Colors.textSecondary)
+                // No plan message with dropdown
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Status")
+                        .font(.caption)
+                        .foregroundColor(AppStyle.Colors.textSecondary)
+                    HStack(spacing: 4) {
+                        Text("No active plan")
+                            .font(.headline)
+                            .foregroundColor(AppStyle.Colors.primary)
+                        
+                        // Dropdown menu for plan actions
+                        Menu {
+                            Button(action: {
+                                showingPlanCreation = true
+                            }) {
+                                Label("Create New Plan", systemImage: "plus")
+                            }
+                            Button(action: {
+                                showingPlansView = true
+                            }) {
+                                Label("View Plans", systemImage: "list.bullet")
+                            }
+                        } label: {
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppStyle.Colors.textSecondary)
+                        }
+                    }
+                }
                 
                 Spacer()
-                
-                Button(action: {
-                    showingPlanCreation = true
-                }) {
-                    Text("Create Plan")
-                        .font(.headline)
-                        .foregroundColor(AppStyle.Colors.primary)
-                }
             }
         }
         .padding(.horizontal)

@@ -832,9 +832,9 @@
             filePath = "Train/Views/EnhancedTrainingView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "227"
-            endingLineNumber = "227"
-            landmarkName = "workoutSection(title:workouts:isUpcoming:)"
+            startingLineNumber = "222"
+            endingLineNumber = "222"
+            landmarkName = "handleActiveWorkoutChange(newId:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1056,9 +1056,9 @@
             filePath = "Train/Views/EnhancedTrainingView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "288"
-            endingLineNumber = "288"
-            landmarkName = "emptyStateView(for:)"
+            startingLineNumber = "283"
+            endingLineNumber = "283"
+            landmarkName = "workoutSection(title:workouts:isUpcoming:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1107,6 +1107,22 @@
             startingLineNumber = "18"
             endingLineNumber = "18"
             landmarkName = "navigateToAdaptivePlanSetup()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "FBC3B4B1-ACBA-421F-A846-77230578498F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Train/Views/EnhancedTrainingView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "98"
+            endingLineNumber = "98"
+            landmarkName = "mainContentView()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
