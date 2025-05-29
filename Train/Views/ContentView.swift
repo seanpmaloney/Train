@@ -199,11 +199,9 @@ struct ContentView: View {
                                 .padding(.bottom, 100)
                             }
                         case 1:
-                            PlansView()
-                        case 2:
                             EnhancedTrainingView(appState: appState)
                                 .environmentObject(appState)
-                        case 3:
+                        case 2:
                             StatsView(appState: appState)
                                 .environmentObject(appState)
                         default:
@@ -484,7 +482,7 @@ struct CustomTabBar: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(0..<4) { index in
+            ForEach(0..<3) { index in
                 Button {
                     selectedTab = index
                 } label: {
@@ -505,10 +503,9 @@ struct CustomTabBar: View {
     
     private func tabIcon(for index: Int) -> String {
         switch index {
-        case 0: return "list.bullet.clipboard.fill"
-        case 1: return "chart.bar.fill"
-        case 2: return "dumbbell.fill"
-        case 3: return "chart.xyaxis.line"
+        case 0: return "list.bullet.clipboard.fill" // Dashboard
+        case 1: return "dumbbell.fill"              // Training
+        case 2: return "chart.xyaxis.line"          // Stats
         default: return ""
         }
     }
@@ -516,9 +513,8 @@ struct CustomTabBar: View {
     private func tabTitle(for index: Int) -> String {
         switch index {
         case 0: return "Dashboard"
-        case 1: return "Plans"
-        case 2: return "Training"
-        case 3: return "Stats"
+        case 1: return "Training"
+        case 2: return "Stats"
         default: return ""
         }
     }

@@ -834,8 +834,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "222"
             endingLineNumber = "222"
-            landmarkName = "handleActiveWorkoutChange(newId:)"
-            landmarkType = "7">
+            landmarkName = "EnhancedTrainingView"
+            landmarkType = "14">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

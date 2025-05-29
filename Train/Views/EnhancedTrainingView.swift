@@ -87,6 +87,17 @@ struct EnhancedTrainingView: View {
                 .fullScreenCover(isPresented: $showingPlanCreation) {
                     planCreationView()
                 }
+                // Add NavigationLink in the main view hierarchy
+                .background(
+                    NavigationLink(isActive: $showActiveWorkout, destination: {
+                        if let workout = activeWorkout {
+                            EnhancedActiveWorkoutView(workout: workout)
+                                .environmentObject(appState)
+                        } else {
+                            Text("Loading workout...")
+                        }
+                    }, label: { EmptyView() })
+                )
                 .onChange(of: appState.activeWorkoutId) { newId in
                     handleActiveWorkoutChange(newId: newId)
                 }
@@ -203,28 +214,9 @@ struct EnhancedTrainingView: View {
             
             // Refresh week groups when returning from workout
             refreshWeekGroups()
-            // Use NavigationLink to present the active workout instead of sheet
-            NavigationLink(
-                isActive: $showActiveWorkout,
-                destination: {
-                    if let workout = activeWorkout {
-                        // The original TrainingView directly passed the workout to ActiveWorkoutView
-                        // so we'll do the same and let the view handle setting activeWorkoutId in onAppear
-                        EnhancedActiveWorkoutView(workout: workout)
-                    } else {
-                        // Fallback if workout is nil (should never happen)
-                        Text("Loading workout...")
-                    }
-                },
-                label: { EmptyView() }
-            )
-            .hidden()
-            .onDisappear {
-                // Handle the case when NavigationLink is dismissed but workout is still active
-                if appState.activeWorkoutId != nil && !showActiveWorkout {
-                    hasActiveWorkoutDismissedByGesture = true
-                }
-            }
+            // NavigationLink was moved to the main view hierarchy
+            // Refresh week groups when returning from workout
+            refreshWeekGroups()
         }
     }
     
