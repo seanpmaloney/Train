@@ -16,14 +16,19 @@ class StatsViewModel: ObservableObject {
     /// Sets per muscle group over time
     @Published private(set) var muscleGroupSetsOverTime: [MuscleGroup: [SetOverTimeDataPoint]] = [:]
     
+    /// Weekly sets per muscle group
+    @Published private(set) var weeklyMuscleGroupSets: [MuscleGroup: [WeeklySetDataPoint]] = [:]
+    
+    /// Currently expanded muscle group (for detail view)
+    @Published var expandedMuscleGroup: MuscleGroup?
+    
     /// Estimated 1RM data for tracked exercises
     @Published private(set) var oneRepMaxData: [OneRepMaxData] = []
     
     /// Strength trend data for major movement categories
     @Published private(set) var strengthTrendData: [StrengthTrendCategory] = []
     
-    /// Selected time range for data display
-    @Published var selectedTimeRange: TimeRange = .threeMonths
+    // No longer using time range selector
     
     // MARK: - Private Properties
     
@@ -49,11 +54,8 @@ class StatsViewModel: ObservableObject {
     
     /// Refreshes all stats data
     func refreshAllData() {
-        refreshWeeklyVolumeData()
-        refreshMuscleGroupVolumeData()
-        refreshMuscleGroupSetsOverTime()
+        refreshWeeklyMuscleGroupSets()
         refreshOneRepMaxData()
-        refreshStrengthTrendData()
     }
     
     /// Calculate volume (sets × reps × weight) for a set
@@ -120,18 +122,18 @@ class StatsViewModel: ObservableObject {
         let today = Date()
         let calendar = Calendar.current
         let weekStart = calendar.startOfWeek(for: today)
-        let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart)!
+        let nextWeekStart = calendar.date(byAdding: .weekOfYear, value: 1, to: weekStart)!
         
-        let workouts = getAllWorkouts().filter { workout in
-            workout.isComplete && workout.scheduledDate != nil && 
-            workout.scheduledDate! >= weekStart && workout.scheduledDate! < weekEnd
+        let currentWeekWorkouts = getAllWorkouts().filter { workout in
+            guard let date = workout.scheduledDate else { return false }
+            return workout.isComplete && date >= weekStart && date < nextWeekStart
         }
         
         // Calculate volume for each muscle group
         var volumeByMuscleGroup: [MuscleGroup: Double] = [:]
         var setCountByMuscleGroup: [MuscleGroup: Int] = [:]
         
-        for workout in workouts {
+        for workout in currentWeekWorkouts {
             for exercise in workout.exercises {
                 // Calculate volume for this exercise
                 let exerciseVolume = calculateExerciseVolume(exercise)
@@ -203,83 +205,6 @@ class StatsViewModel: ObservableObject {
         
         // Convert to array and sort by estimated 1RM
         oneRepMaxData = Array(maxByExercise.values).sorted { $0.estimatedOneRM > $1.estimatedOneRM }
-    }
-    
-    func refreshStrengthTrendData() {
-        let timeRangeMonths = monthsForTimeRange(selectedTimeRange)
-        let startDate = Calendar.current.date(byAdding: .month, value: -timeRangeMonths, to: Date()) ?? Date()
-        
-        // Define movement categories
-        let categories = [
-            StrengthCategory(name: "Legs", movements: [.barbellBackSquat, .barbellFrontSquat, .legPress, .legExtension, .lyingLegCurl]),
-            StrengthCategory(name: "Push", movements: [.barbellBenchPress, .dumbbellBenchPress, .overheadPress, .pushUps, .dips]),
-            StrengthCategory(name: "Pull", movements: [.pullUps, .latPulldown, .bentOverRow, .seatedCableRow, .facePull])
-        ]
-        
-        // Get all workouts within the time range
-        let calendar = Calendar.current
-        let relevantWorkouts = getAllWorkouts().filter { workout in
-            workout.isComplete && workout.scheduledDate != nil && 
-            workout.scheduledDate! >= startDate
-        }
-        
-        // Group workouts by month for trend analysis
-        var monthlyData: [Date: [WorkoutEntity]] = [:]
-        
-        for workout in relevantWorkouts {
-            let month = calendar.startOfMonth(for: workout.scheduledDate ?? Date())
-            
-            if monthlyData[month] == nil {
-                monthlyData[month] = []
-            }
-            monthlyData[month]?.append(workout)
-        }
-        
-        // Calculate monthly averages for each category
-        var strengthTrends: [StrengthTrendCategory] = []
-        
-        for category in categories {
-            var dataPoints: [StrengthDataPoint] = []
-            
-            // Sort months chronologically
-            let sortedMonths = monthlyData.keys.sorted()
-            
-            for month in sortedMonths {
-                let workouts = monthlyData[month] ?? []
-                var totalOneRM = 0.0
-                var count = 0
-                
-                // Find the best 1RM for each movement in this category during this month
-                for movement in category.movements {
-                    var bestOneRMForMovement = 0.0
-                    
-                    for workout in workouts {
-                        for exercise in workout.exercises where exercise.movement.movementType == movement {
-                            for set in exercise.sets where set.isComplete {
-                                let oneRM = calculateEstimatedOneRepMax(weight: set.weight, reps: set.completedReps)
-                                bestOneRMForMovement = max(bestOneRMForMovement, oneRM)
-                            }
-                        }
-                    }
-                    
-                    if bestOneRMForMovement > 0 {
-                        totalOneRM += bestOneRMForMovement
-                        count += 1
-                    }
-                }
-                
-                // Calculate average if we have data
-                if count > 0 {
-                    let averageOneRM = totalOneRM / Double(count)
-                    dataPoints.append(StrengthDataPoint(date: month, value: averageOneRM))
-                }
-            }
-            
-            // Add the category with its data points
-            strengthTrends.append(StrengthTrendCategory(name: category.name, dataPoints: dataPoints))
-        }
-        
-        self.strengthTrendData = strengthTrends
     }
     
     private func isVolumeWithinOptimalRangeForHypertrophy(muscle: MuscleGroup, volume: Double) -> Bool {
@@ -357,6 +282,77 @@ class StatsViewModel: ObservableObject {
         case .threeMonths: return 3
         case .sixMonths: return 6
         case .twelveMonths: return 12
+        }
+    }
+    
+    /// Refresh weekly sets per muscle group data (up to 10 weeks)
+    private func refreshWeeklyMuscleGroupSets() {
+        // Get all workouts from past plans and current plan
+        let allWorkouts = getAllWorkouts().filter { $0.isComplete }
+        
+        // Create a date range for the last 10 weeks
+        let calendar = Calendar.current
+        let today = Date()
+        let tenWeeksAgo = calendar.date(byAdding: .weekOfYear, value: -9, to: calendar.startOfWeek(for: today))!
+        
+        // Prepare an array of all week start dates for consistent data
+        var weekStarts: [Date] = []
+        var currentWeekStart = tenWeeksAgo
+        
+        while currentWeekStart <= calendar.startOfWeek(for: today) {
+            weekStarts.append(currentWeekStart)
+            currentWeekStart = calendar.date(byAdding: .weekOfYear, value: 1, to: currentWeekStart)!
+        }
+        
+        // Sets by muscle group and week
+        var setsByWeekAndMuscleGroup: [Date: [MuscleGroup: Double]] = [:]
+        
+        // Initialize all weeks with zero sets for all muscle groups
+        for weekStart in weekStarts {
+            setsByWeekAndMuscleGroup[weekStart] = [:]
+            for muscle in MuscleGroup.allCases {
+                setsByWeekAndMuscleGroup[weekStart]![muscle] = 0.0
+            }
+        }
+        
+        // Process workouts
+        for workout in allWorkouts {
+            // Only consider completed workouts with a date
+            guard let workoutDate = workout.scheduledDate else { continue }
+            
+            // Skip workouts older than our timeframe
+            let weekStart = calendar.startOfWeek(for: workoutDate)
+            if weekStart < tenWeeksAgo { continue }
+            
+            // Process each exercise
+            for exercise in workout.exercises {
+                // Skip incomplete exercises
+                guard exercise.isComplete else { continue }
+                
+                // Count sets for each muscle group
+                let completedSets = Double(exercise.sets.filter { $0.isComplete }.count)
+                
+                // Add full count to primary muscles
+                for muscle in exercise.movement.primaryMuscles {
+                    setsByWeekAndMuscleGroup[weekStart]![muscle, default: 0] += completedSets
+                }
+                
+                // Add half count to secondary muscles
+                for muscle in exercise.movement.secondaryMuscles {
+                    setsByWeekAndMuscleGroup[weekStart]![muscle, default: 0] += completedSets * 0.5
+                }
+            }
+        }
+        
+        // Convert to the final data structure
+        weeklyMuscleGroupSets = MuscleGroup.allCases.reduce(into: [:]) { result, muscle in
+            let weeklyData = weekStarts.map { weekStart in
+                WeeklySetDataPoint(
+                    weekStart: weekStart,
+                    sets: setsByWeekAndMuscleGroup[weekStart]?[muscle] ?? 0.0
+                )
+            }
+            result[muscle] = weeklyData
         }
     }
     
@@ -515,6 +511,19 @@ extension StatsViewModel {
             let formatter = DateFormatter()
             formatter.dateFormat = "MMM yyyy"
             return formatter.string(from: date)
+        }
+    }
+    
+    /// Data point for weekly sets
+    struct WeeklySetDataPoint: Identifiable {
+        let id = UUID()
+        let weekStart: Date
+        let sets: Double // Using double to support partial sets (0.5 for secondary muscles)
+        
+        var formattedDate: String {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMM d"
+            return formatter.string(from: weekStart)
         }
     }
 }

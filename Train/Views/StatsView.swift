@@ -6,15 +6,12 @@ struct StatsView: View {
     // MARK: - Properties
     
     @StateObject var viewModel: StatsViewModel
-    @State private var selectedChart: ChartType = .muscleGroup
+    @State private var selectedChart: ChartType = .weeklyMuscleGroupSets
     
     // Enum for chart selection
     enum ChartType: String, CaseIterable, Identifiable {
-        case muscleGroup = "Muscle Groups"
-        //case weeklyVolume = "Weekly Volume"
+        case weeklyMuscleGroupSets = "Weekly Sets"
         case oneRepMax = "1RM Estimates"
-        case strengthTrends = "Strength Trends"
-        case muscleGroupSetsOverTime = "Muscle Group Sets Over Time"
         
         var id: String { rawValue }
     }
@@ -33,11 +30,6 @@ struct StatsView: View {
                 VStack(spacing: 24) {
                     // Chart selector
                     chartSelector
-                    
-                    // Time range selector (for applicable charts)
-                    if selectedChart == .strengthTrends {
-                        timeRangeSelector
-                    }
                     
                     // Selected chart view
                     selectedChartView
@@ -101,49 +93,16 @@ struct StatsView: View {
         }
     }
     
-    /// Time range selector
-    private var timeRangeSelector: some View {
-        HStack(spacing: 12) {
-            ForEach(StatsViewModel.TimeRange.allCases) { timeRange in
-                Button(action: {
-                    withAnimation {
-                        viewModel.selectedTimeRange = timeRange
-                        viewModel.refreshStrengthTrendData()
-                    }
-                }) {
-                    Text(timeRange.rawValue)
-                        .font(AppStyle.Typography.body())
-                        .foregroundColor(viewModel.selectedTimeRange == timeRange ? AppStyle.Colors.textPrimary : AppStyle.Colors.textSecondary)
-                        .padding(.vertical, 6)
-                        .padding(.horizontal, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(viewModel.selectedTimeRange == timeRange ? AppStyle.Colors.surfaceTop : AppStyle.Colors.background)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(AppStyle.Colors.surfaceTop, lineWidth: 1)
-                        )
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-    }
+    // MARK: - Selected Chart View
     
     /// Shows the appropriate chart view based on the current selection
     @ViewBuilder
     private var selectedChartView: some View {
         switch selectedChart {
-        case .muscleGroup:
-            MuscleGroupVolumeView(data: viewModel.muscleGroupVolumeData, viewModel: viewModel)
-        //case .weeklyVolume:
-            //WeeklyVolumeChartView(data: viewModel.weeklyVolumeData)
+        case .weeklyMuscleGroupSets:
+            WeeklyMuscleGroupSetsView(viewModel: viewModel)
         case .oneRepMax:
             OneRepMaxListView(data: viewModel.oneRepMaxData)
-        case .strengthTrends:
-            StrengthTrendsChartView(data: viewModel.strengthTrendData)
-        case .muscleGroupSetsOverTime:
-            MuscleGroupSetsOverTimeView(data: viewModel.muscleGroupSetsOverTime)
         }
     }
     

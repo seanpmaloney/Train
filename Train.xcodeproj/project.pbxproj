@@ -51,6 +51,7 @@
 		8B56F27A2DE158B200132675 /* UserAccount_README.md in Resources */ = {isa = PBXBuildFile; fileRef = 8B56F2792DE158B200132675 /* UserAccount_README.md */; };
 		8B56F27B2DE158B200132675 /* SocialFeed.md in Resources */ = {isa = PBXBuildFile; fileRef = 8B56F2782DE158B200132675 /* SocialFeed.md */; };
 		8B56F27D2DE1F25400132675 /* PlanCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F27C2DE1F25400132675 /* PlanCreationView.swift */; };
+		8B56F2892DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2882DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift */; };
 		8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */; };
 		8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */; };
 		8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A352DAAA08300404F43 /* TrainingType.swift */; };
@@ -171,6 +172,7 @@
 		8B56F2782DE158B200132675 /* SocialFeed.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SocialFeed.md; sourceTree = "<group>"; };
 		8B56F2792DE158B200132675 /* UserAccount_README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = UserAccount_README.md; sourceTree = "<group>"; };
 		8B56F27C2DE1F25400132675 /* PlanCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCreationView.swift; sourceTree = "<group>"; };
+		8B56F2882DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyMuscleGroupSetsView.swift; sourceTree = "<group>"; };
 		8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
 		8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardViewModel.swift; sourceTree = "<group>"; };
@@ -446,6 +448,7 @@
 				8B56F27C2DE1F25400132675 /* PlanCreationView.swift */,
 				8B7BD05B2DA757640089F6D3 /* PlanSummaryView.swift */,
 				8B98776B2DBC2C0E00767AE2 /* StatsView.swift */,
+				8B56F2882DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift */,
 				8B98772C2DAF32D400767AE2 /* LoadingScreenView.swift */,
 				8B7BD04D2DA754F70089F6D3 /* PlanTemplatePickerView.swift */,
 				8B568C7F2DC64990004A39C6 /* AdaptivePlanSetupView.swift */,
@@ -829,6 +832,7 @@
 				8B9877592DBB25AA00767AE2 /* EnhancedActiveWorkoutViewModel+History.swift in Sources */,
 				8B98776C2DBC2C0E00767AE2 /* StatsView.swift in Sources */,
 				8B7BCFBF2DA145110089F6D3 /* TrainingSession.swift in Sources */,
+				8B56F2892DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift in Sources */,
 				8B7BD0282DA5EFD20089F6D3 /* MovementEntity.swift in Sources */,
 				8B7BD0562DA756A90089F6D3 /* MovementPickerView.swift in Sources */,
 			);
