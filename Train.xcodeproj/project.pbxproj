@@ -52,6 +52,8 @@
 		8B56F27B2DE158B200132675 /* SocialFeed.md in Resources */ = {isa = PBXBuildFile; fileRef = 8B56F2782DE158B200132675 /* SocialFeed.md */; };
 		8B56F27D2DE1F25400132675 /* PlanCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F27C2DE1F25400132675 /* PlanCreationView.swift */; };
 		8B56F2892DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F2882DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift */; };
+		8B56F28B2DE7F25300132675 /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F28A2DE7F24F00132675 /* HapticsManager.swift */; };
+		8B56F28D2DE7F42300132675 /* HapticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56F28C2DE7F42300132675 /* HapticService.swift */; };
 		8B7A5A092DA9A5F700404F43 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */; };
 		8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */; };
 		8B7A5A362DAAA08300404F43 /* TrainingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7A5A352DAAA08300404F43 /* TrainingType.swift */; };
@@ -173,6 +175,8 @@
 		8B56F2792DE158B200132675 /* UserAccount_README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = UserAccount_README.md; sourceTree = "<group>"; };
 		8B56F27C2DE1F25400132675 /* PlanCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCreationView.swift; sourceTree = "<group>"; };
 		8B56F2882DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyMuscleGroupSetsView.swift; sourceTree = "<group>"; };
+		8B56F28A2DE7F24F00132675 /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
+		8B56F28C2DE7F42300132675 /* HapticService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticService.swift; sourceTree = "<group>"; };
 		8B7A5A082DA9A5F700404F43 /* PlanDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
 		8B7A5A2A2DAA783D00404F43 /* TrainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B7A5A332DAA9F0D00404F43 /* CalendarCardViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCardViewModel.swift; sourceTree = "<group>"; };
@@ -265,6 +269,7 @@
 		8B568C732DC37E21004A39C6 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				8B56F28C2DE7F42300132675 /* HapticService.swift */,
 				8B568C722DC37E21004A39C6 /* WorkoutManager.swift */,
 			);
 			path = Services;
@@ -292,6 +297,7 @@
 			isa = PBXGroup;
 			children = (
 				8B56F22F2DDEAC1700132675 /* NavigationDestinations.swift */,
+				8B56F28A2DE7F24F00132675 /* HapticsManager.swift */,
 				8B56F2322DDEB00C00132675 /* NavigationCoordinator.swift */,
 			);
 			path = Navigation;
@@ -797,6 +803,7 @@
 				8B7BD0542DA755F40089F6D3 /* PlanEditorViewModel.swift in Sources */,
 				8B98774F2DB9B88B00767AE2 /* WorkoutCardView.swift in Sources */,
 				8B7A5A3B2DABE3D000404F43 /* TodaysTrainingViewModel.swift in Sources */,
+				8B56F28D2DE7F42300132675 /* HapticService.swift in Sources */,
 				8B7BD01D2DA357FB0089F6D3 /* MuscleGroup.swift in Sources */,
 				8B7BD01B2DA357FB0089F6D3 /* Workout.swift in Sources */,
 				8B7BD0522DA755EB0089F6D3 /* PlanEditorView.swift in Sources */,
@@ -834,6 +841,7 @@
 				8B7BCFBF2DA145110089F6D3 /* TrainingSession.swift in Sources */,
 				8B56F2892DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift in Sources */,
 				8B7BD0282DA5EFD20089F6D3 /* MovementEntity.swift in Sources */,
+				8B56F28B2DE7F25300132675 /* HapticsManager.swift in Sources */,
 				8B7BD0562DA756A90089F6D3 /* MovementPickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
