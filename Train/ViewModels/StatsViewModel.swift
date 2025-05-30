@@ -55,6 +55,7 @@ class StatsViewModel: ObservableObject {
     /// Refreshes all stats data
     func refreshAllData() {
         refreshWeeklyMuscleGroupSets()
+        refreshMuscleGroupVolumeData()
         refreshOneRepMaxData()
     }
     
@@ -95,9 +96,12 @@ class StatsViewModel: ObservableObject {
         let calendar = Calendar.current
         var volumeByWeek: [Date: Double] = [:]
         
-        for workout in allWorkouts where workout.isComplete {
-            // Get week start date for the workout (safely)
-            guard let workoutDate = workout.scheduledDate else { continue }
+        // Filter to only include completed workouts with valid dates
+        let validWorkouts = allWorkouts.filter { $0.isComplete && $0.scheduledDate != nil }
+        
+        for workout in validWorkouts {
+            // We've already filtered for non-nil dates
+            let workoutDate = workout.scheduledDate!
             let weekStart = calendar.startOfWeekWithFallback(for: workoutDate)
             
             // Calculate total volume for workout
@@ -129,10 +133,8 @@ class StatsViewModel: ObservableObject {
             return
         }
         
-        let currentWeekWorkouts = getAllWorkouts().filter { workout in
-            guard let date = workout.scheduledDate else { return false }
-            return workout.isComplete && date >= weekStart && date < nextWeekStart
-        }
+        // Get completed workouts for current week only
+        let currentWeekWorkouts = workoutsInRange(from: weekStart, to: nextWeekStart, completed: true)
         
         // Calculate volume for each muscle group
         var volumeByMuscleGroup: [MuscleGroup: Double] = [:]
@@ -170,46 +172,60 @@ class StatsViewModel: ObservableObject {
     }
     
     private func refreshOneRepMaxData() {
-        // Get all workouts
-        let allWorkouts = getAllWorkouts()
+        // Get completed workouts with valid dates
+        let validWorkouts = completedWorkouts()
         
-        // Track the best estimated 1RM for each unique exercise
         var maxByExercise: [String: OneRepMaxData] = [:]
         
-        for workout in allWorkouts where workout.isComplete {
-            for exercise in workout.exercises {
-                let exerciseName = exercise.movement.movementType.rawValue
-                
-                // Find the set with the best possible 1RM
-                var bestOneRM = 0.0
-                var bestSet: ExerciseSetEntity?
-                
-                for set in exercise.sets where set.isComplete {
-                    let oneRM = calculateEstimatedOneRepMax(weight: set.weight, reps: set.completedReps)
-                    if oneRM > bestOneRM {
-                        bestOneRM = oneRM
-                        bestSet = set
-                    }
-                }
-                
-                // If we found a valid set
-                if let set = bestSet, bestOneRM > 0 {
-                    // If this is a new best or the first time seeing this exercise
-                    if maxByExercise[exerciseName] == nil || bestOneRM > (maxByExercise[exerciseName]?.estimatedOneRM ?? 0) {
-                        maxByExercise[exerciseName] = OneRepMaxData(
-                            exercise: exercise.movement,
-                            weight: set.weight,
-                            reps: set.completedReps,
-                            estimatedOneRM: bestOneRM,
-                            date: workout.scheduledDate ?? Date()
-                        )
-                    }
-                }
-            }
-        }
+        // Process workouts to find best 1RMs
+        processWorkoutsForOneRepMax(validWorkouts, into: &maxByExercise)
         
         // Convert to array and sort by estimated 1RM
         oneRepMaxData = Array(maxByExercise.values).sorted { $0.estimatedOneRM > $1.estimatedOneRM }
+    }
+    
+    /// Process workouts to find best one-rep max values
+    /// - Parameters:
+    ///   - workouts: List of workouts to process
+    ///   - maxByExercise: Dictionary to store results in
+    private func processWorkoutsForOneRepMax(_ workouts: [WorkoutEntity], into maxByExercise: inout [String: OneRepMaxData]) {
+        for workout in workouts {
+            // We've already filtered for valid dates in completedWorkouts()
+            let workoutDate = workout.scheduledDate!
+            
+            for exercise in workout.exercises where isValidExerciseForCalculation(exercise) {
+                let exerciseName = exercise.movement.movementType.rawValue
+                
+                // Cache completed sets for better performance
+                let validSets = exercise.sets.filter { 
+                    $0.isComplete && $0.weight > 0 && $0.completedReps > 0 
+                }
+                
+                // Find the set with the best 1RM
+                var bestSet: (set: ExerciseSetEntity, oneRM: Double)? = nil
+                
+                for set in validSets {
+                    let oneRM = calculateEstimatedOneRepMax(weight: set.weight, reps: set.completedReps)
+                    
+                    if bestSet == nil || oneRM > bestSet!.oneRM {
+                        bestSet = (set, oneRM)
+                    }
+                }
+                
+                // Update the maxByExercise dictionary if we found a better 1RM
+                if let best = bestSet, 
+                   best.oneRM > (maxByExercise[exerciseName]?.estimatedOneRM ?? 0) {
+                    
+                    maxByExercise[exerciseName] = OneRepMaxData(
+                        exercise: exercise.movement,
+                        weight: best.set.weight,
+                        reps: best.set.completedReps,
+                        estimatedOneRM: best.oneRM,
+                        date: workoutDate
+                    )
+                }
+            }
+        }
     }
     
     private func isVolumeWithinOptimalRangeForHypertrophy(muscle: MuscleGroup, volume: Double) -> Bool {
@@ -246,6 +262,64 @@ class StatsViewModel: ObservableObject {
         return muscle.trainingGuidelines.maxHypertrophySets
     }
     
+    // MARK: - Data Validation and Safety
+    
+    // MARK: - Workout Filtering Helpers
+    
+    /// Returns filtered workouts based on provided criteria
+    /// - Parameters:
+    ///   - completed: Whether to include only completed workouts
+    ///   - startDate: Optional start date for filtering (inclusive)
+    ///   - endDate: Optional end date for filtering (inclusive)
+    /// - Returns: Array of workouts matching the criteria
+    private func filteredWorkouts(completed: Bool = false, from startDate: Date? = nil, to endDate: Date? = nil) -> [WorkoutEntity] {
+        // Start with all workouts
+        let allWorkouts = getAllWorkouts()
+        
+        // Apply filters
+        return allWorkouts.compactMap { workout in
+            // Filter out workouts without dates
+            guard let workoutDate = workout.scheduledDate else {
+                #if DEBUG
+                print("Warning: Found workout without scheduled date: \(workout.title)")
+                #endif
+                return nil
+            }
+            
+            // Filter by completion status if requested
+            if completed && !workout.isComplete {
+                return nil
+            }
+            
+            // Filter by date range if provided
+            if let start = startDate, workoutDate < start {
+                return nil
+            }
+            
+            if let end = endDate, workoutDate > end {
+                return nil
+            }
+            
+            return workout
+        }
+    }
+    
+    /// Returns all workouts with valid dates
+    private func validWorkouts() -> [WorkoutEntity] {
+        return filteredWorkouts()
+    }
+    
+    /// Returns completed workouts with valid dates
+    private func completedWorkouts() -> [WorkoutEntity] {
+        return filteredWorkouts(completed: true)
+    }
+    
+    /// Returns workouts within a specific date range
+    private func workoutsInRange(from startDate: Date, to endDate: Date, completed: Bool = false) -> [WorkoutEntity] {
+        return filteredWorkouts(completed: completed, from: startDate, to: endDate)
+    }
+    
+    /// Returns all workouts from current and past plans
     private func getAllWorkouts() -> [WorkoutEntity] {
         var allWorkouts = [WorkoutEntity]()
         
@@ -262,10 +336,23 @@ class StatsViewModel: ObservableObject {
         return allWorkouts
     }
     
+    /// Validates if an exercise has valid data for volume calculations
+    private func isValidExerciseForCalculation(_ exercise: ExerciseInstanceEntity) -> Bool {
+        // Check if exercise has any sets
+        if exercise.sets.isEmpty {
+            #if DEBUG
+            print("Warning: Found exercise without sets: \(exercise.movement.name)")
+            #endif
+            return false
+        }
+        return true
+    }
+    
     private func calculateWorkoutVolume(_ workout: WorkoutEntity) -> Double {
         var totalVolume = 0.0
         
-        for exercise in workout.exercises {
+        // Only process exercises with valid data
+        for exercise in workout.exercises where isValidExerciseForCalculation(exercise) {
             totalVolume += calculateExerciseVolume(exercise)
         }
         
@@ -273,13 +360,13 @@ class StatsViewModel: ObservableObject {
     }
     
     private func calculateExerciseVolume(_ exercise: ExerciseInstanceEntity) -> Double {
-        var totalVolume = 0.0
+        // Cache the complete sets to avoid repeated filtering
+        let completeSets = exercise.sets.filter { $0.isComplete }
         
-        for set in exercise.sets where set.isComplete {
-            totalVolume += calculateSetVolume(set)
+        // Sum up the volume for each completed set
+        return completeSets.reduce(0.0) { totalVolume, set in
+            totalVolume + calculateSetVolume(set)
         }
-        
-        return totalVolume
     }
     
     private func monthsForTimeRange(_ range: TimeRange) -> Int {
@@ -290,32 +377,28 @@ class StatsViewModel: ObservableObject {
         }
     }
     
-    /// Refresh weekly sets per muscle group data (up to 10 weeks)
-    private func refreshWeeklyMuscleGroupSets() {
-        // Get all completed workouts
-        let allWorkouts = getAllWorkouts().filter { $0.isComplete }
-        
-        // Create a date range for the last 10 weeks
+    // MARK: - Date Range Helpers
+    
+    /// Creates an array of dates for the past N weeks from a reference date
+    /// - Parameters:
+    ///   - weekCount: Number of weeks to include (including current week)
+    ///   - fromDate: Reference date (defaults to today)
+    /// - Returns: Array of dates representing week start dates, or nil if calculation fails
+    private func weekStartDates(pastWeeks weekCount: Int, from fromDate: Date = Date()) -> [Date]? {
         let calendar = Calendar.current
-        let today = Date()
         
-        // Get the start of the current week with fallback
-        let currentWeekStart = calendar.startOfWeekWithFallback(for: today)
+        // Get the start of the reference week
+        let currentWeekStart = calendar.startOfWeekWithFallback(for: fromDate)
         
-        // Calculate date from 9 weeks ago
-        guard let tenWeeksAgo = calendar.date(byAdding: .weekOfYear, value: -9, to: currentWeekStart) else {
-            // If date calculation fails, initialize with empty data and return
-            weeklyMuscleGroupSets = MuscleGroup.allCases.reduce(into: [:]) { result, muscle in
-                result[muscle] = []
-            }
-            return
+        // Calculate the earliest date to include (weekCount-1 weeks ago)
+        guard let earliestDate = calendar.date(byAdding: .weekOfYear, value: -(weekCount-1), to: currentWeekStart) else {
+            return nil
         }
         
-        // Build array of week start dates for consistent data points
         var weekStarts: [Date] = []
-        var weekIterator = tenWeeksAgo
+        var weekIterator = earliestDate
         
-        // Generate all week start dates between 10 weeks ago and now
+        // Build array of week start dates
         while weekIterator <= currentWeekStart {
             weekStarts.append(weekIterator)
             
@@ -323,21 +406,18 @@ class StatsViewModel: ObservableObject {
             if let nextWeek = calendar.date(byAdding: .weekOfYear, value: 1, to: weekIterator) {
                 weekIterator = nextWeek
             } else {
-                // If date calculation fails, break to prevent infinite loop
                 break
             }
         }
         
-        // Handle edge case where we couldn't generate any week dates
-        if weekStarts.isEmpty {
-            weeklyMuscleGroupSets = MuscleGroup.allCases.reduce(into: [:]) { result, muscle in
-                result[muscle] = []
-            }
-            return
-        }
-        
-        // Pre-initialize a dictionary for each week with empty muscle group data
-        var setsByWeekAndMuscleGroup: [Date: [MuscleGroup: Double]] = [:]
+        return weekStarts.isEmpty ? nil : weekStarts
+    }
+    
+    /// Creates a dictionary of initialized buckets for each week and muscle group
+    /// - Parameter weekStarts: Array of week start dates
+    /// - Returns: Dictionary mapping weeks to muscle groups to initial values
+    private func initializeWeeklyMuscleGroupBuckets(for weekStarts: [Date]) -> [Date: [MuscleGroup: Double]] {
+        var buckets: [Date: [MuscleGroup: Double]] = [:]
         
         // Initialize all weeks with zero sets for all muscle groups
         for weekStart in weekStarts {
@@ -345,46 +425,78 @@ class StatsViewModel: ObservableObject {
             for muscle in MuscleGroup.allCases {
                 muscleData[muscle] = 0.0
             }
-            setsByWeekAndMuscleGroup[weekStart] = muscleData
+            buckets[weekStart] = muscleData
         }
         
+        return buckets
+    }
+    
+    /// Update muscle group set counts from a completed exercise
+    /// - Parameters:
+    ///   - exercise: The exercise to process
+    ///   - weekStart: The week start date for this exercise
+    ///   - buckets: The dictionary to update
+    private func updateSetCounts(from exercise: ExerciseInstanceEntity, forWeek weekStart: Date, in buckets: inout [Date: [MuscleGroup: Double]]) {
+        // Skip incomplete exercises
+        guard exercise.isComplete else { return }
+        
+        // Cache completed sets count for performance
+        let completedSets = Double(exercise.sets.filter { $0.isComplete }.count)
+        
+        // Add full count to primary muscles
+        for muscle in exercise.movement.primaryMuscles {
+            if var muscleData = buckets[weekStart] {
+                muscleData[muscle, default: 0] += completedSets
+                buckets[weekStart] = muscleData
+            }
+        }
+        
+        // Add half count to secondary muscles
+        for muscle in exercise.movement.secondaryMuscles {
+            if var muscleData = buckets[weekStart] {
+                muscleData[muscle, default: 0] += completedSets * 0.5
+                buckets[weekStart] = muscleData
+            }
+        }
+    }
+    
+    /// Refresh weekly sets per muscle group data (up to 10 weeks)
+    private func refreshWeeklyMuscleGroupSets() {
+        // Get week start dates for the last 10 weeks
+        guard let weekStarts = weekStartDates(pastWeeks: 10) else {
+            // If date calculation fails, initialize with empty data
+            weeklyMuscleGroupSets = MuscleGroup.allCases.reduce(into: [:]) { result, muscle in 
+                result[muscle] = [] 
+            }
+            return
+        }
+        
+        // Create initialized buckets for each week and muscle group
+        var setsByWeekAndMuscleGroup = initializeWeeklyMuscleGroupBuckets(for: weekStarts)
+        
+        // Get all completed workouts with valid dates
+        let validWorkouts = completedWorkouts()
+        
+        // Calculate earliest date to consider
+        let earliestDate = weekStarts.first!
+        
         // Process workouts to collect set data
-        for workout in allWorkouts {
-            // Only consider workouts with valid dates
-            guard let workoutDate = workout.scheduledDate else { continue }
-            
-            // Find the week this workout belongs to
-            let weekStart = calendar.startOfWeekWithFallback(for: workoutDate)
+        for workout in validWorkouts {
+            // We already filtered for valid dates in completedWorkouts()
+            let workoutDate = workout.scheduledDate!
             
             // Skip workouts outside our timeframe
-            if weekStart < tenWeeksAgo { continue }
+            if workoutDate < earliestDate { continue }
             
-            // Only process weeks that are in our pre-built array (handles edge cases)
-            guard let _ = setsByWeekAndMuscleGroup[weekStart] else { continue }
+            // Find the week this workout belongs to
+            let weekStart = Calendar.current.startOfWeekWithFallback(for: workoutDate)
+            
+            // Only process weeks that are in our pre-built array
+            guard setsByWeekAndMuscleGroup[weekStart] != nil else { continue }
             
             // Process each exercise in the workout
-            for exercise in workout.exercises {
-                // Skip incomplete exercises
-                guard exercise.isComplete else { continue }
-                
-                // Count completed sets
-                let completedSets = Double(exercise.sets.filter { $0.isComplete }.count)
-                
-                // Add full count to primary muscles
-                for muscle in exercise.movement.primaryMuscles {
-                    if var muscleData = setsByWeekAndMuscleGroup[weekStart] {
-                        muscleData[muscle, default: 0] += completedSets
-                        setsByWeekAndMuscleGroup[weekStart] = muscleData
-                    }
-                }
-                
-                // Add half count to secondary muscles
-                for muscle in exercise.movement.secondaryMuscles {
-                    if var muscleData = setsByWeekAndMuscleGroup[weekStart] {
-                        muscleData[muscle, default: 0] += completedSets * 0.5
-                        setsByWeekAndMuscleGroup[weekStart] = muscleData
-                    }
-                }
+            for exercise in workout.exercises where isValidExerciseForCalculation(exercise) {
+                updateSetCounts(from: exercise, forWeek: weekStart, in: &setsByWeekAndMuscleGroup)
             }
         }
         
