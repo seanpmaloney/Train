@@ -96,8 +96,9 @@ class StatsViewModel: ObservableObject {
         var volumeByWeek: [Date: Double] = [:]
         
         for workout in allWorkouts where workout.isComplete {
-            // Get week start date for the workout
-            let weekStart = calendar.startOfWeek(for: workout.scheduledDate!)
+            // Get week start date for the workout (safely)
+            guard let workoutDate = workout.scheduledDate else { continue }
+            let weekStart = calendar.startOfWeekWithFallback(for: workoutDate)
             
             // Calculate total volume for workout
             let workoutVolume = calculateWorkoutVolume(workout)
@@ -121,8 +122,12 @@ class StatsViewModel: ObservableObject {
         // Get all workouts from the current week
         let today = Date()
         let calendar = Calendar.current
-        let weekStart = calendar.startOfWeek(for: today)
-        let nextWeekStart = calendar.date(byAdding: .weekOfYear, value: 1, to: weekStart)!
+        let weekStart = calendar.startOfWeekWithFallback(for: today)
+        guard let nextWeekStart = calendar.date(byAdding: .weekOfYear, value: 1, to: weekStart) else {
+            // Handle the error case with empty data
+            muscleGroupVolumeData = []
+            return
+        }
         
         let currentWeekWorkouts = getAllWorkouts().filter { workout in
             guard let date = workout.scheduledDate else { return false }
@@ -287,59 +292,98 @@ class StatsViewModel: ObservableObject {
     
     /// Refresh weekly sets per muscle group data (up to 10 weeks)
     private func refreshWeeklyMuscleGroupSets() {
-        // Get all workouts from past plans and current plan
+        // Get all completed workouts
         let allWorkouts = getAllWorkouts().filter { $0.isComplete }
         
         // Create a date range for the last 10 weeks
         let calendar = Calendar.current
         let today = Date()
-        let tenWeeksAgo = calendar.date(byAdding: .weekOfYear, value: -9, to: calendar.startOfWeek(for: today))!
         
-        // Prepare an array of all week start dates for consistent data
-        var weekStarts: [Date] = []
-        var currentWeekStart = tenWeeksAgo
+        // Get the start of the current week with fallback
+        let currentWeekStart = calendar.startOfWeekWithFallback(for: today)
         
-        while currentWeekStart <= calendar.startOfWeek(for: today) {
-            weekStarts.append(currentWeekStart)
-            currentWeekStart = calendar.date(byAdding: .weekOfYear, value: 1, to: currentWeekStart)!
+        // Calculate date from 9 weeks ago
+        guard let tenWeeksAgo = calendar.date(byAdding: .weekOfYear, value: -9, to: currentWeekStart) else {
+            // If date calculation fails, initialize with empty data and return
+            weeklyMuscleGroupSets = MuscleGroup.allCases.reduce(into: [:]) { result, muscle in
+                result[muscle] = []
+            }
+            return
         }
         
-        // Sets by muscle group and week
+        // Build array of week start dates for consistent data points
+        var weekStarts: [Date] = []
+        var weekIterator = tenWeeksAgo
+        
+        // Generate all week start dates between 10 weeks ago and now
+        while weekIterator <= currentWeekStart {
+            weekStarts.append(weekIterator)
+            
+            // Safely get the next week's start date
+            if let nextWeek = calendar.date(byAdding: .weekOfYear, value: 1, to: weekIterator) {
+                weekIterator = nextWeek
+            } else {
+                // If date calculation fails, break to prevent infinite loop
+                break
+            }
+        }
+        
+        // Handle edge case where we couldn't generate any week dates
+        if weekStarts.isEmpty {
+            weeklyMuscleGroupSets = MuscleGroup.allCases.reduce(into: [:]) { result, muscle in
+                result[muscle] = []
+            }
+            return
+        }
+        
+        // Pre-initialize a dictionary for each week with empty muscle group data
         var setsByWeekAndMuscleGroup: [Date: [MuscleGroup: Double]] = [:]
         
         // Initialize all weeks with zero sets for all muscle groups
         for weekStart in weekStarts {
-            setsByWeekAndMuscleGroup[weekStart] = [:]
+            var muscleData: [MuscleGroup: Double] = [:]
             for muscle in MuscleGroup.allCases {
-                setsByWeekAndMuscleGroup[weekStart]![muscle] = 0.0
+                muscleData[muscle] = 0.0
             }
+            setsByWeekAndMuscleGroup[weekStart] = muscleData
         }
         
-        // Process workouts
+        // Process workouts to collect set data
         for workout in allWorkouts {
-            // Only consider completed workouts with a date
+            // Only consider workouts with valid dates
             guard let workoutDate = workout.scheduledDate else { continue }
             
-            // Skip workouts older than our timeframe
-            let weekStart = calendar.startOfWeek(for: workoutDate)
+            // Find the week this workout belongs to
+            let weekStart = calendar.startOfWeekWithFallback(for: workoutDate)
+            
+            // Skip workouts outside our timeframe
             if weekStart < tenWeeksAgo { continue }
             
-            // Process each exercise
+            // Only process weeks that are in our pre-built array (handles edge cases)
+            guard let _ = setsByWeekAndMuscleGroup[weekStart] else { continue }
+            
+            // Process each exercise in the workout
             for exercise in workout.exercises {
                 // Skip incomplete exercises
                 guard exercise.isComplete else { continue }
                 
-                // Count sets for each muscle group
+                // Count completed sets
                 let completedSets = Double(exercise.sets.filter { $0.isComplete }.count)
                 
                 // Add full count to primary muscles
                 for muscle in exercise.movement.primaryMuscles {
-                    setsByWeekAndMuscleGroup[weekStart]![muscle, default: 0] += completedSets
+                    if var muscleData = setsByWeekAndMuscleGroup[weekStart] {
+                        muscleData[muscle, default: 0] += completedSets
+                        setsByWeekAndMuscleGroup[weekStart] = muscleData
+                    }
                 }
                 
                 // Add half count to secondary muscles
                 for muscle in exercise.movement.secondaryMuscles {
-                    setsByWeekAndMuscleGroup[weekStart]![muscle, default: 0] += completedSets * 0.5
+                    if var muscleData = setsByWeekAndMuscleGroup[weekStart] {
+                        muscleData[muscle, default: 0] += completedSets * 0.5
+                        setsByWeekAndMuscleGroup[weekStart] = muscleData
+                    }
                 }
             }
         }

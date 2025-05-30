@@ -486,7 +486,6 @@ struct CustomTabBar: View {
                 Button {
                     selectedTab = index
                     // Trigger haptic feedback when tab changes
-                    HapticService.shared.selection()
                 } label: {
                     VStack(spacing: 4) {
                         Image(systemName: tabIcon(for: index))
@@ -496,6 +495,7 @@ struct CustomTabBar: View {
                     }
                     .foregroundColor(selectedTab == index ? AppStyle.Colors.textPrimary : AppStyle.Colors.textSecondary)
                     .frame(maxWidth: .infinity)
+                    .hapticFeedback(style: .light)
                 }
             }
         }

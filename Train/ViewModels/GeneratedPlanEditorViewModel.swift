@@ -258,7 +258,7 @@ class GeneratedPlanEditorViewModel: ObservableObject {
         let calendar = Calendar.current
         
         // Get start of week for plan start date
-        let startOfWeek = calendar.startOfWeek(for: planStartDate)
+        let startOfWeek = calendar.startOfWeekWithFallback(for: planStartDate)
         
         // Create workouts for each week
         for weekIndex in 0..<planLength {

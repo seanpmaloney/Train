@@ -103,6 +103,7 @@ struct WorkoutCardView: View {
                             Spacer()
                         }
                         .padding(.top, 4)
+                        .hapticFeedback(style: .light)
                     }
                 }
             }

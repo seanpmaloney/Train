@@ -27,13 +27,14 @@ extension EnhancedTrainingViewModel {
         let sortedWorkouts = currentPlan.weeklyWorkouts.flatMap{$0}.sorted { $0.scheduledDate ?? Date() < $1.scheduledDate ?? Date() }
         
         guard let firstWorkoutDate = sortedWorkouts.first?.scheduledDate else { return [] }
-        let firstWeekStart = calendar.startOfWeek(for: firstWorkoutDate)
+        guard let firstWeekStart = calendar.startOfWeek(for: firstWorkoutDate) else { return [] }
         
         // Find the last workout date to determine end week
         guard let lastWorkoutDate = sortedWorkouts.last?.scheduledDate else { return [] }
         
         // Calculate number of weeks between first and last workout
-        let numberOfWeeks = calendar.dateComponents([.weekOfYear], from: firstWeekStart, to: lastWorkoutDate).weekOfYear ?? 0
+        let lastWorkoutWeekStart = calendar.startOfWeekWithFallback(for: lastWorkoutDate)
+        let numberOfWeeks = calendar.dateComponents([.weekOfYear], from: firstWeekStart, to: lastWorkoutWeekStart).weekOfYear ?? 0
         
         // Create empty week groups
         for weekIndex in 0...numberOfWeeks {
@@ -52,9 +53,12 @@ extension EnhancedTrainingViewModel {
         // Assign workouts to appropriate week groups
         for workout in sortedWorkouts {
             guard let workoutDate = workout.scheduledDate else { continue }
-            let weekStart = calendar.startOfWeek(for: workoutDate)
+            let weekStart = calendar.startOfWeekWithFallback(for: workoutDate)
             
-            if let weekIndex = weekGroups.firstIndex(where: { calendar.isDate($0.startDate, inSameDayAs: weekStart) }) {
+            if let weekIndex = weekGroups.firstIndex(where: { group in 
+                // Both dates must be non-optional for isDate comparison
+                return calendar.isDate(group.startDate, inSameDayAs: weekStart) 
+            }) {
                 weekGroups[weekIndex].workouts.append(workout)
             }
         }
@@ -81,10 +85,26 @@ extension EnhancedTrainingViewModel {
     }
 }
 
-// Helper extension for Calendar
+// MARK: - Calendar Extensions
+
 extension Calendar {
-    func startOfWeek(for date: Date) -> Date {
+    /// Returns the start date of the week containing the specified date
+    /// - Parameter date: The date for which to find the start of the week
+    /// - Returns: The start date of the week, or nil if calculation fails
+    func startOfWeek(for date: Date) -> Date? {
+        // Get the year and week components
         let components = dateComponents([.yearForWeekOfYear, .weekOfYear], from: date)
-        return self.date(from: components) ?? date
+        
+        // Create date from these components (this will be the start of the week)
+        return self.date(from: components)
+    }
+    
+    /// Returns the start date of the week containing the specified date, with a fallback value
+    /// - Parameters:
+    ///   - date: The date for which to find the start of the week
+    ///   - fallback: The fallback date to use if calculation fails (defaults to original date)
+    /// - Returns: The start date of the week, or the fallback date if calculation fails
+    func startOfWeekWithFallback(for date: Date, fallback: Date? = nil) -> Date {
+        return startOfWeek(for: date) ?? (fallback ?? date)
     }
 }

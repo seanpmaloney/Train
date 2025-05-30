@@ -271,6 +271,7 @@ struct SetEditRow: View {
                                 .foregroundColor(set.isComplete ? AppStyle.Colors.success : AppStyle.Colors.textSecondary)
                         }
                         .padding(.horizontal, 4)
+                        .hapticFeedback(style: .rigid)
                     }
                     
                     // 3-dot menu for set actions
@@ -280,13 +281,6 @@ struct SetEditRow: View {
                         }) {
                             Label("Skip Set", systemImage: "arrow.uturn.backward.circle")
                         }
-                        
-//                        Button(action: {
-//                            viewModel.deleteSet(in: exercise, set: set)
-//                        }) {
-//                            Label("Delete Set", systemImage: "minus.circle")
-//                        }
-                        
                         Button(action: {
                             viewModel.addSet(to: exercise)
                         }) {

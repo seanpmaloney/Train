@@ -18,12 +18,10 @@ struct ExerciseFeedbackView: View {
                 exerciseHeader
                 
                 // Feedback sections
-                ScrollView {
                     VStack(spacing: AppStyle.Layout.standardSpacing) {
                         intensitySection
                         volumeSection
                     }
-                }
                 
                 // Submit button
                 Button {
@@ -40,6 +38,11 @@ struct ExerciseFeedbackView: View {
                 .disabled(!submitButtonEnabled)
                 .padding(.horizontal)
                 .padding(.bottom)
+                .simultaneousGesture(TapGesture().onEnded { _ in
+                    if submitButtonEnabled {
+                        HapticService.shared.impact(style: .medium)
+                    }
+                })
             }
             .background(AppStyle.Colors.background.ignoresSafeArea())
             .navigationTitle("Exercise Feedback")
@@ -138,6 +141,13 @@ struct ExerciseFeedbackView: View {
                     color: intensityColor(for: intensity),
                     action: {
                         selectedIntensity = intensity
+                        
+                        // Use error haptic only for failed, medium for others
+                        if intensity == .failed {
+                            HapticService.shared.error()
+                        } else {
+                            HapticService.shared.impact(style: .medium)
+                        }
                     }
                 )
             }
@@ -160,6 +170,13 @@ struct ExerciseFeedbackView: View {
                     color: volumeColor(for: volume),
                     action: {
                         selectedVolume = volume
+                        
+                        // Use error haptic only for too much sets, medium for others
+                        if volume == .tooMuch {
+                            HapticService.shared.error()
+                        } else {
+                            HapticService.shared.impact(style: .medium)
+                        }
                     }
                 )
             }

@@ -27,6 +27,8 @@ struct PreWorkoutFeedbackView: View {
                 // Start button
                 Button {
                     saveFeedback()
+                    // Success haptic for starting the workout
+                    HapticService.shared.success()
                 } label: {
                     Text("Start Workout")
                         .font(AppStyle.Typography.headline())
@@ -150,6 +152,9 @@ struct PreWorkoutFeedbackView: View {
         } else {
             selectedSoreMuscles.insert(muscle)
         }
+        
+        // Medium haptic for sore muscle selection/deselection
+        HapticService.shared.impact(style: .medium)
     }
     
     private func toggleJoint(_ joint: JointArea) {
@@ -158,6 +163,9 @@ struct PreWorkoutFeedbackView: View {
         } else {
             selectedJointAreas.insert(joint)
         }
+        
+        // Error haptic for joint pain selection/deselection
+        HapticService.shared.error()
     }
     
     private func saveFeedback() {

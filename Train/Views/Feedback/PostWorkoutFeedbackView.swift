@@ -20,6 +20,8 @@ struct PostWorkoutFeedbackView: View {
                 // Finish button
                 Button {
                     saveFeedback()
+                    // Success haptic for workout completion
+                    HapticService.shared.success()
                 } label: {
                     Text("Finish Workout")
                         .font(AppStyle.Typography.headline())
@@ -89,6 +91,8 @@ struct PostWorkoutFeedbackView: View {
                     isSelected: selectedFatigue == level,
                     action: {
                         selectedFatigue = level
+                        // Medium haptic for fatigue selection
+                        HapticService.shared.impact(style: .medium)
                     }
                 )
             }

@@ -40,7 +40,7 @@ final class HapticService {
     /// - Parameter style: The impact style to use
     /// - Note: Following Apple's recommendation, we create a new generator for each impact
     ///         as UIImpactFeedbackGenerator instances should be short-lived
-    func impact(style: UIImpactFeedbackGenerator.FeedbackStyle = .light) {
+    func impact(style: UIImpactFeedbackGenerator.FeedbackStyle = .medium) {
         // Create a new generator each time (Apple recommendation for impact generators)
         let generator = UIImpactFeedbackGenerator(style: style)
         generator.prepare()
