@@ -30,16 +30,33 @@ struct TrainApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
                 .task {
                     // Initial authorization and data fetch
                     appState.loadPlans()
+                    
+                    // Fetch health data
                     if !healthKit.isAuthorized {
                         if await healthKit.requestAuthorization() {
                             await healthKit.fetchTodayData()
                         }
                     } else {
                         await healthKit.fetchTodayData()
+                    }
+                }
+                // Using onReceive with the isLoaded publisher provides a clean, reactive way
+                // to respond when the app state finishes loading from disk
+                .onReceive(appState.$isLoaded) { isLoaded in
+                    if isLoaded {
+                        // Sync the user session when app state is loaded
+                        print("AppState loaded, syncing UserSessionManager...")
+                        if let persistedUser = appState.currentUser {
+                            print("Found persisted user: \(persistedUser.id), name: \(persistedUser.displayName ?? "None")")
+                        } else {
+                            print("No persisted user found in AppState")
+                        }
+                        // This ensures authentication persists across app launches
+                        userSessionManager.syncWithAppState(appState)
                     }
                 }
                 .onChange(of: scenePhase) { oldPhase, newPhase in

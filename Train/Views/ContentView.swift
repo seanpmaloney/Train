@@ -137,8 +137,10 @@ struct ContentView: View {
             if !appState.isLoaded {
                 LoadingView()
             } else if !userSessionManager.isAuthenticated && appState.requiresAuthentication {
-                // Show login view when not authenticated and authentication is required
-                LoginView()
+                // Show auth view when not authenticated and authentication is required
+                AuthView()
+                    .environmentObject(userSessionManager)
+                    .environmentObject(appState)
             } else {
                 ZStack {
                     // Background color
@@ -155,7 +157,7 @@ struct ContentView: View {
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text(getTimeBasedGreeting())
                                                 .foregroundColor(AppStyle.Colors.textSecondary)
-                                            Text(userSessionManager.currentUser?.displayName ?? "")
+                                            Text(appState.currentUser?.firstName ?? "")
                                                 .font(.title)
                                                 .fontWeight(.bold)
                                             
@@ -217,14 +219,28 @@ struct ContentView: View {
                 }
             }
         }
-        .preferredColorScheme(.dark)
+        .environmentObject(userSessionManager)
         .environmentObject(appState)
-        .sheet(isPresented: $showingAccountView) {
-            if userSessionManager.isAuthenticated {
-                AccountView()
+        .preferredColorScheme(.dark)
+        .onAppear {
+            // Sync UserSessionManager with AppState to ensure consistent user data
+            print("ContentView appeared, syncing auth state...")
+            
+            // Print current state for debugging
+            if let user = appState.currentUser {
+                print("AppState has user: \(user.id), displayName: \(user.displayName ?? "none")")
             } else {
-                LoginView()
+                print("AppState has no user!")
             }
+            
+            // Sync to ensure UserSessionManager has the latest user data from AppState
+            userSessionManager.syncWithAppState(appState)
+        }
+        .sheet(isPresented: $showingAccountView) {
+            // Use the consolidated AuthView for both login and account functionality
+            AuthView()
+                .environmentObject(userSessionManager)
+                .environmentObject(appState)
         }
     }
     

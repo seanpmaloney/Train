@@ -13,6 +13,7 @@ class AppState: ObservableObject {
     @Published var isLoaded: Bool = false
     
     // User account related properties
+    @Published var currentUser: UserEntity? = nil // Current authenticated user
     @Published var requiresAuthentication: Bool = false // Set to true when features require authentication
     @Published var syncEnabled: Bool = false // Whether to sync data with Firebase
     
@@ -53,6 +54,7 @@ class AppState: ObservableObject {
         let activeWorkout: WorkoutEntity?
         let requiresAuthentication: Bool
         let syncEnabled: Bool
+        let currentUser: UserEntity?
     }
     
     // MARK: File I/O operations marked as nonisolated
@@ -68,7 +70,8 @@ class AppState: ObservableObject {
                 scheduledWorkouts: self.scheduledWorkouts,
                 activeWorkout: self.activeWorkout,
                 requiresAuthentication: self.requiresAuthentication,
-                syncEnabled: self.syncEnabled
+                syncEnabled: self.syncEnabled,
+                currentUser: self.currentUser
             )
             
             // Now perform the file operations in the background
@@ -164,8 +167,12 @@ class AppState: ObservableObject {
                 self.activeWorkout = savedPlans.activeWorkout
                 self.requiresAuthentication = savedPlans.requiresAuthentication
                 self.syncEnabled = savedPlans.syncEnabled
+                self.currentUser = savedPlans.currentUser
                 self.isLoaded = true
                 print("Successfully loaded \(savedPlans.pastPlans.count) past plans")
+                if let user = savedPlans.currentUser {
+                    print("Loaded user: \(user.displayName ?? user.id)")
+                }
             }
         } catch let DecodingError.keyNotFound(key, context) {
             await MainActor.run {
@@ -200,6 +207,72 @@ class AppState: ObservableObject {
     }
     
     // MARK: - User Account Management
+    
+    /// Updates the user profile in AppState and persists the changes
+    /// - Parameter user: The user to update, or nil to clear the current user
+    @MainActor
+    func updateUser(_ user: UserEntity?) {
+        // Update the user in app state
+        self.currentUser = user
+        
+        if let user = user {
+            print("Updated user in AppState: \(user.displayName ?? user.id)")
+        } else {
+            print("Cleared user in AppState")
+        }
+        
+        // Save changes to persist the updated user
+        savePlans()
+    }
+    
+    /// Finalizes the onboarding process by saving the generated plan and updating user data
+    @MainActor
+    func finalizeOnboarding(user: UserEntity, plan: TrainingPlanEntity?, marketingOptIn: Bool, userSessionManager: UserSessionManager) async throws {
+        print("Starting finalizeOnboarding for user: \(user.displayName ?? user.id)")
+        
+        // Store the marketing preference in UserDefaults for easy access
+        UserDefaults.standard.set(marketingOptIn, forKey: "marketingOptIn")
+        
+        // Update the user profile with marketing preference
+        var updatedUser = user
+        updatedUser.marketingOptIn = marketingOptIn
+        
+        // Save the user in AppState
+        self.currentUser = updatedUser
+        print("✅ Set AppState.currentUser to: \(updatedUser.displayName ?? updatedUser.id)")
+        
+        // Save the changes to disk immediately to ensure persistence
+        savePlans()
+        
+        // Update the user profile via the user session manager and set authentication state
+        print("Signing in user in UserSessionManager: \(updatedUser.id), displayName: \(updatedUser.displayName ?? "none")")
+        
+        // Use signInWithUser to properly set auth state
+        userSessionManager.signInWithUser(updatedUser, appState: self)
+        
+        // Verify the user was properly updated in the session manager
+        if let currentUser = userSessionManager.currentUser {
+            print("✅ UserSessionManager currentUser updated successfully: \(currentUser.id), displayName: \(currentUser.displayName ?? "none")")
+        } else {
+            print("⚠️ UserSessionManager currentUser is still nil after update!")
+        }
+        
+        // Verify authentication state
+        print("UserSessionManager authState: \(userSessionManager.authState)")
+        
+        print("Onboarding completed for user ID: \(user.id), username: \(user.username ?? "none"), marketing opt-in: \(marketingOptIn)")
+        
+        // Set the generated plan if available
+        if let plan = plan {
+            self.setCurrentPlan(plan)
+            self.savePlans()
+            print("Set current training plan: \(plan.name)")
+        }
+        
+        // Mark app as requiring authentication if needed
+        self.setRequiresAuthentication(true)
+        print("App now requires authentication")
+    }
     
     /// Get all plans (current and past)
     func getAllPlans() -> [TrainingPlanEntity] {
@@ -440,7 +513,8 @@ class AppState: ObservableObject {
             scheduledWorkouts: self.scheduledWorkouts,
             activeWorkout: self.activeWorkout,
             requiresAuthentication: false,
-            syncEnabled: false
+            syncEnabled: false,
+            currentUser: self.currentUser
         )
         return savedPlans
     }

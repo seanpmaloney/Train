@@ -11,6 +11,12 @@ struct UserEntity: Codable, Identifiable, Equatable {
     /// User's display name (optional)
     var displayName: String?
     
+    /// User's first name (optional)
+    var firstName: String?
+    
+    /// User's last name (optional)
+    var lastName: String?
+    
     /// User's subscription tier
     var tier: SubscriptionTier
     
@@ -28,6 +34,12 @@ struct UserEntity: Codable, Identifiable, Equatable {
     
     /// Count of users following this user (we don't store the actual followers for privacy)
     var followerCount: Int = 0
+    
+    /// User's username for identification in the app
+    var username: String?
+    
+    /// Whether the user has opted-in to receive marketing emails
+    var marketingOptIn: Bool = false
     
     /// Whether the user has unlocked the social feed today
     var hasFeedUnlockedToday: Bool {
@@ -104,25 +116,45 @@ struct UserEntity: Codable, Identifiable, Equatable {
     ///   - tier: User's subscription tier (defaults to free)
     ///   - createdAt: Account creation date (defaults to now)
     ///   - lastLoginAt: Last login date (defaults to now)
+    ///   - lastPostDate: Date of the user's last post to the social feed (optional)
+    ///   - following: IDs of users this user follows (defaults to empty array)
+    ///   - followerCount: Count of users following this user (defaults to 0)
+    ///   - username: User's username (optional)
+    ///   - marketingOptIn: Whether the user has opted-in to marketing emails (defaults to false)
     init(
         id: String,
         email: String,
         displayName: String? = nil,
+        firstName: String? = nil,
+        lastName: String? = nil,
         tier: SubscriptionTier = .free,
         createdAt: Date = Date(),
         lastLoginAt: Date = Date(),
         lastPostDate: Date? = nil,
         following: [String] = [],
-        followerCount: Int = 0
+        followerCount: Int = 0,
+        username: String? = nil,
+        marketingOptIn: Bool = false
     ) {
         self.id = id
         self.email = email
         self.displayName = displayName
+        self.firstName = firstName
+        self.lastName = lastName
         self.tier = tier
         self.createdAt = createdAt
         self.lastLoginAt = lastLoginAt
         self.lastPostDate = lastPostDate
         self.following = following
         self.followerCount = followerCount
+        self.username = username
+        self.marketingOptIn = marketingOptIn
+    }
+    
+    /// Updates the last login time to now
+    func updatedLoginTime() -> UserEntity {
+        var updated = self
+        updated.lastLoginAt = Date()
+        return updated
     }
 }
