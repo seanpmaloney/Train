@@ -129,7 +129,7 @@ final class OnboardingViewModel: ObservableObject {
 enum OnboardingStep: Int, CaseIterable {
     case welcome
     case signIn
-    case nameSetup      // Re-added step for name collection
+//    case nameSetup      // Re-added step for name collection
     case usernameSetup
     case marketingOptIn
     case planIntro
@@ -140,7 +140,7 @@ enum OnboardingStep: Int, CaseIterable {
         switch self {
         case .welcome: return "Welcome"
         case .signIn: return "Sign In"
-        case .nameSetup: return "Your Profile"
+//        case .nameSetup: return "Your Profile"
         case .usernameSetup: return "Create Username"
         case .marketingOptIn: return "Preferences"
         case .planIntro: return "Training Plan"

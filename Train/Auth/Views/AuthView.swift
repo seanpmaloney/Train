@@ -46,17 +46,9 @@ struct AuthView: View {
                     onRequest: { request in
                         request.requestedScopes = [.fullName, .email]
                     },
-                    onCompletion: { result in
+                    onCompletion: { _ in
                         Task {
-                            switch result {
-                            case .success(let authorization):
-                                // Process the authorization directly instead of triggering another sign-in
-                                if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
-                                    await processAppleSignIn(with: appleIDCredential)
-                                }
-                            case .failure(let error):
-                                self.errorMessage = "Sign in failed: \(error.localizedDescription)"
-                            }
+                            await signIn()
                         }
                     }
                 )
@@ -239,61 +231,7 @@ struct AuthView: View {
     
     // MARK: - Helper Methods
     
-    /// Process Apple Sign In with received credentials
-    private func processAppleSignIn(with appleIDCredential: ASAuthorizationAppleIDCredential) async {
-        isLoading = true
-        errorMessage = nil
-        
-        // Create user from the credential
-        let userId = appleIDCredential.user
-        
-        // Keep the email if we got one or preserve existing email if already signed in before
-        let email = appleIDCredential.email ?? 
-                    (sessionManager.currentUser?.email ?? "")
-        
-        // Extract name if provided by Apple
-        // If Apple doesn't provide names but we had them from a previous sign-in, keep those
-        let firstName = appleIDCredential.fullName?.givenName ?? 
-                        sessionManager.currentUser?.firstName
-        let lastName = appleIDCredential.fullName?.familyName ?? 
-                       sessionManager.currentUser?.lastName
-        
-        // Generate display name from first and last name
-        var displayName: String? = nil
-        if let firstName = firstName, let lastName = lastName {
-            displayName = "\(firstName) \(lastName)"
-        } else if let existingName = sessionManager.currentUser?.displayName {
-            // Preserve existing display name if available
-            displayName = existingName
-        }
-        
-        // Preserve username if already set
-        let username = sessionManager.currentUser?.username
-        
-        // Create user entity
-        let user = UserEntity(
-            id: userId,
-            email: email,
-            displayName: displayName,
-            firstName: firstName,
-            lastName: lastName,
-            username: username
-        )
-        
-        print("Created user from Apple Sign In: ID=\(userId), Name=\(displayName ?? "None"), Email=\(email)")
-        
-        // Sign in the user directly without triggering another Apple dialog
-        sessionManager.signInWithUser(user, appState: appState)
-        
-        // Force an immediate save to ensure persistence
-        appState.updateUser(user)
-        appState.savePlans()
-        
-        print("User signed in and saved to AppState")
-        isLoading = false
-    }
-    
-    /// Legacy sign in method - only kept for compatibility, should not be used directly
+    /// Primary sign-in method that uses AuthService's delegate-based flow
     private func signIn() async {
         isLoading = true
         errorMessage = nil

@@ -7,7 +7,7 @@
 
 import SwiftUI
 // Firebase will need to be added via Swift Package Manager in Xcode
-// import Firebase
+import Firebase
 
 @main
 struct TrainApp: App {
@@ -22,8 +22,7 @@ struct TrainApp: App {
     
     init() {
         // Initialize Firebase
-        // In a real implementation, this would be uncommented:
-        // FirebaseApp.configure()
+        FirebaseApp.configure()
         
         print("TrainApp initialized with user accounts")
     }

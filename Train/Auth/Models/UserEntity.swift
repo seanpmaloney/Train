@@ -36,7 +36,7 @@ struct UserEntity: Codable, Identifiable, Equatable {
     var followerCount: Int = 0
     
     /// User's username for identification in the app
-    var username: String?
+    var username: String
     
     /// Whether the user has opted-in to receive marketing emails
     var marketingOptIn: Bool = false
@@ -133,7 +133,7 @@ struct UserEntity: Codable, Identifiable, Equatable {
         lastPostDate: Date? = nil,
         following: [String] = [],
         followerCount: Int = 0,
-        username: String? = nil,
+        username: String = "",
         marketingOptIn: Bool = false
     ) {
         self.id = id

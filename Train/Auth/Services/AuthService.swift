@@ -1,6 +1,9 @@
 import Foundation
 import AuthenticationServices
 import SwiftUI
+import Firebase
+import FirebaseAuth
+import CryptoKit
 
 /// Protocol for authentication services
 @MainActor
@@ -19,6 +22,9 @@ protocol AuthService {
     
     /// Update user profile information
     func updateUserProfile(_ user: UserEntity) async throws
+    
+    /// Process a credential directly (for use when you already have an authorization)
+    func processCredential(_ credential: ASAuthorizationAppleIDCredential) async throws -> UserEntity
 }
 
 /// Implementation of AuthService that provides Apple authentication
@@ -32,13 +38,39 @@ class AppleAuthService: NSObject, AuthService {
     /// Temporary storage for auth completion handling
     private var authContinuation: CheckedContinuation<UserEntity, Error>?
     
+    /// Current nonce for Apple Sign In security
+    /// This needs to be accessed across multiple methods to ensure consistency
+    private var currentNonce: String?
+    
     // MARK: - Public Methods
+    
+    /// Configure an Apple authorization request with the required parameters
+    func configureRequest(_ request: ASAuthorizationAppleIDRequest) {
+        // Generate a new nonce and store it for later verification
+        let nonce = randomNonceString()
+        currentNonce = nonce
+        
+        // Set the SHA256 hash of the nonce in the request
+        request.requestedScopes = [.fullName, .email]
+        request.nonce = sha256(nonce)
+        
+        print("Configured Apple request with nonce: \(nonce)")
+    }
     
     /// Sign in with Apple and return the authenticated user
     func signInWithApple(presentationContextProvider: ASAuthorizationControllerPresentationContextProviding) async throws -> UserEntity {
+        // Generate a random nonce for PKCE verification
+        let nonce = randomNonceString()
+        currentNonce = nonce
+        
+        // Create the Apple Sign In request
         let provider = ASAuthorizationAppleIDProvider()
         let request = provider.createRequest()
         request.requestedScopes = [.fullName, .email]
+        
+        // Set the SHA256 hash of the nonce in the request
+        // This is critical for Firebase Auth verification
+        request.nonce = sha256(nonce)
         
         let controller = ASAuthorizationController(authorizationRequests: [request])
         controller.delegate = self
@@ -76,6 +108,69 @@ class AppleAuthService: NSObject, AuthService {
         try await signOut()
     }
     
+    /// Process an Apple ID credential directly (for use when you already have an authorization)
+    /// - Parameter credential: The Apple ID credential to process
+    /// - Returns: A UserEntity representing the authenticated user
+    func processCredential(_ credential: ASAuthorizationAppleIDCredential) async throws -> UserEntity {
+        // Extract required fields from the credential
+        guard let identityToken = credential.identityToken,
+              let idTokenString = String(data: identityToken, encoding: .utf8),
+              let userId = credential.user as? String,
+              let nonce = currentNonce else {
+            print("⚠️ Missing required credential fields or nonce")
+            throw AuthError.invalidCredentials
+        }
+        
+        print("Processing Apple credential with nonce: \(nonce)")
+        
+        // Create Firebase credential with the same nonce used in the request
+        let firebaseCredential = OAuthProvider.appleCredential(
+            withIDToken: idTokenString,
+            rawNonce: nonce,
+            fullName: credential.fullName
+        )
+        
+        // Sign in to Firebase
+        try await signInWithFirebase(credential: firebaseCredential)
+        
+        // Extract user information
+        let email = credential.email ?? ""
+        let firstName = credential.fullName?.givenName
+        let lastName = credential.fullName?.familyName
+        
+        // Retrieve existing user if available
+        let existingUser = retrieveUserFromDefaults(userId: userId)
+        
+        // Determine display name based on available info
+        var displayName: String?
+        if let firstName = firstName, let lastName = lastName {
+            displayName = "\(firstName) \(lastName)"
+        } else if let firstName = firstName {
+            displayName = firstName
+        } else if let lastName = lastName {
+            displayName = lastName
+        } else {
+            displayName = existingUser?.displayName
+        }
+        
+        // Create the user entity
+        let user = UserEntity(
+            id: userId,
+            email: email,
+            displayName: displayName,
+            firstName: firstName,
+            lastName: lastName
+        )
+        
+        // Store the user ID for later retrieval
+        UserDefaults.standard.set(userId, forKey: userIdKey)
+        
+        // Save the user profile
+        saveUserToDefaults(user: user)
+        
+        return user
+    }
+    
     /// Update user profile information
     func updateUserProfile(_ user: UserEntity) async throws {
         // Store the ID for backward compatibility
@@ -83,6 +178,24 @@ class AppleAuthService: NSObject, AuthService {
         
         // Save the complete user data to UserDefaults
         saveUserToDefaults(user: user)
+    }
+    
+    /// Sign in to Firebase Auth with a credential
+    /// This method handles the non-sendable AuthDataResult type
+    /// - Parameter credential: The OAuthCredential to authenticate with
+    private func signInWithFirebase(credential: OAuthCredential) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            Auth.auth().signIn(with: credential) { result, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else if let result = result {
+                    print("✅ Firebase Auth successful with UID: \(result.user.uid)")
+                    continuation.resume(returning: ())
+                } else {
+                    continuation.resume(throwing: AuthError.unknown(message: "Unknown Firebase error"))
+                }
+            }
+        }
     }
     
     // MARK: - Private Helper Methods
@@ -122,12 +235,8 @@ extension AppleAuthService: ASAuthorizationControllerDelegate {
             return
         }
         
-        // Store the user ID for backward compatibility
-        UserDefaults.standard.set(userId, forKey: userIdKey)
-        
-        // Check if we have an existing user in UserDefaults to retrieve profile data
-        // that Apple might not provide on subsequent sign-ins
-        var existingUser: UserEntity? = retrieveUserFromDefaults(userId: userId)
+        // Get existing user if available
+        let existingUser = retrieveUserFromDefaults(userId: userId)
         
         // Get the new email from Apple or fall back to existing
         let email = appleIDCredential.email ?? existingUser?.email ?? ""
@@ -135,7 +244,7 @@ extension AppleAuthService: ASAuthorizationControllerDelegate {
         // Extract name if provided by Apple
         var firstName = appleIDCredential.fullName?.givenName
         var lastName = appleIDCredential.fullName?.familyName
-        var username = existingUser?.username
+        let username = existingUser?.username
         
         // If Apple didn't provide name data but we have it stored, use that
         if firstName == nil {
@@ -159,23 +268,67 @@ extension AppleAuthService: ASAuthorizationControllerDelegate {
             displayName = existingUser?.displayName
         }
         
+        // CRITICAL: Sign in to Firebase Auth with the Apple credential
+        // Use the existing nonce we stored when creating the request
+        guard let nonce = currentNonce else {
+            print("❌ Fatal error: No nonce found for Apple Sign In")
+            authContinuation?.resume(throwing: AuthError.invalidCredentials)
+            authContinuation = nil
+            return
+        }
+        
+        // Get the ASAuthorizationAppleIDCredential and identityToken
+        guard let appleIDToken = appleIDCredential.identityToken else {
+            authContinuation?.resume(throwing: AuthError.invalidCredentials)
+            authContinuation = nil
+            return
+        }
+        
+        // Convert token to string
+        guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+            authContinuation?.resume(throwing: AuthError.invalidCredentials)
+            authContinuation = nil
+            return
+        }
+        
+        // Create Firebase Auth credential with proper Apple provider method
+        // This includes the user's full name for new user creation
+        let credential = OAuthProvider.appleCredential(
+            withIDToken: idTokenString,
+            rawNonce: nonce,
+            fullName: appleIDCredential.fullName
+        )
+        
+        // Create the UserEntity with our app's user info
         let user = UserEntity(
-            id: userId,
+            id: userId, // Keep the original Apple user ID for backward compatibility
             email: email,
             displayName: displayName,
             firstName: firstName,
             lastName: lastName,
-            username: username // Include preserved username
+            username: username ?? "" // Unwrap optional username with default empty string
         )
         
         // Store the user data in UserDefaults for subsequent sign-ins
+        UserDefaults.standard.set(userId, forKey: userIdKey)
         saveUserToDefaults(user: user)
         
-        // UserSessionManager will handle saving the complete user entity
-        
-        // Resume with the user
-        authContinuation?.resume(returning: user)
-        authContinuation = nil
+        // Authenticate with Firebase - this is already on the main actor because of the class annotation
+        Task {
+            do {
+                // Call the method that handles Firebase Auth
+                try await signInWithFirebase(credential: credential)
+                print("✅ Successfully authenticated with Firebase")
+                
+                // Resume with the user
+                authContinuation?.resume(returning: user)
+            } catch {
+                print("❌ Firebase authentication failed: \(error.localizedDescription)")
+                authContinuation?.resume(throwing: AuthError.unknown(message: error.localizedDescription))
+            }
+            // Clear continuation reference
+            authContinuation = nil
+        }
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
@@ -194,57 +347,113 @@ extension AppleAuthService: ASAuthorizationControllerDelegate {
     }
 }
 
-/// Implementation of AuthService for testing
-@MainActor
-class MockAuthService: AuthService {
-    var shouldSucceed = true
-    var mockUser: UserEntity? = UserEntity(
-        id: "mock-user-id", 
-        email: "mock@example.com",
-        displayName: "Mock User",
-        firstName: "Mock",
-        lastName: "User"
-    )
-    
-    func signInWithApple(presentationContextProvider: ASAuthorizationControllerPresentationContextProviding) async throws -> UserEntity {
-        if shouldSucceed, let user = mockUser {
-            // UserSessionManager will handle saving the user data
-            return user
-        } else {
-            throw AuthError.invalidCredentials
-        }
+// MARK: - Firebase Auth Helpers
+
+extension AppleAuthService {
+    /// Hash a string using SHA256
+    private func sha256(_ input: String) -> String {
+        let inputData = Data(input.utf8)
+        let hashedData = SHA256.hash(data: inputData)
+        let hashString = hashedData.compactMap { String(format: "%02x", $0) }.joined()
+        
+        return hashString
     }
     
-    func signOut() async throws {
-        if !shouldSucceed {
-            throw AuthError.unknown(message: "Failed to sign out")
-        }
-        // UserSessionManager will handle clearing user data
-    }
-    
-    func getCurrentUser() -> UserEntity? {
-        if !shouldSucceed {
-            return nil
+    /// Generate a random nonce for secure token exchange
+    private func randomNonceString(length: Int = 32) -> String {
+        precondition(length > 0)
+        let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        var result = ""
+        var remainingLength = length
+        
+        while remainingLength > 0 {
+            let randoms: [UInt8] = (0 ..< 16).map { _ in
+                var random: UInt8 = 0
+                let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+                if errorCode != errSecSuccess {
+                    fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+                }
+                return random
+            }
+            
+            randoms.forEach { random in
+                if remainingLength == 0 {
+                    return
+                }
+                
+                if random < charset.count {
+                    result.append(charset[Int(random)])
+                    remainingLength -= 1
+                }
+            }
         }
         
-        // Just return the mock user
-        // UserSessionManager handles full user data persistence
-        return mockUser
+        return result
     }
     
-    func deleteAccount() async throws {
-        if !shouldSucceed {
-            throw AuthError.unknown(message: "Failed to delete account")
+    /// Implementation of AuthService for testing
+    @MainActor
+    class MockAuthService: AuthService {
+        var shouldSucceed = true
+        var mockUser: UserEntity? = UserEntity(
+            id: "mock-user-id",
+            email: "mock@example.com",
+            displayName: "Mock User",
+            firstName: "Mock",
+            lastName: "User"
+        )
+        
+        func signInWithApple(presentationContextProvider: ASAuthorizationControllerPresentationContextProviding) async throws -> UserEntity {
+            if shouldSucceed, let user = mockUser {
+                // UserSessionManager will handle saving the user data
+                return user
+            } else {
+                throw AuthError.invalidCredentials
+            }
         }
-        // UserSessionManager will handle clearing user data
-    }
-    
-    func updateUserProfile(_ user: UserEntity) async throws {
-        if shouldSucceed {
-            mockUser = user
-            // UserSessionManager will handle saving user data
-        } else {
-            throw AuthError.unknown(message: "Failed to update profile")
+        
+        func signOut() async throws {
+            if !shouldSucceed {
+                throw AuthError.unknown(message: "Failed to sign out")
+            }
+            // UserSessionManager will handle clearing user data
+        }
+        
+        func getCurrentUser() -> UserEntity? {
+            if !shouldSucceed {
+                return nil
+            }
+            
+            // Just return the mock user
+            // UserSessionManager handles full user data persistence
+            return mockUser
+        }
+        
+        func deleteAccount() async throws {
+            if !shouldSucceed {
+                throw AuthError.unknown(message: "Failed to delete account")
+            }
+            // UserSessionManager will handle clearing user data
+        }
+        
+        func updateUserProfile(_ user: UserEntity) async throws {
+            if shouldSucceed {
+                mockUser = user
+                // UserSessionManager will handle saving user data
+            } else {
+                throw AuthError.unknown(message: "Failed to update profile")
+            }
+        }
+        
+        /// Process an Apple ID credential directly (mocked implementation)
+        /// - Parameter credential: The Apple ID credential to process
+        /// - Returns: A UserEntity representing the authenticated user
+        func processCredential(_ credential: ASAuthorizationAppleIDCredential) async throws -> UserEntity {
+            if shouldSucceed, let user = mockUser {
+                return user
+            } else {
+                throw AuthError.invalidCredentials
+            }
         }
     }
 }

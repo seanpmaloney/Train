@@ -57,8 +57,8 @@ struct OnboardingContainerView: View {
             WelcomeView()
         case .signIn:
             SignInView()
-        case .nameSetup:
-            NameSetupView()
+//        case .nameSetup:
+//            NameSetupView()
         case .usernameSetup:
             UsernameSetupView()
         case .marketingOptIn:

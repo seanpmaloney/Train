@@ -1,11 +1,16 @@
 import SwiftUI
 import AuthenticationServices
+import Firebase
+import FirebaseAuth
 
-/// Sign In view that handles Apple Sign In
+/// Sign In view that handles Apple Sign In using the centralized AuthService
 struct SignInView: View {
+    // MARK: - Dependencies and State
     @EnvironmentObject var viewModel: OnboardingViewModel
+    @EnvironmentObject var appState: AppState
     @State private var showingError = false
     @State private var errorMessage = ""
+    @State private var isLoading = false
     
     var body: some View {
         VStack(spacing: 24) {
@@ -19,15 +24,31 @@ struct SignInView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             
-            SignInWithAppleButton(
-                .signIn,
-                onRequest: configureRequest,
-                onCompletion: handleSignInCompletion
-            )
-            .signInWithAppleButtonStyle(.white)
-            .frame(height: 50)
-            .padding(.horizontal, 24)
-            .padding(.top, 12)
+            if isLoading {
+                ProgressView()
+                    .frame(height: 50)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 12)
+            } else {
+                // Use SignInWithAppleButton with our existing UserSessionManager
+                SignInWithAppleButton(
+                    .signIn,
+                    onRequest: { request in
+                        // Let AppleAuthService handle the request configuration
+                        viewModel.userSessionManager.configureAppleRequest(request)
+                    },
+                    onCompletion: { result in
+                        Task {
+                            await self.handleAppleSignIn(result)
+                        }
+                    }
+                )
+                // The button has its own presentation context handling
+                .signInWithAppleButtonStyle(.white)
+                .frame(height: 50)
+                .padding(.horizontal, 24)
+                .padding(.top, 12)
+            }
         }
         .padding()
         .alert("Sign In Failed", isPresented: $showingError) {
@@ -37,47 +58,40 @@ struct SignInView: View {
         }
     }
     
-    private func configureRequest(_ request: ASAuthorizationAppleIDRequest) {
-        request.requestedScopes = [.email]
-    }
+    // MARK: - Helper Methods
     
-    private func handleSignInCompletion(_ result: Result<ASAuthorization, Error>) {
-        switch result {
-        case .success(let auth):
-            if let appleIDCredential = auth.credential as? ASAuthorizationAppleIDCredential {
-                let userId = appleIDCredential.user
-                let email = appleIDCredential.email ?? ""
-                
-                // Extract name if provided
-                var displayName: String? = nil
-                if let firstName = appleIDCredential.fullName?.givenName,
-                   let lastName = appleIDCredential.fullName?.familyName {
-                    displayName = "\(firstName) \(lastName)"
-                }
-                
-                // Create user entity
-                let user = UserEntity(
-                    id: userId,
-                    email: email,
-                    displayName: displayName
-                )
-                
-                // Update view model and proceed
-                viewModel.user = user
-                
-                Task {
-                    await HapticService.shared.impact(style: .medium)
-                    viewModel.advanceToNextStep()
-                }
+    /// Handle Apple authorization result
+    private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        // Delegate to UserSessionManager to handle the sign-in with properly injected AppState
+        let error = await viewModel.userSessionManager.handleAppleSignInResult(result, appState: appState)
+        
+        if let error = error {
+            if case AuthError.signInCanceled = error {
+                // User canceled, no need to show an error
+                return
             }
-        case .failure(let error):
-            errorMessage = error.localizedDescription
-            showingError = true
-            
-            Task {
-                await HapticService.shared.error()
+            showError(message: error.localizedDescription)
+        } else {
+            // Authentication successful - get the current user from UserSessionManager
+            if let currentUser = viewModel.userSessionManager.currentUser {
+                // Update the OnboardingViewModel with the user
+                viewModel.user = currentUser
+                
+                // Advance to next onboarding step
+                viewModel.advanceToNextStep()
+            } else {
+                showError(message: "Failed to retrieve user after authentication")
             }
         }
+    }
+    
+    /// Show an error message to the user
+    private func showError(message: String) {
+        self.errorMessage = message
+        self.showingError = true
     }
 }
 
@@ -85,7 +99,7 @@ struct SignInView: View {
 struct SignInView_Previews: PreviewProvider {
     static var previews: some View {
         SignInView()
-            .environmentObject(OnboardingViewModel())
+            .environmentObject(OnboardingViewModel(appState: AppState(), userSessionManager: UserSessionManager()))
     }
 }
 #endif

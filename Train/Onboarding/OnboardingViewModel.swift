@@ -4,6 +4,10 @@ import AuthenticationServices
 
 @MainActor
 final class OnboardingViewModel: ObservableObject {
+    // MARK: - Dependencies
+    
+    /// User session manager for authentication operations
+    let userSessionManager: UserSessionManager
     // MARK: - Published Properties
     
     @Published private(set) var currentStep: OnboardingStep = .welcome
@@ -15,6 +19,12 @@ final class OnboardingViewModel: ObservableObject {
     
     @AppStorage("isOnboardingCompleted") private var isOnboardingCompleted: Bool = false
     
+    // MARK: - Initialization
+    
+    init(userSessionManager: UserSessionManager = UserSessionManager()) {
+        self.userSessionManager = userSessionManager
+    }
+    
     // MARK: - Navigation Methods
     
     func advanceToNextStep() {
@@ -24,8 +34,23 @@ final class OnboardingViewModel: ObservableObject {
             return
         }
         
+        // Determine the next step
+        let nextStep: OnboardingStep
+        
+        // If we're at sign-in and moving to name setup, check if we already have names from Apple
+        if currentStep == .signIn && 
+           OnboardingStep.allCases[currentIndex + 1] == .usernameSetup && 
+           user?.firstName != nil && 
+           !(user?.firstName?.isEmpty ?? true) {
+            // Skip name setup since we already have first name from Apple Sign-In
+            nextStep = OnboardingStep.allCases[currentIndex + 2]
+        } else {
+            // Normal progression
+            nextStep = OnboardingStep.allCases[currentIndex + 1]
+        }
+        
         withAnimation {
-            currentStep = OnboardingStep.allCases[currentIndex + 1]
+            currentStep = nextStep
         }
         
         Task {
@@ -59,7 +84,8 @@ final class OnboardingViewModel: ObservableObject {
                 try await AppState.shared.finalizeOnboarding(
                     user: user,
                     plan: generatedPlan,
-                    marketingOptIn: marketingOptIn
+                    marketingOptIn: marketingOptIn,
+                    userSessionManager: userSessionManager
                 )
                 
                 await HapticService.shared.success()

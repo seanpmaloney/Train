@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import FirebaseFirestore
 
 // Add MainActor to the entire class since this is primarily UI state
 @MainActor
@@ -226,6 +227,7 @@ class AppState: ObservableObject {
     }
     
     /// Finalizes the onboarding process by saving the generated plan and updating user data
+    /// This method requires a username to be already set in the user entity
     @MainActor
     func finalizeOnboarding(user: UserEntity, plan: TrainingPlanEntity?, marketingOptIn: Bool, userSessionManager: UserSessionManager) async throws {
         print("Starting finalizeOnboarding for user: \(user.displayName ?? user.id)")
@@ -243,6 +245,16 @@ class AppState: ObservableObject {
         
         // Save the changes to disk immediately to ensure persistence
         savePlans()
+        
+        // Now that we have all user data including username, save directly to Firebase
+        do {
+            try await FirestoreService.shared.saveUser(updatedUser)
+            print("✅ Complete user data saved to Firestore: \(updatedUser.id)")
+        } catch {
+            print("⚠️ Error saving user to Firestore: \(error.localizedDescription)")
+            // Re-throw the error to allow proper handling by the caller
+            throw error
+        }
         
         // Update the user profile via the user session manager and set authentication state
         print("Signing in user in UserSessionManager: \(updatedUser.id), displayName: \(updatedUser.displayName ?? "none")")

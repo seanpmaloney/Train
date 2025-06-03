@@ -111,19 +111,21 @@
 		8BD541942DBE812A00D5E1C3 /* AppStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD541872DBE812A00D5E1C3 /* AppStateTests.swift */; };
 		8BD541952DBE812A00D5E1C3 /* Train.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 8BD5418F2DBE812A00D5E1C3 /* Train.xctestplan */; };
 		8BD541962DBE812A00D5E1C3 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 8BD5418D2DBE812A00D5E1C3 /* README.md */; };
-		8BD5E7C92DEA05AF000B9778 /* MarketingOptInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7BF2DEA05AF000B9778 /* MarketingOptInView.swift */; };
-		8BD5E7CA2DEA05AF000B9778 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7C52DEA05AF000B9778 /* WelcomeView.swift */; };
-		8BD5E7CB2DEA05AF000B9778 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7C02DEA05AF000B9778 /* OnboardingContainerView.swift */; };
-		8BD5E7CC2DEA05AF000B9778 /* UsernameSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7C42DEA05AF000B9778 /* UsernameSetupView.swift */; };
-		8BD5E7CD2DEA05AF000B9778 /* OnboardingPlanBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7C12DEA05AF000B9778 /* OnboardingPlanBuilderView.swift */; };
-		8BD5E7CE2DEA05AF000B9778 /* CompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7BE2DEA05AF000B9778 /* CompletionView.swift */; };
-		8BD5E7CF2DEA05AF000B9778 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7C32DEA05AF000B9778 /* SignInView.swift */; };
-		8BD5E7D02DEA05AF000B9778 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7C22DEA05AF000B9778 /* RootView.swift */; };
 		8BD5E7D12DEA05AF000B9778 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7C72DEA05AF000B9778 /* OnboardingViewModel.swift */; };
-		8BD5E7D32DEA3DB0000B9778 /* PlanIntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7D22DEA3DB0000B9778 /* PlanIntroView.swift */; };
-		8BD5E7D52DEA4665000B9778 /* NameSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7D42DEA4665000B9778 /* NameSetupView.swift */; };
 		8BD5E7D72DEB142D000B9778 /* AppleAuthorizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7D62DEB142D000B9778 /* AppleAuthorizationProvider.swift */; };
 		8BD5E7DB2DEB315B000B9778 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7DA2DEB315B000B9778 /* AuthView.swift */; };
+		8BD5E7DD2DECB6C4000B9778 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BD5E7DC2DECB6C4000B9778 /* GoogleService-Info.plist */; };
+		8BD5E7DF2DECDADD000B9778 /* FirestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7DE2DECDADD000B9778 /* FirestoreService.swift */; };
+		8BD5E7EB2DEE7963000B9778 /* UsernameSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7E82DEE7963000B9778 /* UsernameSetupView.swift */; };
+		8BD5E7EC2DEE7963000B9778 /* CompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7E02DEE7963000B9778 /* CompletionView.swift */; };
+		8BD5E7ED2DEE7963000B9778 /* OnboardingPlanBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7E42DEE7963000B9778 /* OnboardingPlanBuilderView.swift */; };
+		8BD5E7EE2DEE7963000B9778 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7E72DEE7963000B9778 /* SignInView.swift */; };
+		8BD5E7EF2DEE7963000B9778 /* NameSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7E22DEE7963000B9778 /* NameSetupView.swift */; };
+		8BD5E7F02DEE7963000B9778 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7E92DEE7963000B9778 /* WelcomeView.swift */; };
+		8BD5E7F12DEE7963000B9778 /* MarketingOptInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7E12DEE7963000B9778 /* MarketingOptInView.swift */; };
+		8BD5E7F22DEE7963000B9778 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7E32DEE7963000B9778 /* OnboardingContainerView.swift */; };
+		8BD5E7F32DEE7963000B9778 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7E62DEE7963000B9778 /* RootView.swift */; };
+		8BD5E7F42DEE7963000B9778 /* PlanIntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5E7E52DEE7963000B9778 /* PlanIntroView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -243,19 +245,21 @@
 		8BD5418D2DBE812A00D5E1C3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		8BD5418E2DBE812A00D5E1C3 /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
 		8BD5418F2DBE812A00D5E1C3 /* Train.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Train.xctestplan; sourceTree = "<group>"; };
-		8BD5E7BE2DEA05AF000B9778 /* CompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionView.swift; sourceTree = "<group>"; };
-		8BD5E7BF2DEA05AF000B9778 /* MarketingOptInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketingOptInView.swift; sourceTree = "<group>"; };
-		8BD5E7C02DEA05AF000B9778 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
-		8BD5E7C12DEA05AF000B9778 /* OnboardingPlanBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPlanBuilderView.swift; sourceTree = "<group>"; };
-		8BD5E7C22DEA05AF000B9778 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
-		8BD5E7C32DEA05AF000B9778 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
-		8BD5E7C42DEA05AF000B9778 /* UsernameSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameSetupView.swift; sourceTree = "<group>"; };
-		8BD5E7C52DEA05AF000B9778 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		8BD5E7C72DEA05AF000B9778 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
-		8BD5E7D22DEA3DB0000B9778 /* PlanIntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanIntroView.swift; sourceTree = "<group>"; };
-		8BD5E7D42DEA4665000B9778 /* NameSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameSetupView.swift; sourceTree = "<group>"; };
 		8BD5E7D62DEB142D000B9778 /* AppleAuthorizationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthorizationProvider.swift; sourceTree = "<group>"; };
 		8BD5E7DA2DEB315B000B9778 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
+		8BD5E7DC2DECB6C4000B9778 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		8BD5E7DE2DECDADD000B9778 /* FirestoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreService.swift; sourceTree = "<group>"; };
+		8BD5E7E02DEE7963000B9778 /* CompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionView.swift; sourceTree = "<group>"; };
+		8BD5E7E12DEE7963000B9778 /* MarketingOptInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketingOptInView.swift; sourceTree = "<group>"; };
+		8BD5E7E22DEE7963000B9778 /* NameSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameSetupView.swift; sourceTree = "<group>"; };
+		8BD5E7E32DEE7963000B9778 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
+		8BD5E7E42DEE7963000B9778 /* OnboardingPlanBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPlanBuilderView.swift; sourceTree = "<group>"; };
+		8BD5E7E52DEE7963000B9778 /* PlanIntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanIntroView.swift; sourceTree = "<group>"; };
+		8BD5E7E62DEE7963000B9778 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		8BD5E7E72DEE7963000B9778 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		8BD5E7E82DEE7963000B9778 /* UsernameSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameSetupView.swift; sourceTree = "<group>"; };
+		8BD5E7E92DEE7963000B9778 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -338,6 +342,7 @@
 			isa = PBXGroup;
 			children = (
 				8B56F25E2DE0071A00132675 /* AuthService.swift */,
+				8BD5E7DE2DECDADD000B9778 /* FirestoreService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -401,6 +406,7 @@
 		8B7BCF8D2D9DFD3F0089F6D3 /* Train */ = {
 			isa = PBXGroup;
 			children = (
+				8BD5E7DC2DECB6C4000B9778 /* GoogleService-Info.plist */,
 				8B56F26B2DE0071A00132675 /* Auth */,
 				8B56F2362DE003FF00132675 /* UserAccountImplementation */,
 				8B56F2302DDEAC1700132675 /* Navigation */,
@@ -634,30 +640,30 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		8BD5E7C62DEA05AF000B9778 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				8BD5E7BE2DEA05AF000B9778 /* CompletionView.swift */,
-				8BD5E7BF2DEA05AF000B9778 /* MarketingOptInView.swift */,
-				8BD5E7C02DEA05AF000B9778 /* OnboardingContainerView.swift */,
-				8BD5E7D42DEA4665000B9778 /* NameSetupView.swift */,
-				8BD5E7D22DEA3DB0000B9778 /* PlanIntroView.swift */,
-				8BD5E7C12DEA05AF000B9778 /* OnboardingPlanBuilderView.swift */,
-				8BD5E7C22DEA05AF000B9778 /* RootView.swift */,
-				8BD5E7C32DEA05AF000B9778 /* SignInView.swift */,
-				8BD5E7C42DEA05AF000B9778 /* UsernameSetupView.swift */,
-				8BD5E7C52DEA05AF000B9778 /* WelcomeView.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
 		8BD5E7C82DEA05AF000B9778 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				8BD5E7C62DEA05AF000B9778 /* Views */,
+				8BD5E7EA2DEE7963000B9778 /* Views */,
 				8BD5E7C72DEA05AF000B9778 /* OnboardingViewModel.swift */,
 			);
 			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		8BD5E7EA2DEE7963000B9778 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				8BD5E7E02DEE7963000B9778 /* CompletionView.swift */,
+				8BD5E7E12DEE7963000B9778 /* MarketingOptInView.swift */,
+				8BD5E7E22DEE7963000B9778 /* NameSetupView.swift */,
+				8BD5E7E32DEE7963000B9778 /* OnboardingContainerView.swift */,
+				8BD5E7E42DEE7963000B9778 /* OnboardingPlanBuilderView.swift */,
+				8BD5E7E52DEE7963000B9778 /* PlanIntroView.swift */,
+				8BD5E7E62DEE7963000B9778 /* RootView.swift */,
+				8BD5E7E72DEE7963000B9778 /* SignInView.swift */,
+				8BD5E7E82DEE7963000B9778 /* UsernameSetupView.swift */,
+				8BD5E7E92DEE7963000B9778 /* WelcomeView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -758,6 +764,7 @@
 				8B568C8C2DC66853004A39C6 /* README.md in Resources */,
 				8B7BCF962D9DFD430089F6D3 /* Preview Assets.xcassets in Resources */,
 				8B7BCF932D9DFD430089F6D3 /* Assets.xcassets in Resources */,
+				8BD5E7DD2DECB6C4000B9778 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -812,6 +819,7 @@
 				8B7A5A3C2DABE3D000404F43 /* TrainingViewModel.swift in Sources */,
 				8B568C822DC64DBA004A39C6 /* AdaptivePlanModels.swift in Sources */,
 				8B9877452DB9B7B100767AE2 /* EnhancedTrainingView.swift in Sources */,
+				8BD5E7DF2DECDADD000B9778 /* FirestoreService.swift in Sources */,
 				8B56F2312DDEAC1700132675 /* NavigationDestinations.swift in Sources */,
 				8B98772D2DAF32D400767AE2 /* LoadingScreenView.swift in Sources */,
 				8B7BD0482DA74FCB0089F6D3 /* MovementLibrary.swift in Sources */,
@@ -825,6 +833,16 @@
 				8B7BCFBE2DA145110089F6D3 /* CalendarCardView.swift in Sources */,
 				8B56F2232DD2D35700132675 /* AppState+Progression.swift in Sources */,
 				8B7BD0582DA756B00089F6D3 /* MovementPickerViewModel.swift in Sources */,
+				8BD5E7EB2DEE7963000B9778 /* UsernameSetupView.swift in Sources */,
+				8BD5E7EC2DEE7963000B9778 /* CompletionView.swift in Sources */,
+				8BD5E7ED2DEE7963000B9778 /* OnboardingPlanBuilderView.swift in Sources */,
+				8BD5E7EE2DEE7963000B9778 /* SignInView.swift in Sources */,
+				8BD5E7EF2DEE7963000B9778 /* NameSetupView.swift in Sources */,
+				8BD5E7F02DEE7963000B9778 /* WelcomeView.swift in Sources */,
+				8BD5E7F12DEE7963000B9778 /* MarketingOptInView.swift in Sources */,
+				8BD5E7F22DEE7963000B9778 /* OnboardingContainerView.swift in Sources */,
+				8BD5E7F32DEE7963000B9778 /* RootView.swift in Sources */,
+				8BD5E7F42DEE7963000B9778 /* PlanIntroView.swift in Sources */,
 				8B7BD05F2DA757900089F6D3 /* AppState.swift in Sources */,
 				8B9877532DBB15B100767AE2 /* WorkoutDay.swift in Sources */,
 				8B98776A2DBC2BC400767AE2 /* StatsViewModel.swift in Sources */,
@@ -843,20 +861,11 @@
 				8B568C922DC68BDA004A39C6 /* GeneratedPlanEditorView.swift in Sources */,
 				8B7BCFE22DA1460F0089F6D3 /* CustomNumberPadView.swift in Sources */,
 				8B7BCF8F2D9DFD3F0089F6D3 /* TrainApp.swift in Sources */,
-				8BD5E7C92DEA05AF000B9778 /* MarketingOptInView.swift in Sources */,
-				8BD5E7CA2DEA05AF000B9778 /* WelcomeView.swift in Sources */,
-				8BD5E7CB2DEA05AF000B9778 /* OnboardingContainerView.swift in Sources */,
-				8BD5E7CC2DEA05AF000B9778 /* UsernameSetupView.swift in Sources */,
-				8BD5E7CD2DEA05AF000B9778 /* OnboardingPlanBuilderView.swift in Sources */,
-				8BD5E7CE2DEA05AF000B9778 /* CompletionView.swift in Sources */,
-				8BD5E7CF2DEA05AF000B9778 /* SignInView.swift in Sources */,
-				8BD5E7D02DEA05AF000B9778 /* RootView.swift in Sources */,
 				8BD5E7D12DEA05AF000B9778 /* OnboardingViewModel.swift in Sources */,
 				8B7BD0232DA35A540089F6D3 /* TrainingDataRoot.swift in Sources */,
 				8B9877552DBB195A00767AE2 /* DayPickerView.swift in Sources */,
 				8B98775C2DBB25C500767AE2 /* ExerciseHistoryIndicator.swift in Sources */,
 				8B9877492DB9B7B700767AE2 /* EnhancedTrainingViewModel.swift in Sources */,
-				8BD5E7D32DEA3DB0000B9778 /* PlanIntroView.swift in Sources */,
 				8B56F2142DCBA12B00132675 /* PlanInput.swift in Sources */,
 				8B56F2332DDEB00C00132675 /* NavigationCoordinator.swift in Sources */,
 				8B98774A2DB9B7B700767AE2 /* EnhancedActiveWorkoutViewModel.swift in Sources */,
@@ -866,7 +875,6 @@
 				8B56F21D2DD23EDA00132675 /* PreWorkoutFeedbackView.swift in Sources */,
 				8B56F21E2DD23EDA00132675 /* PostWorkoutFeedbackView.swift in Sources */,
 				8B56F21F2DD23EDA00132675 /* ExerciseFeedbackView.swift in Sources */,
-				8BD5E7D52DEA4665000B9778 /* NameSetupView.swift in Sources */,
 				8B568C902DC68BC3004A39C6 /* GeneratedPlanEditorViewModel.swift in Sources */,
 				8B7A5A382DAB0CF000404F43 /* UpcomingTrainingViewModel.swift in Sources */,
 				8B7BCFDF2DA1460F0089F6D3 /* ActiveWorkoutView.swift in Sources */,
@@ -1066,7 +1074,7 @@
 				DEVELOPMENT_TEAM = 7229M3R3PU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Deadset;
+				INFOPLIST_KEY_CFBundleDisplayName = Dedset;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.\n";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.";
@@ -1101,7 +1109,7 @@
 				DEVELOPMENT_TEAM = 7229M3R3PU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Deadset;
+				INFOPLIST_KEY_CFBundleDisplayName = Dedset;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.\n";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.";
