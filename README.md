@@ -15,10 +15,9 @@ It focuses on speed, clarity, and clean UI — without the bloat of other liftin
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/7480a6be-2074-4ee4-a5d7-9c262d2def90" width="300"/>
-  <img src="https://github.com/user-attachments/assets/4d473073-b4a0-46fb-8bfc-627293b2f1a6" width="300"/>
-  <img src="https://github.com/user-attachments/assets/6f4c5ccf-c7df-466d-843a-3e1340af9bdf" width="300"/>
-  <img src="https://github.com/user-attachments/assets/1cc71775-a861-4be9-9b57-1e1f86f6c10e" width="300"/>
+  <img src="https://github.com/user-attachments/assets/7480a6be-2074-4ee4-a5d7-9c262d2def90" width="200"/>
+  <img src="https://github.com/user-attachments/assets/4d473073-b4a0-46fb-8bfc-627293b2f1a6" width="200"/>
+  <img src="https://github.com/user-attachments/assets/6f4c5ccf-c7df-466d-843a-3e1340af9bdf" width="200"/>
 </p>
 
 ---
