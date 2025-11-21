@@ -13,6 +13,22 @@ enum AppStyle {
         static let textSecondary = Color(hex: "#B0B0B0") // Secondary text
     }
     
+    enum Glass {
+        // Liquid Glass materials for different contexts
+        static let navigation = Material.regularMaterial    // For tab bars, toolbars   
+        static let card = Material.thinMaterial            // For cards and surfaces
+        static let button = Material.ultraThinMaterial     // For interactive elements
+        static let overlay = Material.thickMaterial        // For modals and overlays
+        
+        // Glass tint colors
+        static let primaryTint = Color(hex: "#00B4D8").opacity(0.1)
+        static let surfaceTint = Color(hex: "#1A1C20").opacity(0.2)
+        
+        // Fallback colors for compatibility
+        static let navigationFallback = Color(hex: "#1A1C20").opacity(0.8)
+        static let buttonFallback = Color(hex: "#24262A").opacity(0.6)
+    }
+    
     enum MuscleColors {
         // Upper Body Push
         static let chest = Color(hex: "#00B4D8")         // Bright Blue

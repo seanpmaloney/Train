@@ -25,7 +25,6 @@ struct StatsView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
                     // Chart selector
@@ -57,7 +56,6 @@ struct StatsView: View {
                     }
                 }
             }
-        }
     }
     
     // MARK: - Subviews

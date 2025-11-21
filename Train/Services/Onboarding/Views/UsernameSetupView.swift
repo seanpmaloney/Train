@@ -29,6 +29,7 @@ struct UsernameSetupView: View {
                     TextField("Choose a username", text: $username)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
+                        .colorInvert()
                     
                     if isCheckingUsername {
                         ProgressView()

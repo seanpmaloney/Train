@@ -17,6 +17,8 @@ struct TodaysTrainingCard: View {
             cardContent
         }
         .buttonStyle(.plain)
+        .scaleEffect(1.0)
+        .animation(.easeInOut(duration: 0.1), value: false)
     }
     
     private var cardContent: some View {

@@ -8,6 +8,7 @@
 import SwiftUI
 import Charts
 import AuthenticationServices
+import UIKit
 
 struct VitalStat: View {
     let icon: String
@@ -495,28 +496,64 @@ struct RecoveryRow: View {
 
 struct CustomTabBar: View {
     @Binding var selectedTab: Int
+    @Namespace private var tabNamespace
     
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 4) {
             ForEach(0..<3) { index in
-                Button {
-                    selectedTab = index
-                    // Trigger haptic feedback when tab changes
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: tabIcon(for: index))
-                            .font(.system(size: 20))
-                        Text(tabTitle(for: index))
-                            .font(.caption)
-                    }
-                    .foregroundColor(selectedTab == index ? AppStyle.Colors.textPrimary : AppStyle.Colors.textSecondary)
-                    .frame(maxWidth: .infinity)
-                    .hapticFeedback(style: .light)
-                }
+                tabButton(for: index)
             }
         }
-        .padding(.vertical, 8)
-        .background(AppStyle.Colors.surface)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 12)
+        .background(
+            // Background glass effect
+            RoundedRectangle(cornerRadius: 28)
+                .fill(AppStyle.Glass.navigation)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28)
+                        .fill(AppStyle.Glass.surfaceTint)
+                )
+        )
+        .padding(.horizontal, 20)
+        .padding(.bottom, 12)
+    }
+    
+    @ViewBuilder
+    private func tabButton(for index: Int) -> some View {
+        Button {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                selectedTab = index
+            }
+            // Trigger haptic feedback
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+        } label: {
+            VStack(spacing: 3) {
+                Image(systemName: tabIcon(for: index))
+                    .font(.system(size: 18, weight: selectedTab == index ? .semibold : .regular))
+                Text(tabTitle(for: index))
+                    .font(.system(size: 11, weight: selectedTab == index ? .semibold : .regular))
+            }
+            .foregroundColor(selectedTab == index ? AppStyle.Colors.textPrimary : AppStyle.Colors.textSecondary)
+            .frame(maxWidth: .infinity)
+            .frame(height: 48)
+            .background(
+                // Glass selection indicator
+                Group {
+                    if selectedTab == index {
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(AppStyle.Glass.button)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 24)
+                                    .fill(AppStyle.Glass.primaryTint)
+                            )
+                            .matchedGeometryEffect(id: "tabSelection", in: tabNamespace)
+                    }
+                }
+            )
+        }
+        .buttonStyle(.plain) // Use plain button style to avoid interference
     }
     
     private func tabIcon(for index: Int) -> String {
