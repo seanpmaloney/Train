@@ -5,6 +5,7 @@ class CalendarCardViewModel: ObservableObject {
     @Published var selectedDate: Date
     @Published var displayedMonth: Date
     private var appState: AppState
+    private var healthKitManager = HealthKitManager.shared
     private let calendar = Calendar.current
     
     init(appState: AppState) {
@@ -44,8 +45,13 @@ class CalendarCardViewModel: ObservableObject {
         appState.getWorkouts(for: selectedDate)
     }
     
+    var selectedDayExternalWorkouts: [ExternalWorkout] {
+        healthKitManager.getExternalWorkouts(for: selectedDate)
+    }
+    
     func isDateSelectable(_ date: Date) -> Bool {
-        date >= calendar.startOfDay(for: Date())
+        // Allow selecting any date to view past workouts and external workouts
+        return true
     }
     
     func moveMonth(by value: Int) {
@@ -55,16 +61,30 @@ class CalendarCardViewModel: ObservableObject {
     }
     
     func getWorkoutType(for date: Date) -> TrainingType {
-        let workouts = appState.getWorkouts(for: date)
-        guard !workouts.isEmpty else { return .none }
+        let internalWorkouts = appState.getWorkouts(for: date)
+        let externalWorkouts = healthKitManager.getExternalWorkouts(for: date)
         
-        if workouts.count > 1 {
+        // If we have both internal and external workouts, show hybrid
+        if !internalWorkouts.isEmpty && !externalWorkouts.isEmpty {
             return .hybrid
         }
         
-        // For now just return strength for single workouts
-        // TODO: Add workout type to WorkoutEntity and use that
-        return .strength
+        // If we only have external workouts, show external type
+        if !externalWorkouts.isEmpty && internalWorkouts.isEmpty {
+            return .external
+        }
+        
+        // If we only have internal workouts
+        if !internalWorkouts.isEmpty {
+            if internalWorkouts.count > 1 {
+                return .hybrid
+            }
+            // For now just return strength for single workouts
+            // TODO: Add workout type to WorkoutEntity and use that
+            return .strength
+        }
+        
+        return .none
     }
 }
 

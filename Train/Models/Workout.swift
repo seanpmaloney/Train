@@ -1,4 +1,5 @@
 import Foundation
+import HealthKit
 
 class WorkoutEntity: ObservableObject, Identifiable, Codable {
     let id: UUID
@@ -82,4 +83,162 @@ class WorkoutEntity: ObservableObject, Identifiable, Codable {
             postWorkoutFeedback: self.postWorkoutFeedback
         )
     }
-} 
+}
+
+/// Represents a workout from Apple Health (external to our app)
+struct ExternalWorkout: Identifiable, Hashable {
+    let id: UUID
+    let title: String
+    let startDate: Date
+    let endDate: Date
+    let duration: TimeInterval
+    let workoutType: HKWorkoutActivityType
+    let sourceName: String
+    let averageHeartRate: Double?
+    let totalEnergyBurned: Double? // in calories
+    
+    init(from hkWorkout: HKWorkout) {
+        self.id = UUID()
+        self.startDate = hkWorkout.startDate
+        self.endDate = hkWorkout.endDate
+        self.duration = hkWorkout.duration
+        self.workoutType = hkWorkout.workoutActivityType
+        self.sourceName = hkWorkout.sourceRevision.source.name
+        
+        // Extract heart rate statistics
+        if let heartRateStats = hkWorkout.statistics(for: HKQuantityType(.heartRate)) {
+            self.averageHeartRate = heartRateStats.averageQuantity()?.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+        } else {
+            self.averageHeartRate = nil
+        }
+        
+        // Extract total energy burned
+        self.totalEnergyBurned = hkWorkout.totalEnergyBurned?.doubleValue(for: HKUnit.kilocalorie())
+        
+        // Map HKWorkoutActivityType to readable title
+        self.title = Self.getWorkoutTitle(for: hkWorkout.workoutActivityType)
+    }
+    
+    private static func getWorkoutTitle(for activityType: HKWorkoutActivityType) -> String {
+        switch activityType {
+        case .running:
+            return "Running"
+        case .walking:
+            return "Walking"
+        case .cycling:
+            return "Cycling"
+        case .swimming:
+            return "Swimming"
+        case .yoga:
+            return "Yoga"
+        case .pilates:
+            return "Pilates"
+        case .functionalStrengthTraining:
+            return "Strength Training"
+        case .traditionalStrengthTraining:
+            return "Weightlifting"
+        case .crossTraining:
+            return "Cross Training"
+        case .highIntensityIntervalTraining:
+            return "HIIT"
+        case .dance:
+            return "Dance"
+        case .boxing:
+            return "Boxing"
+        case .martialArts:
+            return "Martial Arts"
+        case .tennis:
+            return "Tennis"
+        case .basketball:
+            return "Basketball"
+        case .soccer:
+            return "Soccer"
+        case .americanFootball:
+            return "Football"
+        case .baseball:
+            return "Baseball"
+        case .golf:
+            return "Golf"
+        case .hiking:
+            return "Hiking"
+        case .climbing:
+            return "Climbing"
+        case .rowing:
+            return "Rowing"
+        case .elliptical:
+            return "Elliptical"
+        case .stairClimbing:
+            return "Stair Climbing"
+        case .stepTraining:
+            return "Step Training"
+        case .flexibility:
+            return "Stretching"
+        case .cooldown:
+            return "Cool Down"
+        case .wheelchairWalkPace:
+            return "Wheelchair"
+        case .wheelchairRunPace:
+            return "Wheelchair Run"
+        default:
+            return "Workout"
+        }
+    }
+    
+    /// Maps HKWorkoutActivityType to our TrainingType for calendar display
+    var trainingType: TrainingType {
+        switch workoutType {
+        case .functionalStrengthTraining, .traditionalStrengthTraining, .crossTraining:
+            return .strength
+        case .running, .cycling, .swimming, .rowing, .elliptical:
+            return .endurance
+        case .yoga, .pilates, .flexibility, .cooldown:
+            return .mobility
+        case .highIntensityIntervalTraining:
+            return .hybrid
+        default:
+            return .strength // Default fallback
+        }
+    }
+    
+    /// Formatted duration string
+    var durationString: String {
+        let hours = Int(duration) / 3600
+        let minutes = Int(duration) % 3600 / 60
+        
+        if hours > 0 {
+            return "\(hours)h \(minutes)m"
+        } else {
+            return "\(minutes)m"
+        }
+    }
+    
+    /// Formatted time string
+    var timeString: String {
+        startDate.formatted(date: .omitted, time: .shortened)
+    }
+    
+    /// Primary metric to display (heart rate or calories)
+    var primaryMetric: String? {
+        // Show heart rate if available (for both strength and cardio)
+        if let heartRate = averageHeartRate {
+            return "\(Int(heartRate)) bpm avg"
+        }
+        
+        // Fallback to calories if heart rate isn't available
+        if let calories = totalEnergyBurned, calories > 0 {
+            return "\(Int(calories)) cal"
+        }
+        
+        return nil
+    }
+    
+    /// Whether this is a strength training workout
+    private var isStrengthWorkout: Bool {
+        switch workoutType {
+        case .functionalStrengthTraining, .traditionalStrengthTraining, .crossTraining:
+            return true
+        default:
+            return false
+        }
+    }
+}

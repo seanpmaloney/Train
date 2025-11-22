@@ -145,6 +145,13 @@ struct AuthView: View {
                     }
                 }
                 
+                // Workout Sources section
+                Section(header: Text("Workout Sources")) {
+                    NavigationLink(destination: WorkoutSourcesSettingsView()) {
+                        Label("Manage Source Priority", systemImage: "list.number")
+                    }
+                }
+                
                 // Account management section
                 Section(header: Text("Account Management")) {
                     Button(action: {
@@ -388,6 +395,89 @@ struct TermsOfServiceView: View {
 struct ErrorWrapper: Identifiable {
     let id = UUID()
     let message: String
+}
+
+/// View for managing workout source priorities
+struct WorkoutSourcesSettingsView: View {
+    @StateObject private var healthKitManager = HealthKitManager.shared
+    @State private var workoutSources: [String] = []
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            VStack(alignment: .leading, spacing: 16) {
+                // Header explanation
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Source Priority")
+                        .font(.headline)
+                    
+                    Text("When duplicate workouts are detected (same time and duration), the app will keep the workout from the highest priority source. Drag to reorder.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal)
+                .padding(.top)
+                
+                // Reorderable list
+                List {
+                    ForEach(workoutSources, id: \.self) { source in
+                        HStack {
+                            Image(systemName: "line.3.horizontal")
+                                .foregroundColor(.secondary)
+                            
+                            Text(source)
+                                .font(.body)
+                            
+                            Spacer()
+                            
+                            // Priority indicator
+                            if let index = workoutSources.firstIndex(of: source) {
+                                Text("#\(index + 1)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.secondary.opacity(0.2))
+                                    .cornerRadius(8)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .onMove(perform: moveSource)
+                }
+                .listStyle(PlainListStyle())
+                
+                Spacer()
+            }
+            .navigationTitle("Workout Sources")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(
+                leading: Button("Cancel") {
+                    dismiss()
+                },
+                trailing: Button("Done") {
+                    saveChanges()
+                    dismiss()
+                }
+            )
+            .onAppear {
+                loadWorkoutSources()
+            }
+        }
+    }
+    
+    private func loadWorkoutSources() {
+        workoutSources = healthKitManager.getDetectedWorkoutSources()
+    }
+    
+    private func moveSource(from source: IndexSet, to destination: Int) {
+        workoutSources.move(fromOffsets: source, toOffset: destination)
+    }
+    
+    private func saveChanges() {
+        healthKitManager.updateWorkoutSourcePriorities(workoutSources)
+    }
 }
 
 #Preview {

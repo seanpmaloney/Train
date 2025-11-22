@@ -1,4 +1,4 @@
-import HealthKit
+    import HealthKit
 import Foundation
 
 @MainActor
@@ -12,20 +12,31 @@ class HealthKitManager: ObservableObject {
     @Published var sleepHours: Double?
     @Published var restingHeartRate: Double?
     @Published var isAuthorized = false
+    @Published var externalWorkouts: [ExternalWorkout] = []
+    @Published var workoutSourcePriorities: [String] = []
     
-    private init() {}
+    private var allExternalWorkouts: [ExternalWorkout] = [] // Unfiltered workouts
+    
+    private init() {
+        loadWorkoutSourcePriorities()
+    }
     
     func requestAuthorization() async -> Bool {
         // Define the types we want to read from HealthKit
         let typesToRead: Set<HKSampleType> = [
             HKQuantityType(.heartRateVariabilitySDNN),
             HKQuantityType(.restingHeartRate),
-            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+            HKObjectType.workoutType()
         ]
         
         do {
             try await healthStore.requestAuthorization(toShare: [], read: typesToRead)
             isAuthorized = true
+            
+            // Immediately fetch data after authorization is granted
+            await fetchTodayData()
+            
             return true
         } catch {
             print("Error requesting HealthKit authorization: \(error)")
@@ -49,6 +60,9 @@ class HealthKitManager: ObservableObject {
         
         // Fetch Resting Heart Rate
         await fetchRestingHeartRate(predicate: predicate)
+        
+        // Fetch recent workouts (last 30 days)
+        await fetchRecentWorkouts()
     }
     
     private func fetchHRV(predicate: NSPredicate) async {
@@ -284,4 +298,210 @@ class HealthKitManager: ObservableObject {
             restingHeartRate = nil
         }
     }
-} 
+    
+    // MARK: - Workout Data
+    
+    func fetchRecentWorkouts() async {
+        guard isAuthorized else { return }
+        
+        // Get workouts from the last 30 days
+        let endDate = Date()
+        let startDate = Calendar.current.date(byAdding: .day, value: -30, to: endDate)!
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: [])
+        
+        do {
+            let workouts: [ExternalWorkout] = try await withCheckedThrowingContinuation { continuation in
+                let query = HKSampleQuery(
+                    sampleType: HKObjectType.workoutType(),
+                    predicate: predicate,
+                    limit: HKObjectQueryNoLimit,
+                    sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
+                ) { _, samples, error in
+                    if let error = error {
+                        print("Error fetching workouts: \(error)")
+                        continuation.resume(returning: [])
+                        return
+                    }
+                    
+                    let hkWorkouts = samples as? [HKWorkout] ?? []
+                    let externalWorkouts = hkWorkouts.map { ExternalWorkout(from: $0) }
+                    
+                    print("Fetched \(externalWorkouts.count) external workouts")
+                    continuation.resume(returning: externalWorkouts)
+                }
+                
+                healthStore.execute(query)
+            }
+            
+            self.allExternalWorkouts = workouts
+            self.externalWorkouts = filterDuplicateWorkouts(workouts)
+            
+        } catch {
+            print("Error fetching workouts: \(error)")
+            self.externalWorkouts = []
+        }
+    }
+    
+    /// Get external workouts for a specific date
+    func getExternalWorkouts(for date: Date) -> [ExternalWorkout] {
+        return externalWorkouts.filter { workout in
+            calendar.isDate(workout.startDate, inSameDayAs: date)
+        }
+    }
+    
+    /// Get all workouts (external) for a date range
+    func getExternalWorkouts(from startDate: Date, to endDate: Date) -> [ExternalWorkout] {
+        return externalWorkouts.filter { workout in
+            workout.startDate >= startDate && workout.startDate <= endDate
+        }
+    }
+    
+    // MARK: - Workout Source Priority Management
+    
+    private func loadWorkoutSourcePriorities() {
+        if let savedPriorities = UserDefaults.standard.array(forKey: "WorkoutSourcePriorities") as? [String] {
+            workoutSourcePriorities = savedPriorities
+        } else {
+            // Set default priorities: Apple Watch > Garmin Connect > Strava > Others alphabetically
+            workoutSourcePriorities = getDefaultSourcePriorities()
+            saveWorkoutSourcePriorities()
+        }
+    }
+    
+    private func saveWorkoutSourcePriorities() {
+        UserDefaults.standard.set(workoutSourcePriorities, forKey: "WorkoutSourcePriorities")
+    }
+    
+    private func getDefaultSourcePriorities() -> [String] {
+        return ["Apple Watch", "Garmin Connect", "Strava"]
+    }
+    
+    func updateWorkoutSourcePriorities(_ newPriorities: [String]) {
+        workoutSourcePriorities = newPriorities
+        saveWorkoutSourcePriorities()
+        
+        // Re-filter workouts with new priorities
+        externalWorkouts = filterDuplicateWorkouts(allExternalWorkouts)
+    }
+    
+    func getDetectedWorkoutSources() -> [String] {
+        let detectedSources = Set(allExternalWorkouts.map { $0.sourceName })
+        
+        // Combine existing priorities with newly detected sources
+        var allSources = workoutSourcePriorities
+        
+        // Add any new sources not in priorities (alphabetically)
+        let newSources = detectedSources.subtracting(Set(workoutSourcePriorities)).sorted()
+        allSources.append(contentsOf: newSources)
+        
+        // Update priorities to include new sources
+        if !newSources.isEmpty {
+            updateWorkoutSourcePriorities(allSources)
+        }
+        
+        return allSources.filter { detectedSources.contains($0) }
+    }
+    
+    // MARK: - Duplicate Filtering
+    
+    private func filterDuplicateWorkouts(_ workouts: [ExternalWorkout]) -> [ExternalWorkout] {
+        print("[HealthKit] Starting duplicate filtering with \(workouts.count) workouts")
+        
+        // First, let's manually group duplicates with more precise logic
+        var filteredWorkouts: [ExternalWorkout] = []
+        var processedWorkouts: Set<UUID> = []
+        
+        for workout in workouts {
+            if processedWorkouts.contains(workout.id) {
+                continue // Already processed as part of a duplicate group
+            }
+            
+            
+            // Find all potential duplicates for this workout
+            let duplicates = workouts.filter { otherWorkout in
+                otherWorkout.id != workout.id &&
+                !processedWorkouts.contains(otherWorkout.id) &&
+                abs(otherWorkout.startDate.timeIntervalSince1970 - workout.startDate.timeIntervalSince1970) <= 300
+            }
+            
+            if duplicates.isEmpty {
+                // No duplicates, keep the original workout
+                filteredWorkouts.append(workout)
+                processedWorkouts.insert(workout.id)
+            } else {
+                // Found duplicates, choose the best one
+                let allDuplicates = [workout] + duplicates
+                let bestWorkout = chooseBestWorkout(from: allDuplicates)
+                
+                print("[HealthKitManager] Found \(allDuplicates.count) duplicates at \(workout.startDate):")
+                for dup in allDuplicates {
+                    let isChosen = dup.id == bestWorkout.id ? "✓" : "✗"
+                    print("  \(isChosen) \(dup.sourceName): \(dup.title) (\(dup.durationString))")
+                }
+                
+                filteredWorkouts.append(bestWorkout)
+                
+                // Mark all duplicates as processed
+                for duplicate in allDuplicates {
+                    processedWorkouts.insert(duplicate.id)
+                }
+            }
+        }
+        
+        print("[HealthKit] Filtered from \(workouts.count) to \(filteredWorkouts.count) workouts")
+        return filteredWorkouts.sorted { $0.startDate > $1.startDate }
+    }
+    
+    private func chooseBestWorkout(from workouts: [ExternalWorkout]) -> ExternalWorkout {
+        // Sort by source priority (lower index = higher priority)
+        let bestWorkout = workouts.min { workout1, workout2 in
+            let priority1 = workoutSourcePriorities.firstIndex(of: workout1.sourceName) ?? Int.max
+            let priority2 = workoutSourcePriorities.firstIndex(of: workout2.sourceName) ?? Int.max
+            
+            if priority1 != priority2 {
+                return priority1 < priority2
+            }
+            
+            // If same priority, prefer the one with more data (heart rate or calories)
+            let hasData1 = workout1.averageHeartRate != nil || workout1.totalEnergyBurned != nil
+            let hasData2 = workout2.averageHeartRate != nil || workout2.totalEnergyBurned != nil
+            
+            if hasData1 != hasData2 {
+                return hasData1
+            }
+            
+            // Finally, prefer the one that was recorded first (earlier start time)
+            return workout1.startDate < workout2.startDate
+        } ?? workouts[0]
+        
+        print("[HealthKit] Chose \(bestWorkout.sourceName) over other sources: \(workouts.map { $0.sourceName }.joined(separator: ", "))")
+        return bestWorkout
+    }
+}
+
+// Helper struct for grouping duplicate workouts
+private struct DuplicateKey: Hashable {
+    let startTime: TimeInterval
+    let duration: TimeInterval
+    
+    // Normalize values to 60-second buckets for consistent hashing and equality
+    private var normalizedStartTime: Int {
+        Int(startTime / 60)
+    }
+    
+    private var normalizedDuration: Int {
+        Int(duration / 60)
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        // Use normalized values for consistent hashing
+        hasher.combine(normalizedStartTime)
+        hasher.combine(normalizedDuration)
+    }
+    
+    static func == (lhs: DuplicateKey, rhs: DuplicateKey) -> Bool {
+        // Use the same normalization logic for equality
+        return lhs.normalizedStartTime == rhs.normalizedStartTime &&
+               lhs.normalizedDuration == rhs.normalizedDuration
+    }
+}

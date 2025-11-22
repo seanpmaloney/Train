@@ -56,10 +56,16 @@ struct CalendarCardView: View {
             }
             
             // Workouts preview section
-            if !viewModel.selectedDayWorkouts.isEmpty {
+            if !viewModel.selectedDayWorkouts.isEmpty || !viewModel.selectedDayExternalWorkouts.isEmpty {
                 VStack(spacing: 12) {
+                    // Internal workouts
                     ForEach(viewModel.selectedDayWorkouts) { workout in
                         WorkoutPreview(workout: workout)
+                    }
+                    
+                    // External workouts
+                    ForEach(viewModel.selectedDayExternalWorkouts) { externalWorkout in
+                        ExternalWorkoutPreview(workout: externalWorkout)
                     }
                 }
                 .padding(.top, 8)
@@ -186,6 +192,61 @@ struct WorkoutPreview: View {
         secondary.subtract(primary)
         
         return (primary, secondary)
+    }
+}
+
+struct ExternalWorkoutPreview: View {
+    let workout: ExternalWorkout
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(workout.title)
+                    .font(.headline)
+                    .foregroundColor(Color(hex: "#6B7280")) // Gray color for external workouts
+                
+                Spacer()
+                
+                Text(workout.timeString)
+                    .foregroundColor(.secondary)
+            }
+            
+            HStack {
+                Text(workout.durationString)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                // Show primary metric (heart rate or sets) if available
+                if let metric = workout.primaryMetric {
+                    Text("•")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    Text(metric)
+                        .font(.subheadline)
+                        .foregroundColor(Color(hex: "#6B7280"))
+                }
+                
+                Spacer()
+                
+                Text(workout.sourceName)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color(hex: "#6B7280").opacity(0.2))
+                    .cornerRadius(8)
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(hex: "#0F1115"))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color(hex: "#6B7280").opacity(0.3), lineWidth: 1)
+                )
+        )
     }
 }
 
