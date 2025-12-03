@@ -192,14 +192,13 @@ struct ContentView: View {
                                         // Calendar
                                         CalendarCardView(appState: appState)
                                             .padding(.horizontal)
-                                        
-                                        // Recovery Status
-                                        RecoveryStatusCard()
-                                            .padding(.horizontal)
                                     }
                                 }
                                 // Add bottom padding to clear the tab bar
                                 .padding(.bottom, 100)
+                            }
+                            .refreshable {
+                                await handleRefresh()
                             }
                         case 1:
                             EnhancedTrainingView(appState: appState)
@@ -258,6 +257,18 @@ struct ContentView: View {
         default:      // 5pm to 3:59am
             return "Good evening"
         }
+    }
+    
+    // Handle pull-to-refresh action
+    private func handleRefresh() async {
+    print("[ContentView] Pull-to-refresh triggered")
+        let authorized = await healthKit.requestAuthorization()
+        if (authorized)
+        {
+            await healthKit.fetchRecentWorkouts()
+        }
+        appState.loadPlans()
+    print("[ContentView] Pull-to-refresh completed")
     }
 }
 

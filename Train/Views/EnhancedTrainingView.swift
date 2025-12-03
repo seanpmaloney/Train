@@ -497,3 +497,134 @@ struct EnhancedTrainingView: View {
         }
     }
 }
+
+// MARK: - Preview
+
+// Helper function for creating sample sets (outside preview closure)
+private func createSampleSets(weight: Double = 135.0, reps: Int = 8, count: Int = 3) -> [ExerciseSetEntity] {
+    (0..<count).map { _ in
+        ExerciseSetEntity(weight: weight, completedReps: 0, targetReps: reps, isComplete: false)
+    }
+}
+
+#Preview {
+    // Create the preview content in a closure to avoid void return issues
+    let previewContent = {
+        let appState = AppState()
+        let navigationCoordinator = NavigationCoordinator()
+        
+        // Create sample movements
+        let benchPress = MovementEntity(
+            type: MovementType.barbellBenchPress,
+            primaryMuscles: [.chest],
+            secondaryMuscles: [.shoulders, .triceps],
+            equipment: .barbell
+        )
+        
+        let squat = MovementEntity(
+            type: MovementType.barbellBackSquat,
+            primaryMuscles: [.quads],
+            secondaryMuscles: [.glutes, .hamstrings],
+            equipment: .barbell
+        )
+        
+        let deadlift = MovementEntity(
+            type: MovementType.barbellDeadlift,
+            primaryMuscles: [.back],
+            secondaryMuscles: [.glutes, .hamstrings],
+            equipment: .barbell
+        )
+        
+        let pullUps = MovementEntity(
+            type: MovementType.pullUps,
+            primaryMuscles: [.back],
+            secondaryMuscles: [.biceps],
+            equipment: .bodyweight
+        )
+        
+        // Create sample workouts for Week 1
+        let upperBodyWorkout = WorkoutEntity(
+            title: "Upper Body Strength",
+            description: "Chest, shoulders, and back focus",
+            isComplete: false,
+            scheduledDate: Calendar.current.date(byAdding: .day, value: 0, to: Date())
+        )
+        
+        // Create exercises separately to avoid protocol conformance issues
+        let benchExercise = ExerciseInstanceEntity(
+            movement: benchPress,
+            exerciseType: "Strength",
+            sets: createSampleSets(weight: 185.0, reps: 5)
+        )
+        
+        let pullUpExercise = ExerciseInstanceEntity(
+            movement: pullUps,
+            exerciseType: "Hypertrophy",
+            sets: createSampleSets(weight: 0, reps: 12)
+        )
+        
+        upperBodyWorkout.exercises = [benchExercise, pullUpExercise]
+        
+        let lowerBodyWorkout = WorkoutEntity(
+            title: "Lower Body Power",
+            description: "Legs and glutes development",
+            isComplete: false,
+            scheduledDate: Calendar.current.date(byAdding: .day, value: 2, to: Date())
+        )
+        
+        let squatExercise = ExerciseInstanceEntity(
+            movement: squat,
+            exerciseType: "Strength",
+            sets: createSampleSets(weight: 225.0, reps: 5)
+        )
+        
+        let deadliftExercise = ExerciseInstanceEntity(
+            movement: deadlift,
+            exerciseType: "Strength",
+            sets: createSampleSets(weight: 275.0, reps: 3)
+        )
+        
+        lowerBodyWorkout.exercises = [squatExercise, deadliftExercise]
+        
+        let fullBodyWorkout = WorkoutEntity(
+            title: "Full Body Conditioning",
+            description: "Complete body workout",
+            isComplete: true,
+            scheduledDate: Calendar.current.date(byAdding: .day, value: -2, to: Date())
+        )
+        
+        let benchHypertrophyExercise = ExerciseInstanceEntity(
+            movement: benchPress,
+            exerciseType: "Hypertrophy",
+            sets: createSampleSets(weight: 155.0, reps: 10)
+        )
+        
+        fullBodyWorkout.exercises = [benchHypertrophyExercise]
+        
+        // Create sample plan with weekly workouts
+        let samplePlan = TrainingPlanEntity(
+            name: "Strength & Hypertrophy Program",
+            notes: "12-week progressive overload program",
+            startDate: Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date()) ?? Date(),
+            daysPerWeek: 3,
+            isCompleted: false
+        )
+        
+        // Set up weekly workouts (3 weeks worth)
+        samplePlan.weeklyWorkouts = [
+            [upperBodyWorkout, lowerBodyWorkout, fullBodyWorkout], // Week 1
+            [upperBodyWorkout, lowerBodyWorkout, fullBodyWorkout], // Week 2  
+            [upperBodyWorkout, lowerBodyWorkout, fullBodyWorkout]  // Week 3
+        ]
+        
+        // Set the current plan in AppState
+        appState.currentPlan = samplePlan
+        
+        return EnhancedTrainingView(appState: appState)
+            .environmentObject(appState)
+            .environmentObject(navigationCoordinator)
+            .preferredColorScheme(.dark)
+    }
+    
+    return previewContent()
+}

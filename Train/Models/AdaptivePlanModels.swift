@@ -7,7 +7,7 @@ import SwiftUI
 /// Training goal options
 enum TrainingGoal: String, CaseIterable, Identifiable, Codable {
     case hypertrophy = "Build Muscle"
-    case strength = "Get Stronger"
+    case strength = "Gain Strength"
     
     var id: String { rawValue }
     
