@@ -352,24 +352,23 @@ struct EnhancedTrainingView: View {
                     Text("Current Plan")
                         .font(.caption)
                         .foregroundColor(AppStyle.Colors.textSecondary)
-                    HStack(spacing: 4) {
-                        Text(plan.name)
-                            .font(.headline)
-                            .foregroundColor(AppStyle.Colors.textPrimary)
-                        
-                        // Dropdown menu for plan actions
-                        Menu {
-                            Button(action: {
-                                showingPlanCreation = true
-                            }) {
-                                Label("Create New Plan", systemImage: "plus")
-                            }
-                            Button(action: {
-                                showingPlansView = true
-                            }) {
-                                Label("View Plans", systemImage: "list.bullet")
-                            }
-                        } label: {
+                    Menu {
+                        Button(action: {
+                            showingPlanCreation = true
+                        }) {
+                            Label("Create New Plan", systemImage: "plus")
+                        }
+                        Button(action: {
+                            showingPlansView = true
+                        }) {
+                            Label("View Plans", systemImage: "list.bullet")
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(plan.name)
+                                .font(.headline)
+                                .foregroundColor(AppStyle.Colors.textPrimary)
+                                .multilineTextAlignment(.leading)
                             Image(systemName: "chevron.down")
                                 .font(.system(size: 12))
                                 .foregroundColor(AppStyle.Colors.textSecondary)
@@ -421,10 +420,6 @@ struct EnhancedTrainingView: View {
                     Text("Status")
                         .font(.caption)
                         .foregroundColor(AppStyle.Colors.textSecondary)
-                    HStack(spacing: 4) {
-                        Text("No active plan")
-                            .font(.headline)
-                            .foregroundColor(AppStyle.Colors.primary)
                         
                         // Dropdown menu for plan actions
                         Menu {
@@ -439,6 +434,11 @@ struct EnhancedTrainingView: View {
                                 Label("View Plans", systemImage: "list.bullet")
                             }
                         } label: {
+                            HStack(spacing: 4) {
+                                Text("No active plan")
+                                    .font(.headline)
+                                    .foregroundColor(AppStyle.Colors.primary)
+                                    .multilineTextAlignment(.leading)
                             Image(systemName: "chevron.down")
                                 .font(.system(size: 12))
                                 .foregroundColor(AppStyle.Colors.textSecondary)
@@ -628,3 +628,4 @@ private func createSampleSets(weight: Double = 135.0, reps: Int = 8, count: Int 
     
     return previewContent()
 }
+
