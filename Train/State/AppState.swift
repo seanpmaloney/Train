@@ -12,6 +12,8 @@ class AppState: ObservableObject {
     @Published var activeWorkout: WorkoutEntity?
     @Published var activeWorkoutId: UUID?
     @Published var isLoaded: Bool = false
+    @Published var shouldShowPlanComplete: Bool = false
+    @Published var completedPlanStats: PlanCompletionStats?
     
     // User account related properties
     @Published var currentUser: UserEntity? = nil // Current authenticated user
@@ -104,17 +106,8 @@ class AppState: ObservableObject {
                 // Use the captured fileName copy instead of accessing self.fileName
                 let fileURL = url.appendingPathComponent(fileNameCopy)
                 
-                // Write atomically to temporary file first
-                let tempURL = url.appendingPathComponent("\(fileNameCopy).temp")
-                try data.write(to: tempURL, options: .atomic)
-                
-                // Remove existing file if it exists
-                if FileManager.default.fileExists(atPath: fileURL.path) {
-                    try FileManager.default.removeItem(at: fileURL)
-                }
-                
-                // Rename temp file to final file
-                try FileManager.default.moveItem(at: tempURL, to: fileURL)
+                // Write directly with atomic option - iOS handles the temp file internally
+                try data.write(to: fileURL, options: .atomic)
                 
                 print("Successfully saved plans to \(fileURL.path)")
             } catch {
@@ -485,14 +478,19 @@ class AppState: ObservableObject {
     
     func archiveCurrentPlan() {
         guard let plan = currentPlan else { return }
-        
-        // Set end date to now
+        archiveSpecificPlan(plan)
+        currentPlan = nil
+    }
+    
+    private func archiveSpecificPlan(_ plan: TrainingPlanEntity) {
+        // Set completion date and mark as completed
         plan.endDate = Date()
         plan.isCompleted = true
         
-        // Move to past plans
-        pastPlans.append(plan)
-        currentPlan = nil
+        // Move to past plans if not already there
+        if !pastPlans.contains(where: { $0.id == plan.id }) {
+            pastPlans.append(plan)
+        }
         
         // Save changes
         savePlans()
@@ -754,15 +752,42 @@ class AppState: ObservableObject {
         // 2. Mark workout as complete
         markWorkoutComplete(activeWorkout, isComplete: true)
         
-        // 5. Check if we need to apply weekly progression
-        applyWeeklyProgressionIfNeeded(justCompletedWorkout: activeWorkout)
+        // 3. Check if this completes the entire plan
+        let isPlanComplete = checkIfPlanIsComplete(justCompletedWorkout: activeWorkout)
         
-        // 4. Clear active workout
+        // 4. Check if we need to apply weekly progression (only if plan isn't complete)
+        if !isPlanComplete {
+            applyWeeklyProgressionIfNeeded(justCompletedWorkout: activeWorkout)
+        }
+        
+        // 5. Clear active workout
         self.activeWorkout = nil
         self.activeWorkoutId = nil
         
         // 6. Save changes
         savePlans()
+        
+        // 7. Trigger plan completion flow if needed
+        if isPlanComplete {
+            shouldShowPlanComplete = true
+        }
+    }
+    
+    // MARK: - Plan Complete Detection
+    
+    func isLastWorkoutInPlan(_ workout: WorkoutEntity) -> Bool {
+        guard let plan = currentPlan else { return false }
+        
+        // Get all workouts in the plan
+        let allWorkouts = plan.weeklyWorkouts.flatMap { $0 }
+        
+        // Find the workout in the plan
+        guard let workoutIndex = allWorkouts.firstIndex(where: { $0.id == workout.id }) else {
+            return false
+        }
+        
+        // Check if this is the last workout
+        return workoutIndex == allWorkouts.count - 1
     }
     
     /// Find an exercise entity by ID from any workout
@@ -883,4 +908,275 @@ class AppState: ObservableObject {
         // No complete weeks found
         return nil
     }
+    
+    // MARK: - Plan Completion Detection
+    
+    /// Checks if the plan is complete after the given workout is finished
+    /// - Parameter justCompletedWorkout: The workout that was just completed
+    /// - Returns: True if this workout completion finishes the entire plan
+    private func checkIfPlanIsComplete(justCompletedWorkout: WorkoutEntity) -> Bool {
+        guard let plan = currentPlan else { 
+            print("DEBUG: No current plan, cannot check completion")
+            return false 
+        }
+        
+        // Find the last scheduled workout in the plan
+        let allWorkouts = plan.weeklyWorkouts.flatMap { $0 }
+        guard !allWorkouts.isEmpty else { 
+            print("DEBUG: No workouts in plan")
+            return false 
+        }
+        
+        // Sort by scheduled date, with fallback to creation order
+        let sortedWorkouts = allWorkouts.sorted { workout1, workout2 in
+            let date1 = workout1.scheduledDate ?? Date.distantPast
+            let date2 = workout2.scheduledDate ?? Date.distantPast
+            return date1 < date2
+        }
+        
+        guard let lastWorkout = sortedWorkouts.last else { 
+            print("DEBUG: Could not determine last workout")
+            return false 
+        }
+        
+        // Check if the just completed workout is the last scheduled workout
+        let isLastWorkout = justCompletedWorkout.id == lastWorkout.id
+        
+        print("DEBUG: Checking plan completion - Last workout: \(lastWorkout.title), Just completed: \(justCompletedWorkout.title), Is last: \(isLastWorkout)")
+        
+        if isLastWorkout {
+            print("DEBUG: Plan is complete! Calculating stats...")
+            // Calculate and store stats for the completed plan
+            completedPlanStats = PlanStatsCalculator.calculateStats(for: plan)
+            return true
+        }
+        
+        return false
+    }
+    
+    // MARK: - Plan Continuation Logic
+    
+    /// Creates a new plan that continues from the completed plan
+    /// - Parameters:
+    ///   - completedPlan: The plan that was just completed
+    ///   - startDate: Start date for the new plan
+    ///   - includeDeload: Whether to include a deload week at the beginning
+    /// - Returns: The new training plan
+    func createContinuationPlan(from completedPlan: TrainingPlanEntity, startDate: Date, includeDeload: Bool = false) -> TrainingPlanEntity {
+        // Create new plan with similar structure
+        let newPlan = TrainingPlanEntity(
+            name: "\(completedPlan.name) - Cycle 2",
+            notes: "Continuation of \(completedPlan.name)",
+            startDate: startDate,
+            daysPerWeek: completedPlan.daysPerWeek,
+            isCompleted: false
+        )
+        
+        // Copy muscle preferences and training goal
+        newPlan.musclePreferences = completedPlan.musclePreferences
+        newPlan.trainingGoal = completedPlan.trainingGoal
+        
+        // Clone the weekly structure
+        newPlan.weeklyWorkouts = cloneWeeklyWorkouts(from: completedPlan)
+        
+        // Apply weight adjustments
+        let weeksCount = completedPlan.weeklyWorkouts.count
+        applyWeightAdjustments(to: newPlan, basedOn: completedPlan, weeksCount: weeksCount, includeDeload: includeDeload)
+        
+        // Schedule the workouts with dates
+        scheduleWorkoutsWithDates(for: newPlan, startingFrom: startDate)
+        
+        return newPlan
+    }
+    
+    /// Clones the weekly workout structure from a completed plan
+    private func cloneWeeklyWorkouts(from plan: TrainingPlanEntity) -> [[WorkoutEntity]] {
+        return plan.weeklyWorkouts.map { week in
+            week.map { workout in
+                let newWorkout = workout.copy()
+                newWorkout.isComplete = false
+                newWorkout.preWorkoutFeedback = nil
+                newWorkout.postWorkoutFeedback = nil
+                
+                // Reset exercise feedback and set completion
+                for exercise in newWorkout.exercises {
+                    exercise.feedback = nil
+                    for set in exercise.sets {
+                        set.isComplete = false
+                    }
+                }
+                
+                return newWorkout
+            }
+        }
+    }
+    
+    /// Applies weight adjustments to the new plan based on the completed plan
+    private func applyWeightAdjustments(to newPlan: TrainingPlanEntity, basedOn completedPlan: TrainingPlanEntity, weeksCount: Int, includeDeload: Bool) {
+        // Determine multipliers based on plan length
+        let backoffMultiplier = weeksCount <= 4 ? 
+            WeightUtilities.PlanContinuation.shortPlanBackoffMultiplier : 
+            WeightUtilities.PlanContinuation.longPlanBackoffMultiplier
+        
+        // Get last week's weights from completed plan
+        let lastWeekWeights = getLastWeekWeights(from: completedPlan)
+        
+        for (weekIndex, week) in newPlan.weeklyWorkouts.enumerated() {
+            for workout in week {
+                for exercise in workout.exercises {
+                    let movementId = exercise.movement.id
+                    
+                    if let lastWeight = lastWeekWeights[movementId], lastWeight > 0 {
+                        let newWeight: Double
+                        
+                        if includeDeload && weekIndex == 0 {
+                            // First week is deload
+                            newWeight = lastWeight * WeightUtilities.PlanContinuation.deloadMultiplier
+                        } else if includeDeload && weekIndex == 1 {
+                            // Second week starts the new progression
+                            newWeight = lastWeight * backoffMultiplier
+                        } else if !includeDeload && weekIndex == 0 {
+                            // First week starts the new progression
+                            newWeight = lastWeight * backoffMultiplier
+                        } else {
+                            // Keep the same weight for later weeks (progression will handle increases)
+                            continue
+                        }
+                        
+                        let roundedWeight = WeightUtilities.closestWeightIn2pt5Increment(newWeight)
+                        
+                        // Apply to all working sets in this exercise
+                        for set in exercise.sets {
+                            set.weight = roundedWeight
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Gets the heaviest working weights from the last week of a completed plan
+    private func getLastWeekWeights(from plan: TrainingPlanEntity) -> [UUID: Double] {
+        guard let lastWeekIndex = plan.weeklyWorkouts.indices.last else { return [:] }
+        
+        let lastWeek = plan.weeklyWorkouts[lastWeekIndex]
+        var weights: [UUID: Double] = [:]
+        
+        for workout in lastWeek where workout.isComplete {
+            for exercise in workout.exercises {
+                let movementId = exercise.movement.id
+                let heaviestWeight = exercise.sets
+                    .filter { $0.isComplete }
+                    .map { $0.weight }
+                    .max() ?? 0.0
+                
+                if heaviestWeight > 0 {
+                    weights[movementId] = max(weights[movementId] ?? 0, heaviestWeight)
+                }
+            }
+        }
+        
+        return weights
+    }
+    
+    /// Dismisses the plan complete screen and handles the selected action
+    func dismissPlanComplete(action: PlanCompleteAction) {
+        shouldShowPlanComplete = false
+        
+        // Store reference to completed plan before any changes
+        let completedPlan = currentPlan
+        
+        switch action {
+        case .continuePlan(let startDate):
+            handleContinuePlan(startDate: startDate, includeDeload: false)
+        case .continueWithDeload(let startDate):
+            handleContinuePlan(startDate: startDate, includeDeload: true)
+        case .chooseNewPlan:
+            // Navigation will be handled by the UI
+            break
+        case .maybeLater:
+            // Just archive the plan, no new plan created
+            break
+        }
+        
+        // Archive the completed plan (not the new one)
+        if let planToArchive = completedPlan {
+            archiveSpecificPlan(planToArchive)
+        }
+        completedPlanStats = nil
+    }
+    
+    private func handleContinuePlan(startDate: Date, includeDeload: Bool) {
+        guard let completedPlan = currentPlan else { return }
+        
+        print("DEBUG: Creating continuation plan with deload: \(includeDeload)")
+        let newPlan = createContinuationPlan(from: completedPlan, startDate: startDate, includeDeload: includeDeload)
+        
+        print("DEBUG: New plan created with \(newPlan.weeklyWorkouts.count) weeks")
+        print("DEBUG: New plan isCompleted: \(newPlan.isCompleted)")
+        
+        setCurrentPlan(newPlan)
+        
+        print("DEBUG: Current plan set, checking if it's still current: \(currentPlan?.name ?? "nil")")
+    }
+    
+    /// Schedules workouts for a plan with proper dates based on the original plan's pattern
+    private func scheduleWorkoutsWithDates(for plan: TrainingPlanEntity, startingFrom startDate: Date) {
+        let calendar = Calendar.current
+        var currentDate = startDate
+        
+        // Get the original workout days pattern from the first week
+        guard let firstWeek = plan.weeklyWorkouts.first, !firstWeek.isEmpty else { return }
+        
+        // Extract the weekdays from the original plan
+        let originalWeekdays = firstWeek.compactMap { workout -> Int? in
+            guard let scheduledDate = workout.scheduledDate else { return nil }
+            return calendar.component(.weekday, from: scheduledDate)
+        }.sorted()
+        
+        // If no original pattern, use a default pattern based on days per week
+        let weekdays = originalWeekdays.isEmpty ? getDefaultWeekdays(for: plan.daysPerWeek) : originalWeekdays
+        
+        for (weekIndex, week) in plan.weeklyWorkouts.enumerated() {
+            let weekStartDate = calendar.date(byAdding: .weekOfYear, value: weekIndex, to: startDate) ?? currentDate
+            
+            for (dayIndex, workout) in week.enumerated() {
+                if dayIndex < weekdays.count {
+                    let targetWeekday = weekdays[dayIndex]
+                    let workoutDate = getDateForWeekday(targetWeekday, in: weekStartDate, using: calendar)
+                    workout.scheduledDate = workoutDate
+                }
+            }
+        }
+        
+        // Schedule all workouts
+        let allWorkouts = plan.weeklyWorkouts.flatMap { $0 }
+        scheduleWorkouts(allWorkouts)
+    }
+    
+    /// Gets default weekdays based on training frequency
+    private func getDefaultWeekdays(for daysPerWeek: Int) -> [Int] {
+        switch daysPerWeek {
+        case 2: return [2, 5] // Monday, Thursday
+        case 3: return [2, 4, 6] // Monday, Wednesday, Friday
+        case 4: return [2, 3, 5, 6] // Monday, Tuesday, Thursday, Friday
+        case 5: return [2, 3, 4, 5, 6] // Monday-Friday
+        case 6: return [2, 3, 4, 5, 6, 7] // Monday-Saturday
+        default: return [2, 4, 6] // Default to 3 days
+        }
+    }
+    
+    /// Gets the date for a specific weekday within a given week
+    private func getDateForWeekday(_ weekday: Int, in weekStartDate: Date, using calendar: Calendar) -> Date {
+        let weekStart = calendar.dateInterval(of: .weekOfYear, for: weekStartDate)?.start ?? weekStartDate
+        return calendar.date(byAdding: .day, value: weekday - 1, to: weekStart) ?? weekStartDate
+    }
+}
+
+/// Actions available when a plan is completed
+enum PlanCompleteAction {
+    case continuePlan(startDate: Date)
+    case continueWithDeload(startDate: Date)
+    case chooseNewPlan
+    case maybeLater
 }

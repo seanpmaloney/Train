@@ -242,6 +242,12 @@ struct ContentView: View {
                 .environmentObject(userSessionManager)
                 .environmentObject(appState)
         }
+        .fullScreenCover(isPresented: $appState.shouldShowPlanComplete) {
+            if let stats = appState.completedPlanStats {
+                PlanCompleteView(stats: stats)
+                    .environmentObject(appState)
+            }
+        }
     }
     
     private func getTimeBasedGreeting() -> String {

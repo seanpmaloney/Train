@@ -1,1 +1,4 @@
-Train.xcodeproj/*
+# Xcode
+*.pbxproj
+*.xcbkptlist
+xcuserdata/

@@ -105,6 +105,10 @@
 		8B98775F2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B98775E2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift */; };
 		8B98776A2DBC2BC400767AE2 /* StatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9877692DBC2BC400767AE2 /* StatsViewModel.swift */; };
 		8B98776C2DBC2C0E00767AE2 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B98776B2DBC2C0E00767AE2 /* StatsView.swift */; };
+		8BC9D3432EEADF3700E605CB /* PlanCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC9D3412EEADF3700E605CB /* PlanCompleteView.swift */; };
+		8BC9D3442EEADF3700E605CB /* PlanCreationSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC9D3422EEADF3700E605CB /* PlanCreationSheetView.swift */; };
+		8BC9D3472EEADF6000E605CB /* PlanCompletionStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC9D3452EEADF6000E605CB /* PlanCompletionStats.swift */; };
+		8BC9D3482EEADF6000E605CB /* WeightUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC9D3462EEADF6000E605CB /* WeightUtilities.swift */; };
 		8BD541912DBE812A00D5E1C3 /* WorkoutFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD541832DBE812A00D5E1C3 /* WorkoutFlowUITests.swift */; };
 		8BD541922DBE812A00D5E1C3 /* EnhancedActiveWorkoutViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5418A2DBE812A00D5E1C3 /* EnhancedActiveWorkoutViewModelTests.swift */; };
 		8BD541932DBE812A00D5E1C3 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5418E2DBE812A00D5E1C3 /* TestHelpers.swift */; };
@@ -239,6 +243,10 @@
 		8B98775E2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeableExerciseCard.swift; sourceTree = "<group>"; };
 		8B9877692DBC2BC400767AE2 /* StatsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
 		8B98776B2DBC2C0E00767AE2 /* StatsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		8BC9D3412EEADF3700E605CB /* PlanCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCompleteView.swift; sourceTree = "<group>"; };
+		8BC9D3422EEADF3700E605CB /* PlanCreationSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCreationSheetView.swift; sourceTree = "<group>"; };
+		8BC9D3452EEADF6000E605CB /* PlanCompletionStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCompletionStats.swift; sourceTree = "<group>"; };
+		8BC9D3462EEADF6000E605CB /* WeightUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightUtilities.swift; sourceTree = "<group>"; };
 		8BD541832DBE812A00D5E1C3 /* WorkoutFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutFlowUITests.swift; sourceTree = "<group>"; };
 		8BD541872DBE812A00D5E1C3 /* AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateTests.swift; sourceTree = "<group>"; };
 		8BD5418A2DBE812A00D5E1C3 /* EnhancedActiveWorkoutViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancedActiveWorkoutViewModelTests.swift; sourceTree = "<group>"; };
@@ -467,6 +475,8 @@
 				8B9877432DB9B7B100767AE2 /* EnhancedTrainingView.swift */,
 				8B56F27C2DE1F25400132675 /* PlanCreationView.swift */,
 				8B7BD05B2DA757640089F6D3 /* PlanSummaryView.swift */,
+				8BC9D3412EEADF3700E605CB /* PlanCompleteView.swift */,
+				8BC9D3422EEADF3700E605CB /* PlanCreationSheetView.swift */,
 				8B98776B2DBC2C0E00767AE2 /* StatsView.swift */,
 				8B56F2882DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift */,
 				8B98772C2DAF32D400767AE2 /* LoadingScreenView.swift */,
@@ -496,6 +506,8 @@
 				8B7BD0272DA5EFD20089F6D3 /* MovementEntity.swift */,
 				8B56F2202DD23EEB00132675 /* WorkoutFeedback.swift */,
 				8B7BD0472DA74FCA0089F6D3 /* MovementLibrary.swift */,
+				8BC9D3452EEADF6000E605CB /* PlanCompletionStats.swift */,
+				8BC9D3462EEADF6000E605CB /* WeightUtilities.swift */,
 				8B56F2132DCBA12800132675 /* PlanInput.swift */,
 				8B9877522DBB15B100767AE2 /* WorkoutDay.swift */,
 				8B568C932DC6A4F1004A39C6 /* DefaultExerciseSelector.swift */,
@@ -790,6 +802,8 @@
 			files = (
 				8B7BCFE32DA1460F0089F6D3 /* TrainingView.swift in Sources */,
 				8B7BCFE42DA1460F0089F6D3 /* RestTimer.swift in Sources */,
+				8BC9D3432EEADF3700E605CB /* PlanCompleteView.swift in Sources */,
+				8BC9D3442EEADF3700E605CB /* PlanCreationSheetView.swift in Sources */,
 				8B98775F2DBBB0AA00767AE2 /* SwipeableExerciseCard.swift in Sources */,
 				8B56F27D2DE1F25400132675 /* PlanCreationView.swift in Sources */,
 				8B568C8A2DC65B5C004A39C6 /* VolumeRampStrategy.swift in Sources */,
@@ -838,6 +852,8 @@
 				8BD5E7ED2DEE7963000B9778 /* OnboardingPlanBuilderView.swift in Sources */,
 				8BD5E7EE2DEE7963000B9778 /* SignInView.swift in Sources */,
 				8BD5E7EF2DEE7963000B9778 /* NameSetupView.swift in Sources */,
+				8BC9D3472EEADF6000E605CB /* PlanCompletionStats.swift in Sources */,
+				8BC9D3482EEADF6000E605CB /* WeightUtilities.swift in Sources */,
 				8BD5E7F02DEE7963000B9778 /* WelcomeView.swift in Sources */,
 				8BD5E7F12DEE7963000B9778 /* MarketingOptInView.swift in Sources */,
 				8BD5E7F22DEE7963000B9778 /* OnboardingContainerView.swift in Sources */,
@@ -1076,13 +1092,14 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Dedset;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.\n";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app analyzes your health data to optimize your training and recovery\n";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app analyzes your health data to optimize your training and recovery";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1111,13 +1128,14 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Dedset;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.\n";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app uses your heart rate, HRV, and sleep data to help you optimize training and recovery.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app analyzes your health data to optimize your training and recovery\n";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app analyzes your health data to optimize your training and recovery";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

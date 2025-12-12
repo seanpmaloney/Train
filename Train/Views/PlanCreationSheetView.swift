@@ -37,6 +37,7 @@ struct PlanCreationSheetView: View {
                             Text("Plan not found")
                         }
                     case .planEditor(let templateId):
+                        let template = templateId != nil ? PlanTemplate.templates.first(where: { $0.id.uuidString == templateId }) : nil
                         PlanEditorView(template: template, appState: appState)
                             .environmentObject(appState)
                             .environmentObject(coordinator)

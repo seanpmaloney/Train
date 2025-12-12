@@ -116,9 +116,16 @@ struct EnhancedActiveWorkoutView: View {
             // Reset the feedback collection state
             isCollectingExerciseFeedback = false
             
-            // Check if the entire workout is complete and show post-workout feedback
+            // Check if the entire workout is complete
             if viewModel.getCompletionPercentage() >= 1.0 && !viewModel.isComplete && !showingPostWorkoutFeedback {
-                showingPostWorkoutFeedback = true
+                // Check if this is the final workout in the plan
+                if appState.isLastWorkoutInPlan(viewModel.workout) {
+                    // Skip post-workout feedback and go straight to plan completion
+                    appState.endWorkout(with: .normal) // Use default fatigue
+                } else {
+                    // Show post-workout feedback for non-final workouts
+                    showingPostWorkoutFeedback = true
+                }
             }
         }) { exercise in
             ExerciseFeedbackView(
@@ -134,6 +141,7 @@ struct EnhancedActiveWorkoutView: View {
             PostWorkoutFeedbackView()
                 .environmentObject(appState) // Ensure app state is passed to the view
         }
+        
         
         .onAppear {
             // Set the active workout ID when the view appears
@@ -236,7 +244,14 @@ struct EnhancedActiveWorkoutView: View {
     private func checkForCompletedExercises() {
         // Only check if the whole workout is complete - individual exercises are handled via callbacks
         if viewModel.getCompletionPercentage() >= 1.0 && !viewModel.isComplete && !showingPostWorkoutFeedback {
-            showingPostWorkoutFeedback = true
+            // Check if this is the final workout in the plan
+            if appState.isLastWorkoutInPlan(viewModel.workout) {
+                // Skip post-workout feedback and go straight to plan completion
+                appState.endWorkout(with: .normal) // Use default fatigue
+            } else {
+                // Show post-workout feedback for non-final workouts
+                showingPostWorkoutFeedback = true
+            }
         }
     }
     
