@@ -12,6 +12,7 @@ struct PlanCompleteView: View {
     @State private var showingDeloadChoice = false
     @State private var currentStatIndex = 0
     @State private var showButtons = false
+    @State private var showConfetti = false
     
     var body: some View {
         NavigationStack {
@@ -34,6 +35,18 @@ struct PlanCompleteView: View {
                 }
             }
             .navigationBarHidden(true)
+        }
+        .confetti(isActive: showConfetti)
+        .onAppear {
+            // Trigger confetti animation when view appears
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                showConfetti = true
+            }
+            
+            // Stop confetti after 4 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4.3) {
+                showConfetti = false
+            }
         }
         .sheet(isPresented: $showingDeloadChoice) {
             deloadChoiceSheet
@@ -99,7 +112,7 @@ struct PlanCompleteView: View {
                     let percentIncrease = ((improvement.endingWeight - improvement.startingWeight) / improvement.startingWeight) * 100
                     AnimatedStatCard(
                         icon: "arrow.up.circle.fill",
-                        title: "Biggest PR",
+                        title: "Most Improved",
                         value: improvement.movement.name,
                         subtitle: "+\(Int(percentIncrease))% (\(improvement.formattedRange))",
                         color: .green
@@ -160,43 +173,25 @@ struct PlanCompleteView: View {
             // Action buttons
             VStack(spacing: 16) {
                 // Primary button - Continue this plan
-                Button {
+                CustomPrimaryButton(title: "Continue this plan") {
                     HapticService.shared.impact(style: .medium)
                     showingDeloadChoice = true
-                } label: {
-                    Text("Continue this plan")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(AppStyle.Colors.primary)
-                        .cornerRadius(16)
                 }
                 
                 // Secondary button - Choose new plan
-                NavigationLink(destination: PlanTemplatePickerView()) {
-                    Text("Choose a new plan")
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(AppStyle.Colors.textPrimary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(AppStyle.Colors.surface.opacity(0.5))
-                        .cornerRadius(16)
-                }
+                CustomNavigationButton(
+                    title: "Choose a new plan",
+                    destination: AnyView(PlanTemplatePickerView())
+                )
                 .simultaneousGesture(TapGesture().onEnded {
                     appState.dismissPlanComplete(action: .chooseNewPlan)
                     dismiss()
                 })
                 
-                // Ghost button - Maybe later
-                Button {
+                // Tertiary button - Maybe later
+                CustomTertiaryButton(title: "Maybe later") {
                     appState.dismissPlanComplete(action: .maybeLater)
                     dismiss()
-                } label: {
-                    Text("Maybe later")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(AppStyle.Colors.textSecondary)
-                        .padding(.vertical, 12)
                 }
             }
         }
@@ -274,35 +269,19 @@ struct PlanCompleteView: View {
                 
                 VStack(spacing: 16) {
                     // Yes, start with deload
-                    Button {
+                    CustomPrimaryButton(title: "Yes, start with deload") {
                         pendingAction = .continueWithDeload(startDate: Date())
                         selectedStartDate = Date()
                         showingDeloadChoice = false
                         showingDatePicker = true
-                    } label: {
-                        Text("Yes, start with deload")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(AppStyle.Colors.primary)
-                            .cornerRadius(16)
                     }
                     
                     // No, jump right in
-                    Button {
+                    CustomSecondaryButton(title: "No, jump right in") {
                         pendingAction = .continuePlan(startDate: Date())
                         selectedStartDate = Date()
                         showingDeloadChoice = false
                         showingDatePicker = true
-                    } label: {
-                        Text("No, jump right in")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(AppStyle.Colors.textPrimary)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(AppStyle.Colors.surface)
-                            .cornerRadius(16)
                     }
                 }
                 
@@ -313,10 +292,9 @@ struct PlanCompleteView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    CustomTertiaryButton(title: "Cancel") {
                         showingDeloadChoice = false
                     }
-                    .foregroundColor(AppStyle.Colors.textSecondary)
                 }
             }
         }
@@ -344,7 +322,7 @@ struct PlanCompleteView: View {
                 
                 Spacer()
                 
-                Button {
+                CustomPrimaryButton(title: "Start Plan") {
                     if let action = pendingAction {
                         let finalAction: PlanCompleteAction
                         switch action {
@@ -363,14 +341,6 @@ struct PlanCompleteView: View {
                         showingDatePicker = false
                         dismiss()
                     }
-                } label: {
-                    Text("Start Plan")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(AppStyle.Colors.primary)
-                        .cornerRadius(16)
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
@@ -380,11 +350,10 @@ struct PlanCompleteView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    CustomTertiaryButton(title: "Cancel") {
                         showingDatePicker = false
                         pendingAction = nil
                     }
-                    .foregroundColor(AppStyle.Colors.textSecondary)
                 }
             }
         }

@@ -14,7 +14,7 @@ struct PlanCreationSheetView: View {
                 .environmentObject(coordinator)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
+                        CustomCloseButton {
                             showingSheet = false
                         }
                     }

@@ -109,6 +109,8 @@
 		8BC9D3442EEADF3700E605CB /* PlanCreationSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC9D3422EEADF3700E605CB /* PlanCreationSheetView.swift */; };
 		8BC9D3472EEADF6000E605CB /* PlanCompletionStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC9D3452EEADF6000E605CB /* PlanCompletionStats.swift */; };
 		8BC9D3482EEADF6000E605CB /* WeightUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC9D3462EEADF6000E605CB /* WeightUtilities.swift */; };
+		8BC9D3512EEBB56C00E605CB /* CustomButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC9D34F2EEBB56C00E605CB /* CustomButtons.swift */; };
+		8BC9D3532EEC340900E605CB /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC9D3522EEC340900E605CB /* ConfettiView.swift */; };
 		8BD541912DBE812A00D5E1C3 /* WorkoutFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD541832DBE812A00D5E1C3 /* WorkoutFlowUITests.swift */; };
 		8BD541922DBE812A00D5E1C3 /* EnhancedActiveWorkoutViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5418A2DBE812A00D5E1C3 /* EnhancedActiveWorkoutViewModelTests.swift */; };
 		8BD541932DBE812A00D5E1C3 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD5418E2DBE812A00D5E1C3 /* TestHelpers.swift */; };
@@ -247,6 +249,8 @@
 		8BC9D3422EEADF3700E605CB /* PlanCreationSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCreationSheetView.swift; sourceTree = "<group>"; };
 		8BC9D3452EEADF6000E605CB /* PlanCompletionStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCompletionStats.swift; sourceTree = "<group>"; };
 		8BC9D3462EEADF6000E605CB /* WeightUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightUtilities.swift; sourceTree = "<group>"; };
+		8BC9D34F2EEBB56C00E605CB /* CustomButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButtons.swift; sourceTree = "<group>"; };
+		8BC9D3522EEC340900E605CB /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		8BD541832DBE812A00D5E1C3 /* WorkoutFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutFlowUITests.swift; sourceTree = "<group>"; };
 		8BD541872DBE812A00D5E1C3 /* AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateTests.swift; sourceTree = "<group>"; };
 		8BD5418A2DBE812A00D5E1C3 /* EnhancedActiveWorkoutViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancedActiveWorkoutViewModelTests.swift; sourceTree = "<group>"; };
@@ -414,6 +418,7 @@
 		8B7BCF8D2D9DFD3F0089F6D3 /* Train */ = {
 			isa = PBXGroup;
 			children = (
+				8BC9D3502EEBB56C00E605CB /* Components */,
 				8BD5E7DC2DECB6C4000B9778 /* GoogleService-Info.plist */,
 				8B56F26B2DE0071A00132675 /* Auth */,
 				8B56F2362DE003FF00132675 /* UserAccountImplementation */,
@@ -561,6 +566,15 @@
 				8B98775B2DBB25C500767AE2 /* WeekSelectorView.swift */,
 				8B98774B2DB9B88B00767AE2 /* ExerciseEditView.swift */,
 				8B98774C2DB9B88B00767AE2 /* WorkoutCardView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		8BC9D3502EEBB56C00E605CB /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				8BC9D3522EEC340900E605CB /* ConfettiView.swift */,
+				8BC9D34F2EEBB56C00E605CB /* CustomButtons.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -888,6 +902,7 @@
 				8B7A5A342DAA9F0D00404F43 /* CalendarCardViewModel.swift in Sources */,
 				8B98775D2DBB25C500767AE2 /* WeekSelectorView.swift in Sources */,
 				8B7BD0192DA357FB0089F6D3 /* ExerciseSet.swift in Sources */,
+				8BC9D3512EEBB56C00E605CB /* CustomButtons.swift in Sources */,
 				8B56F21D2DD23EDA00132675 /* PreWorkoutFeedbackView.swift in Sources */,
 				8B56F21E2DD23EDA00132675 /* PostWorkoutFeedbackView.swift in Sources */,
 				8B56F21F2DD23EDA00132675 /* ExerciseFeedbackView.swift in Sources */,
@@ -903,6 +918,7 @@
 				8B9877592DBB25AA00767AE2 /* EnhancedActiveWorkoutViewModel+History.swift in Sources */,
 				8B98776C2DBC2C0E00767AE2 /* StatsView.swift in Sources */,
 				8B7BCFBF2DA145110089F6D3 /* TrainingSession.swift in Sources */,
+				8BC9D3532EEC340900E605CB /* ConfettiView.swift in Sources */,
 				8B56F2892DE7E9BA00132675 /* WeeklyMuscleGroupSetsView.swift in Sources */,
 				8B7BD0282DA5EFD20089F6D3 /* MovementEntity.swift in Sources */,
 				8B56F28B2DE7F25300132675 /* HapticsManager.swift in Sources */,
